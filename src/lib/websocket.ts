@@ -201,7 +201,7 @@ class WebSocketService {
 const wsService = new WebSocketService(
   typeof window !== 'undefined' && window.location.protocol === 'https:'
     ? `wss://${window.location.host}`
-    : 'ws://localhost:5000'
+    : 'ws://localhost:3001' // Different port for WebSocket server
 );
 
 export default wsService;

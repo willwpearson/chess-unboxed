@@ -1,4 +1,4 @@
-import { GameModeSelector } from '@/components/game/GameModeSelector';
+import GameModeSelector from '@/components/game/GameModeSelector';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 

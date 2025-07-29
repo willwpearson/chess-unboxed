@@ -5,7 +5,8 @@
 You now have a fully configured Next.js 15 frontend application for your multiplayer chess game! Here's what's included:
 
 ### 🏗️ Project Structure
-```
+
+```bash
 src/
 ├── app/                    # Next.js 15 App Router
 │   ├── globals.css        # Tailwind CSS + chess-specific styles
@@ -46,6 +47,7 @@ src/
 ### 🚀 Development Server
 
 Your application is currently running at:
+
 - **Local**: http://localhost:3000
 - **Network**: Available on your local network
 
@@ -89,38 +91,79 @@ npm run format       # Format with Prettier
 
 ### 🔌 Backend Integration
 
-The frontend is configured to connect to your .NET backend:
+The application uses Next.js API routes with Supabase as the database:
 
-- **API Endpoint**: http://localhost:5000 (configurable via env)
-- **WebSocket**: ws://localhost:5000 (configurable via env)
-- **API Client**: Ready with all endpoints defined
-- **WebSocket Service**: Real-time communication system
+- **API Routes**: Built-in Next.js API routes at `/api/*`
+- **Database**: Supabase PostgreSQL with real-time subscriptions
+- **Schema**: Players, Games, Lobbies, and Endless Sessions tables
+- **Deployment**: Single deployment to Vercel with Supabase integration
 
 ### 📝 Next Steps
 
-1. **Backend Development**:
-   - Set up your .NET Core API project
-   - Implement the endpoints defined in `src/lib/api.ts`
-   - Add WebSocket hub for real-time communication
-   - Connect to your database
+1. **Supabase Setup**:
+   - Create your Supabase project
+   - Set up the database schema (see schema below)
+   - Configure environment variables
 
-2. **Chess Game Implementation**:
-   - Install chess.js library for move validation
-   - Create chess board component
+2. **Database Schema**:
+   
+   ```sql
+   -- Enable UUID extension (if not already enabled)
+   create extension if not exists "uuid-ossp";
+
+   -- 👤 Players Table
+   create table players (
+     id uuid primary key default uuid_generate_v4(),
+     created_at timestamp default now(),
+     nickname text,
+     score integer default 0,
+     is_active boolean default true
+   );
+
+   -- 🎮 Games Table
+   create table games (
+     id uuid primary key default uuid_generate_v4(),
+     created_at timestamp default now(),
+     ended_at timestamp,
+     mode text check (mode in ('bot', 'pvp', 'endless')),
+     player1_id uuid references players(id),
+     player2_id uuid references players(id),
+     winner_id uuid references players(id),
+     status text check (status in ('in_progress', 'completed', 'abandoned')) default 'in_progress',
+     moves jsonb default '[]'::jsonb
+   );
+
+   -- 🛖 Lobbies Table
+   create table lobbies (
+     id uuid primary key default uuid_generate_v4(),
+     created_at timestamp default now(),
+     host_id uuid references players(id),
+     guest_id uuid references players(id),
+     status text check (status in ('waiting', 'full', 'in_game')) default 'waiting'
+   );
+
+   -- 🔁 Endless Sessions Table
+   create table endless_sessions (
+     id uuid primary key default uuid_generate_v4(),
+     player_id uuid references players(id),
+     score integer default 0,
+     active boolean default true,
+     started_at timestamp default now(),
+     ended_at timestamp
+   );
+   ```
+
+3. **Chess Game Implementation**:
+   - Create chess board component using chess.js
    - Implement drag-and-drop for pieces
    - Add move history and game state visualization
-
-3. **Real-time Features**:
-   - WebSocket event handlers
-   - Live game synchronization
-   - Lobby management
-   - Player presence indicators
+   - Connect to API routes for game persistence
 
 4. **Advanced Features**:
    - Bot AI integration
+   - Real-time multiplayer with WebSockets
    - Endless mode scoring
-   - User authentication (if needed)
-   - Game analytics
+   - Game analytics and leaderboards
 
 ### 🎨 Styling Guidelines
 
@@ -133,15 +176,20 @@ The project uses a custom chess theme with Tailwind CSS:
 
 ### 🔐 Environment Configuration
 
-Update `.env.local` with your backend URLs:
+Update `.env.local` with your Supabase credentials:
+
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_WS_URL=ws://localhost:5000
+NEXT_PUBLIC_SUPABASE_URL=https://pyncrtqwvkadrlqpdklx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+JWT_SECRET=your_jwt_secret_key_here
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 ### 🧪 Testing Strategy
 
 Consider adding:
+
 - Unit tests with Jest + React Testing Library
 - E2E tests with Playwright
 - Component storybook for UI development
@@ -149,6 +197,7 @@ Consider adding:
 ### 📦 Deployment Options
 
 Ready for deployment to:
+
 - **Vercel** (recommended for Next.js)
 - **Netlify**
 - **Docker containers**
@@ -160,8 +209,8 @@ Ready for deployment to:
 
 Your Next.js frontend is fully set up and ready for development. Start by:
 
-1. Exploring the application at http://localhost:3000
-2. Setting up your .NET backend API
+1. Exploring the application at <http://localhost:3000>
+2. Setting up your Supabase or Railway database
 3. Implementing the chess board component
 4. Adding real-time multiplayer features
 

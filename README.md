@@ -16,29 +16,32 @@ A real-time multiplayer chess game built with Next.js 15, TypeScript, and Tailwi
 
 ## 🏗️ Architecture
 
-This is the frontend application of a distributed chess game system:
+This is a full-stack chess game built with Next.js and Supabase:
 
-- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS (this repository)
-- **Backend**: .NET Core API + WebSocket server (separate repository)
-- **Database**: PostgreSQL/MongoDB (managed by backend)
-- **Real-time**: WebSocket communication for live gameplay
+- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS
+- **Backend**: Next.js API routes for backend logic
+- **Database**: Supabase PostgreSQL with real-time capabilities
+- **Real-time**: WebSocket support for live gameplay
+- **Deployment**: Single Vercel deployment with Supabase integration
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn/pnpm
-- A running .NET backend API (see backend repository)
+- A Supabase project with the chess schema
 
 ### Installation
 
 1. Clone this repository:
+
 ```bash
 git clone <your-repo-url>
 cd chess.optim.boo
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -47,18 +50,22 @@ yarn install
 pnpm install
 ```
 
-3. Set up environment variables:
+1. Set up environment variables:
+
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local` to match your backend API URLs:
+Edit `.env.local` with your Supabase credentials:
+
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_WS_URL=ws://localhost:5000
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
-4. Run the development server:
+1. Run the development server:
+
 ```bash
 npm run dev
 # or
@@ -67,11 +74,11 @@ yarn dev
 pnpm dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+1. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Structure
 
-```
+```bash
 src/
 ├── app/                    # Next.js 15 App Router
 │   ├── globals.css        # Global styles
@@ -97,16 +104,19 @@ src/
 ## 🎯 Game Modes
 
 ### Bot Mode
+
 - Play against AI opponents
 - Multiple difficulty levels
 - Perfect for practice and learning
 
 ### Multiplayer Mode
+
 - Create or join public/private lobbies
 - Real-time gameplay with other players
 - Matchmaking system
 
 ### Endless Mode
+
 - Continuous games against progressively harder opponents
 - One loss ends your run
 - Compete for high scores on the leaderboard
@@ -120,18 +130,17 @@ src/
 - `npm run type-check` - Run TypeScript checks
 - `npm run format` - Format code with Prettier
 
-## 🌐 Backend Integration
+## 🌐 Database Integration
 
-This frontend connects to a .NET backend API that handles:
+This application connects to a Supabase database that handles:
 
-- User authentication and management
-- Game logic and validation
-- Real-time WebSocket communication
-- Lobby management
-- Bot AI implementation
-- Database operations
+- Player management and profiles
+- Game state and move history
+- Real-time lobby system
+- Endless mode session tracking
+- Leaderboard and statistics
 
-Ensure your backend is running before starting the frontend application.
+The database schema includes tables for players, games, lobbies, and endless sessions with proper relationships and constraints.
 
 ## 🎨 Styling
 
@@ -143,6 +152,7 @@ Ensure your backend is running before starting the frontend application.
 ## 📱 Responsive Design
 
 The application is fully responsive and works on:
+
 - Desktop computers
 - Tablets
 - Mobile phones
@@ -158,18 +168,21 @@ The application is fully responsive and works on:
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 npm install -g vercel
 vercel
 ```
 
 ### Docker
+
 ```bash
 docker build -t chess-frontend .
 docker run -p 3000:3000 chess-frontend
 ```
 
 ### Manual Deployment
+
 ```bash
 npm run build
 npm run start

@@ -9,7 +9,10 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "next": "^15.1.0",
@@ -26,12 +29,21 @@
     "tailwind-merge": "^2.2.0",
     "@tanstack/react-query": "^5.17.0",
     "zustand": "^4.4.0",
+    "socket.io": "^4.7.0",
     "socket.io-client": "^4.7.0",
     "chess.js": "^1.0.0-beta.8",
     "@types/uuid": "^10.0.0",
     "uuid": "^10.0.0",
     "lucide-react": "^0.284.0",
-    "framer-motion": "^10.18.0"
+    "framer-motion": "^10.18.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "drizzle-orm": "^0.29.0",
+    "drizzle-kit": "^0.20.0",
+    "postgres": "^3.4.0",
+    "bcryptjs": "^2.4.3",
+    "@types/bcryptjs": "^2.4.6",
+    "jsonwebtoken": "^9.0.2",
+    "@types/jsonwebtoken": "^9.0.5"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
