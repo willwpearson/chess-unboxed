@@ -1,0 +1,144 @@
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import type { GameState, GameMode, UIState, Square, ChessPiece } from '@/types/game';
+
+interface GameStore {
+  // Current game state
+  currentGame: GameState | null;
+  gameHistory: GameState[];
+  
+  // UI state
+  ui: UIState;
+  
+  // Connection state
+  isConnected: boolean;
+  isConnecting: boolean;
+  connectionError: string | null;
+  
+  // Actions
+  setCurrentGame: (game: GameState | null) => void;
+  updateGameState: (updates: Partial<GameState>) => void;
+  addToHistory: (game: GameState) => void;
+  clearHistory: () => void;
+  
+  // UI actions
+  setSelectedSquare: (square: Square | null) => void;
+  setPossibleMoves: (moves: Square[]) => void;
+  setDraggedPiece: (piece: { piece: ChessPiece; from: Square } | null) => void;
+  showPromotionDialog: (square: Square) => void;
+  hidePromotionDialog: () => void;
+  clearUI: () => void;
+  
+  // Connection actions
+  setConnected: (connected: boolean) => void;
+  setConnecting: (connecting: boolean) => void;
+  setConnectionError: (error: string | null) => void;
+}
+
+const initialUIState: UIState = {
+  selectedSquare: null,
+  possibleMoves: [],
+  draggedPiece: null,
+  showPromotionDialog: false,
+  promotionSquare: null,
+};
+
+export const useGameStore = create<GameStore>()(
+  devtools(
+    (set, get) => ({
+      currentGame: null,
+      gameHistory: [],
+      ui: initialUIState,
+      isConnected: false,
+      isConnecting: false,
+      connectionError: null,
+
+      setCurrentGame: (game: GameState | null) => {
+        set({ currentGame: game });
+        if (game) {
+          get().addToHistory(game);
+        }
+      },
+
+      updateGameState: (updates: Partial<GameState>) => {
+        const currentGame = get().currentGame;
+        if (currentGame) {
+          const updatedGame = { ...currentGame, ...updates };
+          set({ currentGame: updatedGame });
+          get().addToHistory(updatedGame);
+        }
+      },
+
+      addToHistory: (game: GameState) => {
+        const history = get().gameHistory;
+        const lastGame = history[history.length - 1];
+        
+        // Only add if it's different from the last entry
+        if (!lastGame || lastGame.updatedAt !== game.updatedAt) {
+          set({
+            gameHistory: [...history.slice(-49), game], // Keep last 50 states
+          });
+        }
+      },
+
+      clearHistory: () => set({ gameHistory: [] }),
+
+      setSelectedSquare: (square: Square | null) => {
+        set({
+          ui: {
+            ...get().ui,
+            selectedSquare: square,
+            possibleMoves: square ? get().ui.possibleMoves : [],
+          },
+        });
+      },
+
+      setPossibleMoves: (moves: Square[]) => {
+        set({
+          ui: {
+            ...get().ui,
+            possibleMoves: moves,
+          },
+        });
+      },
+
+      setDraggedPiece: (piece: { piece: ChessPiece; from: Square } | null) => {
+        set({
+          ui: {
+            ...get().ui,
+            draggedPiece: piece,
+          },
+        });
+      },
+
+      showPromotionDialog: (square: Square) => {
+        set({
+          ui: {
+            ...get().ui,
+            showPromotionDialog: true,
+            promotionSquare: square,
+          },
+        });
+      },
+
+      hidePromotionDialog: () => {
+        set({
+          ui: {
+            ...get().ui,
+            showPromotionDialog: false,
+            promotionSquare: null,
+          },
+        });
+      },
+
+      clearUI: () => set({ ui: initialUIState }),
+
+      setConnected: (connected: boolean) => set({ isConnected: connected }),
+
+      setConnecting: (connecting: boolean) => set({ isConnecting: connecting }),
+
+      setConnectionError: (error: string | null) => set({ connectionError: error }),
+    }),
+    { name: 'game-store' }
+  )
+);
