@@ -1,29 +1,39 @@
+'use client';
+
+import React, { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Leaderboard } from '@/components/leaderboard/Leaderboard';
 
 export default function LeaderboardPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsLoading(true);
+    
+    try {
+      // TODO: Fetch real leaderboard data from API
+      // const response = await fetch('/api/leaderboard');
+      // const data = await response.json();
+      
+      // For now, simulate refresh
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Refreshed leaderboard data');
+    } catch (error) {
+      console.error('Error refreshing leaderboard:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <h1 className="text-2xl font-bold">Leaderboard</h1>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">
-                See how you rank against other players in different game modes.
-              </p>
-              <div className="text-center py-8">
-                <p className="text-gray-500">
-                  🚧 This page is under construction. Player rankings will be displayed here.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <Leaderboard
+          onRefresh={handleRefresh}
+          isLoading={isLoading}
+        />
       </main>
       <Footer />
     </>

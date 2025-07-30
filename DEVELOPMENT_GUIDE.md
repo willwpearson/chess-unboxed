@@ -106,7 +106,7 @@ The application uses Next.js API routes with Supabase as the database:
    - Configure environment variables
 
 2. **Database Schema**:
-   
+
    ```sql
    -- Enable UUID extension (if not already enabled)
    create extension if not exists "uuid-ossp";
