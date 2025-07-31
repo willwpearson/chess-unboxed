@@ -25,6 +25,10 @@ interface LeaderboardEntry {
 interface LeaderboardProps {
   onRefresh: () => void;
   isLoading?: boolean;
+  data?: {
+    rating: Array<LeaderboardEntry>;
+    endless: Array<{ id: string; score: number; rank: number; player?: { nickname: string } }>;
+  };
 }
 
 const MOCK_LEADERBOARD: LeaderboardEntry[] = [
@@ -150,9 +154,23 @@ const MOCK_LEADERBOARD: LeaderboardEntry[] = [
   }
 ];
 
-export function Leaderboard({ onRefresh, isLoading }: LeaderboardProps) {
+export function Leaderboard({ onRefresh, isLoading, data }: LeaderboardProps) {
   const [selectedTab, setSelectedTab] = useState<'rating' | 'endless'>('rating');
-  const [leaderboard] = useState<LeaderboardEntry[]>(MOCK_LEADERBOARD);
+  
+  // Use real data if available, fallback to mock data for development
+  const ratingLeaderboard = data?.rating || MOCK_LEADERBOARD;
+  const endlessLeaderboard = data?.endless?.map(session => ({
+    rank: session.rank,
+    playerId: session.id,
+    nickname: session.player?.nickname || 'Unknown Player',
+    rating: 0, // Not applicable for endless mode
+    gamesPlayed: 0, // Not applicable for endless mode
+    wins: 0,
+    losses: 0,
+    draws: 0,
+    winRate: 0,
+    endlessHighScore: session.score,
+  })) || [];
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -175,13 +193,9 @@ export function Leaderboard({ onRefresh, isLoading }: LeaderboardProps) {
     return 'text-gray-600';
   };
 
-  const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (selectedTab === 'rating') {
-      return b.rating - a.rating;
-    } else {
-      return (b.endlessHighScore || 0) - (a.endlessHighScore || 0);
-    }
-  });
+  const sortedLeaderboard = selectedTab === 'rating' 
+    ? [...ratingLeaderboard].sort((a, b) => b.rating - a.rating)
+    : [...endlessLeaderboard].sort((a, b) => (b.endlessHighScore || 0) - (a.endlessHighScore || 0));
 
   const renderPlayerRow = (entry: LeaderboardEntry, index: number) => {
     const displayRank = selectedTab === 'rating' ? entry.rank : index + 1;
@@ -334,7 +348,7 @@ export function Leaderboard({ onRefresh, isLoading }: LeaderboardProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-blue-600 mb-1">
-              {leaderboard.reduce((sum, entry) => sum + entry.gamesPlayed, 0).toLocaleString()}
+              {ratingLeaderboard.reduce((sum: number, entry: LeaderboardEntry) => sum + entry.gamesPlayed, 0).toLocaleString()}
             </div>
             <div className="text-sm text-gray-600">Total Games Played</div>
           </CardContent>
@@ -343,7 +357,7 @@ export function Leaderboard({ onRefresh, isLoading }: LeaderboardProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-600 mb-1">
-              {leaderboard.length}
+              {ratingLeaderboard.length}
             </div>
             <div className="text-sm text-gray-600">Active Players</div>
           </CardContent>
@@ -352,7 +366,7 @@ export function Leaderboard({ onRefresh, isLoading }: LeaderboardProps) {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-purple-600 mb-1">
-              {Math.max(...leaderboard.map(e => e.endlessHighScore || 0))}
+              {endlessLeaderboard.length > 0 ? Math.max(...endlessLeaderboard.map((e: LeaderboardEntry) => e.endlessHighScore || 0)) : 0}
             </div>
             <div className="text-sm text-gray-600">Highest Endless Score</div>
           </CardContent>

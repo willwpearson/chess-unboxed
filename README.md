@@ -1,6 +1,6 @@
 # Chess Unboxed
 
-A real-time multiplayer chess game built with Next.js 15, TypeScript, and Tailwind CSS. This is the frontend application that connects to a separate .NET backend API.
+A real-time multiplayer chess game built with Next.js 15, TypeScript, and Tailwind CSS. This is a full-stack application with Next.js API routes and Supabase database integration.
 
 ## 🎮 Features
 
@@ -11,7 +11,9 @@ A real-time multiplayer chess game built with Next.js 15, TypeScript, and Tailwi
 
 - **Real-time Gameplay**: WebSocket-based communication for instant moves and updates
 - **Modern UI**: Built with Tailwind CSS and responsive design
-- **State Management**: Zustand for efficient state management
+- **Database Integration**: Full Supabase PostgreSQL integration with real data
+- **Player Management**: Automatic player creation and management
+- **Statistics Tracking**: Live leaderboards and endless mode statistics
 - **TypeScript**: Full type safety throughout the application
 
 ## 🏗️ Architecture
@@ -24,12 +26,59 @@ This is a full-stack chess game built with Next.js and Supabase:
 - **Real-time**: WebSocket support for live gameplay
 - **Deployment**: Single Vercel deployment with Supabase integration
 
+## ✅ Currently Working Features
+
+### 🔗 Database Integration
+
+- **✅ Players API**: Create, read, update players
+- **✅ Lobbies API**: Create, join, and manage multiplayer lobbies
+- **✅ Games API**: Track game states, moves, and results
+- **✅ Endless Mode API**: Session management and scoring
+- **✅ Real-time Leaderboards**: Live player rankings and statistics
+
+### 🎯 UI Components Connected to Database
+
+- **✅ Leaderboard**: Shows real player stats and endless mode rankings
+- **✅ Lobby System**: Real lobby creation and joining with live data
+- **✅ Player Management**: Automatic guest player creation
+- **✅ Stats Panel**: Endless mode session tracking
+- **✅ Real-time Updates**: Components refresh with live data
+
+### 🛠️ API Client
+
+- **✅ Type-safe API client** with error handling
+- **✅ Player management hooks** for automatic initialization
+- **✅ Comprehensive error handling** and loading states
+
+## 🚧 Next Steps
+
+### 🔮 Chess Game Implementation
+
+- **Chess Board Component**: Interactive chess board with drag-and-drop
+- **Game Logic Integration**: Connect chess.js for move validation
+- **Real-time Moves**: WebSocket integration for live gameplay
+- **Bot AI**: Implement chess bot with different difficulty levels
+
+### 🎮 Game Features
+
+- **Move History**: Visual move tracking and navigation
+- **Timer System**: Configurable time controls for games
+- **Game Analysis**: Post-game analysis and review
+- **Tournament Mode**: Multi-player tournament brackets
+
+### 🔐 Authentication & Social
+
+- **User Authentication**: Proper login system with Supabase Auth
+- **Player Profiles**: Detailed player statistics and history
+- **Social Features**: Friend system and private matches
+- **Chat System**: In-game messaging
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn/pnpm
-- A Supabase project with the chess schema
+- A Supabase project with the chess schema (see setup instructions below)
 
 ### Installation
 
@@ -52,16 +101,69 @@ pnpm install
 
 1. Set up environment variables:
 
-```bash
-cp .env.example .env.local
-```
-
-Edit `.env.local` with your Supabase credentials:
+Create a `.env.local` file in the project root:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+JWT_SECRET=your_jwt_secret_key_here
+```
+
+1. Set up your Supabase database:
+
+Run this SQL in your Supabase SQL editor:
+
+```sql
+-- Enable UUID extension
+create extension if not exists "uuid-ossp";
+
+-- Players table
+create table players (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamp default now(),
+  nickname text,
+  score integer default 0,
+  is_active boolean default true
+);
+
+-- Games table
+create table games (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamp default now(),
+  ended_at timestamp,
+  mode text check (mode in ('bot', 'pvp', 'endless')),
+  player1_id uuid references players(id),
+  player2_id uuid references players(id),
+  winner_id uuid references players(id),
+  status text check (status in ('in_progress', 'completed', 'abandoned')) default 'in_progress',
+  moves jsonb default '[]'::jsonb
+);
+
+-- Lobbies table
+create table lobbies (
+  id uuid primary key default uuid_generate_v4(),
+  created_at timestamp default now(),
+  host_id uuid references players(id),
+  guest_id uuid references players(id),
+  status text check (status in ('waiting', 'full', 'in_game')) default 'waiting'
+);
+
+-- Endless sessions table
+create table endless_sessions (
+  id uuid primary key default uuid_generate_v4(),
+  player_id uuid references players(id),
+  score integer default 0,
+  active boolean default true,
+  started_at timestamp default now(),
+  ended_at timestamp
+);
+
+-- Create indexes for performance
+create index idx_games_player1 on games(player1_id);
+create index idx_games_player2 on games(player2_id);
+create index idx_lobbies_status on lobbies(status);
+create index idx_endless_sessions_player on endless_sessions(player_id);
 ```
 
 1. Run the development server:
@@ -75,6 +177,23 @@ pnpm dev
 ```
 
 1. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Testing the Setup
+
+You can test your API endpoints:
+
+```bash
+# Test health check
+curl http://localhost:3000/api/health
+
+# Create a test player
+curl -X POST http://localhost:3000/api/players \
+  -H "Content-Type: application/json" \
+  -d '{"nickname":"TestPlayer"}'
+
+# Get all lobbies
+curl http://localhost:3000/api/lobbies
+```
 
 ## 📁 Project Structure
 

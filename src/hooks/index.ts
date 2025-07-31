@@ -6,6 +6,8 @@ import { useUserStore } from '@/store/userStore';
 import { useGameStore } from '@/store/gameStore';
 import type { ConnectionState } from '@/types/api';
 
+export { usePlayer } from './usePlayer';
+
 export function useWebSocket() {
   const user = useUserStore((state) => state.user);
   const setConnected = useGameStore((state) => state.setConnected);

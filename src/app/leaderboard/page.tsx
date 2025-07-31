@@ -1,30 +1,39 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Leaderboard } from '@/components/leaderboard/Leaderboard';
+import { api } from '@/lib/api';
 
 export default function LeaderboardPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<{
+    rating: any[];
+    endless: any[];
+  }>({ rating: [], endless: [] });
 
-  const handleRefresh = async () => {
+  const fetchLeaderboard = async () => {
     setIsLoading(true);
     
     try {
-      // TODO: Fetch real leaderboard data from API
-      // const response = await fetch('/api/leaderboard');
-      // const data = await response.json();
-      
-      // For now, simulate refresh
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Refreshed leaderboard data');
+      const data = await api.getLeaderboard();
+      setLeaderboardData(data);
     } catch (error) {
-      console.error('Error refreshing leaderboard:', error);
+      console.error('Error fetching leaderboard:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleRefresh = async () => {
+    await fetchLeaderboard();
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
 
   return (
     <>
@@ -33,6 +42,7 @@ export default function LeaderboardPage() {
         <Leaderboard
           onRefresh={handleRefresh}
           isLoading={isLoading}
+          data={leaderboardData}
         />
       </main>
       <Footer />
