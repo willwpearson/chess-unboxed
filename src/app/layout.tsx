@@ -6,10 +6,10 @@ import { Providers } from '@/components/providers';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Chess Optim Boo - Multiplayer Chess Game',
+  title: 'Chess Unboxed',
   description: 'Play chess online with friends, bots, or in endless mode. Built with Next.js and real-time multiplayer support.',
   keywords: ['chess', 'multiplayer', 'online', 'game', 'strategy'],
-  authors: [{ name: 'Chess Optim Boo Team' }],
+  authors: [{ name: 'Optim II' }],
   viewport: 'width=device-width, initial-scale=1',
   themeColor: '#0ea5e9',
 };

@@ -13,7 +13,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center space-x-2">
             <div className="text-2xl">♔</div>
-            <span className="text-xl font-bold text-primary-600">Chess Optim Boo</span>
+            <span className="text-xl font-bold text-primary-600">Chess Unboxed</span>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">

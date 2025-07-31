@@ -10,7 +10,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-primary-900 mb-4">
-              Chess Optim Boo
+              Chess Unboxed
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Challenge yourself with multiple game modes: play against AI, compete with other players online, 
