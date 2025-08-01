@@ -1,10 +1,13 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { GameState, GameMode, UIState, Square, ChessPiece } from '@/types/game';
+import type { GameState, GameMode, UIState, Square, ChessPiece, ChessMove, GameVariant, BotConfig } from '@/types/game';
+import { GameManager, BotManager, createGame, createBotPlayer, createHumanPlayer } from '@/lib/gameManager';
 
 interface GameStore {
   // Current game state
   currentGame: GameState | null;
+  gameManager: GameManager | null;
+  botManager: BotManager | null;
   gameHistory: GameState[];
   
   // UI state
@@ -15,7 +18,14 @@ interface GameStore {
   isConnecting: boolean;
   connectionError: string | null;
   
-  // Actions
+  // Game management actions
+  initializeGame: (mode: GameMode, variant: GameVariant, botConfig?: BotConfig) => Promise<boolean>;
+  makeMove: (from: Square, to: Square, promotion?: string) => Promise<boolean>;
+  resignGame: () => void;
+  offerDraw: () => void;
+  getLegalMoves: (square: Square) => Square[];
+  
+  // Legacy actions (for backward compatibility)
   setCurrentGame: (game: GameState | null) => void;
   updateGameState: (updates: Partial<GameState>) => void;
   addToHistory: (game: GameState) => void;
@@ -47,12 +57,139 @@ export const useGameStore = create<GameStore>()(
   devtools(
     (set, get) => ({
       currentGame: null,
+      gameManager: null,
+      botManager: null,
       gameHistory: [],
       ui: initialUIState,
       isConnected: false,
       isConnecting: false,
       connectionError: null,
 
+      // Enhanced game management actions
+      initializeGame: async (mode: GameMode, variant: GameVariant, botConfig?: BotConfig): Promise<boolean> => {
+        try {
+          // Create players
+          const humanPlayer = createHumanPlayer('You', 'white', 1200);
+          let botPlayer = null;
+          
+          if (mode === 'bot' && botConfig) {
+            botPlayer = createBotPlayer('Bot', 'black', botConfig.difficulty);
+          }
+
+          // Create game manager
+          const gameManager = createGame({
+            mode,
+            variant,
+            players: {
+              white: humanPlayer,
+              black: botPlayer || humanPlayer // Fallback for non-bot modes
+            }
+          });
+
+          // Create bot manager if needed
+          let botManager = null;
+          if (mode === 'bot' && botConfig) {
+            botManager = new BotManager(gameManager, botConfig.difficulty);
+          }
+
+          // Update store
+          set({ 
+            gameManager, 
+            botManager,
+            currentGame: gameManager.getGameState()
+          });
+
+          get().addToHistory(gameManager.getGameState());
+          return true;
+        } catch (error) {
+          console.error('Failed to initialize game:', error);
+          return false;
+        }
+      },
+
+      makeMove: async (from: Square, to: Square, promotion?: string): Promise<boolean> => {
+        const { gameManager, botManager } = get();
+        if (!gameManager) return false;
+
+        try {
+          // Make player move
+          const result = gameManager.makeMove(from, to, promotion as any);
+          
+          if (!result.isValid) {
+            console.warn('Invalid move:', result.error);
+            return false;
+          }
+
+          // Update game state
+          const updatedGameState = gameManager.getGameState();
+          set({ currentGame: updatedGameState });
+          get().addToHistory(updatedGameState);
+
+          // Clear UI selection
+          get().clearUI();
+
+          // If game ended, don't make bot move
+          if (result.gameEnd) {
+            return true;
+          }
+
+          // Make bot move if it's bot's turn
+          if (botManager && updatedGameState.position.turn === 'black' && !gameManager.isGameOver()) {
+            setTimeout(async () => {
+              try {
+                const botMove = await botManager.generateMove();
+                if (botMove) {
+                  const botResult = gameManager.makeMove(botMove.from, botMove.to, botMove.promotion);
+                  if (botResult.isValid) {
+                    const finalGameState = gameManager.getGameState();
+                    set({ currentGame: finalGameState });
+                    get().addToHistory(finalGameState);
+                  }
+                }
+              } catch (error) {
+                console.error('Bot move failed:', error);
+              }
+            }, 100); // Small delay for better UX
+          }
+
+          return true;
+        } catch (error) {
+          console.error('Move failed:', error);
+          return false;
+        }
+      },
+
+      resignGame: () => {
+        const { gameManager } = get();
+        if (!gameManager) return;
+
+        const currentPlayer = gameManager.getCurrentPlayer();
+        gameManager.resign(currentPlayer);
+        
+        const updatedGameState = gameManager.getGameState();
+        set({ currentGame: updatedGameState });
+        get().addToHistory(updatedGameState);
+      },
+
+      offerDraw: () => {
+        const { gameManager } = get();
+        if (!gameManager) return;
+
+        gameManager.offerDraw();
+        
+        const updatedGameState = gameManager.getGameState();
+        set({ currentGame: updatedGameState });
+        get().addToHistory(updatedGameState);
+      },
+
+      getLegalMoves: (square: Square): Square[] => {
+        const { gameManager } = get();
+        if (!gameManager) return [];
+
+        return gameManager.getLegalMovesForSquare(square);
+      },
+
+      // Legacy actions (for backward compatibility)
       setCurrentGame: (game: GameState | null) => {
         set({ currentGame: game });
         if (game) {
@@ -84,11 +221,14 @@ export const useGameStore = create<GameStore>()(
       clearHistory: () => set({ gameHistory: [] }),
 
       setSelectedSquare: (square: Square | null) => {
+        const { gameManager } = get();
+        const possibleMoves = square && gameManager ? gameManager.getLegalMovesForSquare(square) : [];
+        
         set({
           ui: {
             ...get().ui,
             selectedSquare: square,
-            possibleMoves: square ? get().ui.possibleMoves : [],
+            possibleMoves: square ? possibleMoves : [],
           },
         });
       },
@@ -103,10 +243,14 @@ export const useGameStore = create<GameStore>()(
       },
 
       setDraggedPiece: (piece: { piece: ChessPiece; from: Square } | null) => {
+        const { gameManager } = get();
+        const possibleMoves = piece && gameManager ? gameManager.getLegalMovesForSquare(piece.from) : [];
+        
         set({
           ui: {
             ...get().ui,
             draggedPiece: piece,
+            possibleMoves: piece ? possibleMoves : [],
           },
         });
       },

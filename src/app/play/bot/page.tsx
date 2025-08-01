@@ -10,38 +10,16 @@ import { MoveHistory } from '@/components/game/MoveHistory';
 import { GameInfo } from '@/components/game/GameInfo';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { BotConfig, GameState, ChessMove, Player, GamePosition } from '@/types/game';
+import { BotConfig, GameState, ChessMove, Player, GameVariant } from '@/types/game';
 import { useGameStore } from '@/store/gameStore';
 import { ArrowLeft } from 'lucide-react';
 
-// Initial chess position
-const INITIAL_POSITION: GamePosition = {
-  board: {
-    a8: { type: 'rook', color: 'black' }, b8: { type: 'knight', color: 'black' }, c8: { type: 'bishop', color: 'black' }, d8: { type: 'queen', color: 'black' },
-    e8: { type: 'king', color: 'black' }, f8: { type: 'bishop', color: 'black' }, g8: { type: 'knight', color: 'black' }, h8: { type: 'rook', color: 'black' },
-    a7: { type: 'pawn', color: 'black' }, b7: { type: 'pawn', color: 'black' }, c7: { type: 'pawn', color: 'black' }, d7: { type: 'pawn', color: 'black' },
-    e7: { type: 'pawn', color: 'black' }, f7: { type: 'pawn', color: 'black' }, g7: { type: 'pawn', color: 'black' }, h7: { type: 'pawn', color: 'black' },
-    a2: { type: 'pawn', color: 'white' }, b2: { type: 'pawn', color: 'white' }, c2: { type: 'pawn', color: 'white' }, d2: { type: 'pawn', color: 'white' },
-    e2: { type: 'pawn', color: 'white' }, f2: { type: 'pawn', color: 'white' }, g2: { type: 'pawn', color: 'white' }, h2: { type: 'pawn', color: 'white' },
-    a1: { type: 'rook', color: 'white' }, b1: { type: 'knight', color: 'white' }, c1: { type: 'bishop', color: 'white' }, d1: { type: 'queen', color: 'white' },
-    e1: { type: 'king', color: 'white' }, f1: { type: 'bishop', color: 'white' }, g1: { type: 'knight', color: 'white' }, h1: { type: 'rook', color: 'white' },
-  },
-  turn: 'white',
-  castling: {
-    whiteKingside: true,
-    whiteQueenside: true,
-    blackKingside: true,
-    blackQueenside: true,
-  },
-  halfmoveClock: 0,
-  fullmoveNumber: 1,
-};
-
 export default function BotGamePage() {
   const router = useRouter();
-  const { currentGame, setCurrentGame } = useGameStore();
+  const { currentGame, initializeGame, makeMove, resignGame, offerDraw } = useGameStore();
   const [gameStarted, setGameStarted] = useState(false);
   const [botConfig, setBotConfig] = useState<BotConfig | null>(null);
+  const [gameVariant, setGameVariant] = useState<GameVariant>('classic');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleStartGame = async (config: BotConfig) => {
@@ -49,43 +27,13 @@ export default function BotGamePage() {
     setBotConfig(config);
 
     try {
-      // Create players
-      const humanPlayer: Player = {
-        id: 'human-player',
-        name: 'You',
-        color: 'white',
-        isBot: false,
-        rating: 1200
-      };
-
-      const botPlayer: Player = {
-        id: 'bot-player',
-        name: `Bot (${config.difficulty})`,
-        color: 'black',
-        isBot: true,
-        rating: config.difficulty === 'easy' ? 800 : 
-               config.difficulty === 'medium' ? 1200 :
-               config.difficulty === 'hard' ? 1600 : 2000
-      };
-
-      // Create game state
-      const newGame: GameState = {
-        gameId: `bot-game-${Date.now()}`,
-        mode: 'bot',
-        status: 'active',
-        result: 'ongoing',
-        position: INITIAL_POSITION,
-        moves: [],
-        players: {
-          white: humanPlayer,
-          black: botPlayer
-        },
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      };
-
-      setCurrentGame(newGame);
-      setGameStarted(true);
+      const success = await initializeGame('bot', gameVariant, config);
+      
+      if (success) {
+        setGameStarted(true);
+      } else {
+        alert('Failed to start game. Please try again.');
+      }
     } catch (error) {
       console.error('Error starting bot game:', error);
       alert('Failed to start game. Please try again.');
@@ -94,44 +42,33 @@ export default function BotGamePage() {
     }
   };
 
-  const handleMove = (move: ChessMove) => {
+  const handleMove = async (move: ChessMove) => {
     if (!currentGame) return;
 
-    // TODO: Validate move with chess.js
-    console.log('Move made:', move);
-    
-    // For now, just add the move to history
-    const updatedGame: GameState = {
-      ...currentGame,
-      moves: [...currentGame.moves, move],
-      position: {
-        ...currentGame.position,
-        turn: currentGame.position.turn === 'white' ? 'black' : 'white'
-      },
-      updatedAt: Date.now()
-    };
-
-    setCurrentGame(updatedGame);
-
-    // TODO: If it's bot's turn, make bot move
+    try {
+      const success = await makeMove(move.from, move.to, move.promotion);
+      if (!success) {
+        console.warn('Move rejected by game manager');
+      }
+    } catch (error) {
+      console.error('Error making move:', error);
+    }
   };
 
   const handleResign = () => {
     if (confirm('Are you sure you want to resign?')) {
-      if (currentGame) {
-        setCurrentGame({
-          ...currentGame,
-          status: 'finished',
-          result: 'black-wins',
-          updatedAt: Date.now()
-        });
-      }
+      resignGame();
+    }
+  };
+
+  const handleOfferDraw = () => {
+    if (confirm('Do you want to offer a draw?')) {
+      offerDraw();
     }
   };
 
   const handleNewGame = () => {
     setGameStarted(false);
-    setCurrentGame(null);
     setBotConfig(null);
   };
 
@@ -152,10 +89,46 @@ export default function BotGamePage() {
               </Button>
             </div>
             
-            <BotDifficultySelector
-              onStartGame={handleStartGame}
-              isLoading={isLoading}
-            />
+            <div className="space-y-6">
+              {/* Game Variant Selection */}
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Select Game Variant</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setGameVariant('classic')}
+                    className={`p-4 border-2 rounded-lg text-left transition-all ${
+                      gameVariant === 'classic' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <h3 className="font-semibold text-lg">Classic Chess</h3>
+                    <p className="text-gray-600 text-sm mt-1">
+                      Traditional chess with standard rules
+                    </p>
+                  </button>
+                  
+                  <button
+                    onClick={() => setGameVariant('unboxed')}
+                    className={`p-4 border-2 rounded-lg text-left transition-all ${
+                      gameVariant === 'unboxed' 
+                        ? 'border-purple-500 bg-purple-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <h3 className="font-semibold text-lg">Chess Unboxed</h3>
+                    <p className="text-gray-600 text-sm mt-1">
+                      Pieces can move across board edges - toroidal topology
+                    </p>
+                  </button>
+                </div>
+              </Card>
+
+              <BotDifficultySelector
+                onStartGame={handleStartGame}
+                isLoading={isLoading}
+              />
+            </div>
           </div>
         </main>
         <Footer />
@@ -178,9 +151,25 @@ export default function BotGamePage() {
               <span>New Game</span>
             </Button>
 
-            <h1 className="text-2xl font-bold">
-              Playing vs {botConfig?.difficulty} Bot
-            </h1>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold">
+                {currentGame.variant === 'unboxed' ? 'Chess Unboxed' : 'Classic Chess'} vs {botConfig?.difficulty} Bot
+              </h1>
+              {currentGame.status === 'finished' && (
+                <div className={`mt-2 text-lg font-semibold ${
+                  currentGame.result === 'white-wins' ? 'text-green-600' :
+                  currentGame.result === 'black-wins' ? 'text-red-600' : 'text-yellow-600'
+                }`}>
+                  {currentGame.result === 'white-wins' ? 'You Win!' :
+                   currentGame.result === 'black-wins' ? 'Bot Wins!' : 'Draw!'}
+                  {currentGame.endReason && (
+                    <span className="text-sm text-gray-600 ml-2">
+                      ({currentGame.endReason.replace('-', ' ')})
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="w-24"></div> {/* Spacer for centering */}
           </div>
@@ -190,10 +179,12 @@ export default function BotGamePage() {
             <div className="lg:col-span-2 flex justify-center">
               <ChessBoard
                 position={currentGame.position.board}
+                gameVariant={currentGame.variant}
                 onMove={handleMove}
                 onResign={handleResign}
+                onOfferDraw={handleOfferDraw}
                 currentPlayer={currentGame.position.turn}
-                isPlayerTurn={currentGame.position.turn === 'white'}
+                isPlayerTurn={currentGame.position.turn === 'white' && currentGame.status === 'active'}
                 showCoordinates={true}
                 boardTheme="classic"
               />

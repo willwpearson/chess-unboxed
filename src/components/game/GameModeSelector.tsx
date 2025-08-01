@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Bot, Users, Zap, Crown, Play } from 'lucide-react';
+import { Bot, Users, Zap, Crown, Play, Brain, Code } from 'lucide-react';
 
 interface GameMode {
   id: string;
@@ -43,6 +43,15 @@ const gameModes: GameMode[] = [
     color: 'bg-purple-500',
     route: '/play/endless',
     features: ['Progressive difficulty', 'Leaderboard competition', 'Ultimate challenge']
+  },
+  {
+    id: 'programming',
+    title: 'Programming Chess',
+    description: 'Code your chess strategy with JavaScript functions',
+    icon: Brain,
+    color: 'bg-indigo-500',
+    route: '/play/programming',
+    features: ['Write JavaScript AI', 'Educational programming', 'Both classic & unboxed modes']
   }
 ];
 
@@ -113,7 +122,7 @@ export default function GameModeSelector() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {gameModes.map((mode) => {
           const IconComponent = mode.icon;
           const isSelected = selectedMode === mode.id;

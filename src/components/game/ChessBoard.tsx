@@ -1,17 +1,23 @@
 /**
  * Chess Board Component
- * The main chess board interface for gameplay
+ * The main chess board interface for gameplay with chess.js integration
  */
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
-import { ChessPiece, Square, ChessMove, PieceType, PieceColor } from '@/types/game';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
+import { Chess, Square as ChessJSSquare } from 'chess.js';
+import { ChessPiece, Square, ChessMove, PieceType, PieceColor, GameVariant } from '@/types/game';
+import { WraparoundChessEngine } from '@/lib/chessEngine';
 import { useGameStore } from '@/store/gameStore';
 import { Button } from '@/components/ui/Button';
-import { Crown, RotateCcw, Flag, Users } from 'lucide-react';
+import { PromotionDialog } from './PromotionDialog';
+import { Crown, RotateCcw, Flag, Users, RefreshCw } from 'lucide-react';
 
 interface ChessBoardProps {
-  position: Record<Square, ChessPiece | null>;
+  position?: Record<Square, ChessPiece | null>;
+  chess?: Chess;
+  fen?: string;
+  gameVariant?: GameVariant;
   onMove: (move: ChessMove) => void;
   onResign?: () => void;
   onOfferDraw?: () => void;
@@ -35,6 +41,9 @@ const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'];
 
 export function ChessBoard({
   position,
+  chess: propChess,
+  fen,
+  gameVariant = 'classic',
   onMove,
   onResign,
   onOfferDraw,
@@ -43,9 +52,90 @@ export function ChessBoard({
   showCoordinates = true,
   boardTheme = 'classic'
 }: ChessBoardProps) {
-  const { ui, setSelectedSquare, setPossibleMoves, setDraggedPiece } = useGameStore();
+  const { ui, setSelectedSquare, setPossibleMoves, setDraggedPiece, showPromotionDialog, hidePromotionDialog } = useGameStore();
   const [draggedElement, setDraggedElement] = useState<HTMLElement | null>(null);
+  const [pendingMove, setPendingMove] = useState<{ from: Square; to: Square } | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
+  
+  // Determine if we're in wraparound mode
+  const isWraparoundMode = gameVariant === 'unboxed' || gameVariant === 'programming_unboxed';
+  
+  // Create and manage chess engine instance
+  const chessEngine = useMemo(() => {
+    if (isWraparoundMode) {
+      return new WraparoundChessEngine(fen, true);
+    } else if (propChess) {
+      return propChess;
+    } else {
+      const instance = new Chess();
+      if (fen) {
+        try {
+          instance.load(fen);
+        } catch (error) {
+          console.warn('Invalid FEN provided, using default position:', error);
+        }
+      }
+      return instance;
+    }
+  }, [propChess, fen, isWraparoundMode]);
+
+  // For backward compatibility, maintain chess reference
+  const chess = chessEngine instanceof WraparoundChessEngine ? chessEngine.getChessJS() : chessEngine;
+  
+  // Convert chess engine board to our position format
+  const boardPosition = useMemo(() => {
+    if (position) return position;
+    
+    if (chessEngine instanceof WraparoundChessEngine) {
+      return chessEngine.getPosition();
+    }
+    
+    const pos: Record<Square, ChessPiece | null> = {};
+    const board = chess.board();
+    
+    for (let rank = 0; rank < 8; rank++) {
+      for (let file = 0; file < 8; file++) {
+        const square = `${String.fromCharCode(97 + file)}${8 - rank}` as Square;
+        const piece = board[rank][file];
+        
+        if (piece) {
+          pos[square] = {
+            type: piece.type as PieceType,
+            color: piece.color as PieceColor
+          };
+        } else {
+          pos[square] = null;
+        }
+      }
+    }
+    
+    return pos;
+  }, [chess, chessEngine, position]);
+  
+  // Helper function to convert our square format to chess.js format
+  const toChessJSSquare = useCallback((square: Square): ChessJSSquare => square as ChessJSSquare, []);
+  
+  // Helper function to get legal moves for a square
+  const getLegalMoves = useCallback((square: Square): Square[] => {
+    if (chessEngine instanceof WraparoundChessEngine) {
+      return chessEngine.getLegalMoves(square);
+    } else {
+      const moves = chess.moves({ square: toChessJSSquare(square), verbose: true });
+      return moves.map(move => move.to as Square);
+    }
+  }, [chess, chessEngine, toChessJSSquare]);
+  
+  // Helper function to check if a move requires promotion
+  const requiresPromotion = useCallback((from: Square, to: Square): boolean => {
+    const piece = boardPosition[from];
+    if (!piece || piece.type !== 'pawn') return false;
+    
+    const fromRank = parseInt(from[1]);
+    const toRank = parseInt(to[1]);
+    
+    return (piece.color === 'white' && fromRank === 7 && toRank === 8) ||
+           (piece.color === 'black' && fromRank === 2 && toRank === 1);
+  }, [boardPosition]);
 
   const getSquareColor = (file: string, rank: string) => {
     const fileIndex = FILES.indexOf(file);
@@ -72,10 +162,53 @@ export function ChessBoard({
 
   const getSquareName = (file: string, rank: string): Square => `${file}${rank}`;
 
+  // Helper function to check if a move would be a wraparound move
+  const isWraparoundMove = useCallback((from: Square, to: Square): boolean => {
+    if (!isWraparoundMode) return false;
+    
+    const fromFile = from.charCodeAt(0) - 97; // a=0, b=1, etc.
+    const fromRank = parseInt(from[1]) - 1;   // 1=0, 2=1, etc.
+    const toFile = to.charCodeAt(0) - 97;
+    const toRank = parseInt(to[1]) - 1;
+    
+    // Check for horizontal wraparound (file difference > 4 means likely wraparound)
+    const fileDiff = Math.abs(toFile - fromFile);
+    const horizontalWrap = fileDiff > 4;
+    
+    // Check for vertical wraparound (rank difference > 4 means likely wraparound)
+    const rankDiff = Math.abs(toRank - fromRank);
+    const verticalWrap = rankDiff > 4;
+    
+    return horizontalWrap || verticalWrap;
+  }, [isWraparoundMode]);
+
+  // Helper function to get wraparound visual indicators
+  const getWraparoundIndicators = useCallback((from: Square, to: Square) => {
+    if (!isWraparoundMove(from, to)) return null;
+    
+    const fromFile = from.charCodeAt(0) - 97;
+    const fromRank = parseInt(from[1]) - 1;
+    const toFile = to.charCodeAt(0) - 97;
+    const toRank = parseInt(to[1]) - 1;
+    
+    const fileDiff = Math.abs(toFile - fromFile);
+    const rankDiff = Math.abs(toRank - fromRank);
+    
+    if (fileDiff > 4 && rankDiff > 4) {
+      return 'diagonal-wrap';
+    } else if (fileDiff > 4) {
+      return 'horizontal-wrap';
+    } else if (rankDiff > 4) {
+      return 'vertical-wrap';
+    }
+    
+    return null;
+  }, [isWraparoundMove]);
+
   const handleSquareClick = useCallback((square: Square) => {
     if (!isPlayerTurn) return;
 
-    const piece = position[square];
+    const piece = boardPosition[square];
     
     if (ui.selectedSquare) {
       if (ui.selectedSquare === square) {
@@ -83,33 +216,66 @@ export function ChessBoard({
         setSelectedSquare(null);
         setPossibleMoves([]);
       } else if (ui.possibleMoves.includes(square)) {
-        // Make move
-        const move: ChessMove = {
-          from: ui.selectedSquare,
-          to: square,
-          piece: position[ui.selectedSquare]!,
-          captured: piece || undefined,
-          timestamp: Date.now()
-        };
-        onMove(move);
-        setSelectedSquare(null);
-        setPossibleMoves([]);
+        // Check if this move requires promotion
+        if (requiresPromotion(ui.selectedSquare, square)) {
+          setPendingMove({ from: ui.selectedSquare, to: square });
+          showPromotionDialog(square);
+          return;
+        }
+
+        // Validate and make move using appropriate engine
+        try {
+          let moveResult: ChessMove | null = null;
+          
+          if (chessEngine instanceof WraparoundChessEngine) {
+            moveResult = chessEngine.makeMove(ui.selectedSquare, square);
+          } else {
+            const chessMove = chess.move({
+              from: toChessJSSquare(ui.selectedSquare),
+              to: toChessJSSquare(square)
+            });
+            
+            if (chessMove) {
+              moveResult = {
+                from: ui.selectedSquare,
+                to: square,
+                piece: boardPosition[ui.selectedSquare]!,
+                captured: piece || undefined,
+                promotion: chessMove.promotion as PieceType | undefined,
+                castling: chessMove.san.includes('O-O-O') ? 'queenside' : 
+                         chessMove.san.includes('O-O') ? 'kingside' : undefined,
+                enPassant: chessMove.san.includes('e.p.') || chessMove.captured === 'p',
+                timestamp: Date.now()
+              };
+            }
+          }
+          
+          if (moveResult) {
+            onMove(moveResult);
+            setSelectedSquare(null);
+            setPossibleMoves([]);
+          }
+        } catch (error) {
+          console.warn('Invalid move attempted:', error);
+          setSelectedSquare(null);
+          setPossibleMoves([]);
+        }
       } else if (piece && piece.color === currentPlayer) {
-        // Select new piece
+        // Select new piece and calculate legal moves
         setSelectedSquare(square);
-        // TODO: Calculate possible moves
-        setPossibleMoves([]);
+        const legalMoves = getLegalMoves(square);
+        setPossibleMoves(legalMoves);
       } else {
         setSelectedSquare(null);
         setPossibleMoves([]);
       }
     } else if (piece && piece.color === currentPlayer) {
-      // Select piece
+      // Select piece and calculate legal moves
       setSelectedSquare(square);
-      // TODO: Calculate possible moves
-      setPossibleMoves([]);
+      const legalMoves = getLegalMoves(square);
+      setPossibleMoves(legalMoves);
     }
-  }, [ui.selectedSquare, ui.possibleMoves, position, currentPlayer, isPlayerTurn, onMove, setSelectedSquare, setPossibleMoves]);
+  }, [ui.selectedSquare, ui.possibleMoves, boardPosition, currentPlayer, isPlayerTurn, onMove, setSelectedSquare, setPossibleMoves, chess, chessEngine, getLegalMoves, toChessJSSquare, requiresPromotion, showPromotionDialog]);
 
   const handleDragStart = useCallback((e: React.DragEvent, square: Square) => {
     if (!isPlayerTurn) {
@@ -117,7 +283,7 @@ export function ChessBoard({
       return;
     }
 
-    const piece = position[square];
+    const piece = boardPosition[square];
     if (!piece || piece.color !== currentPlayer) {
       e.preventDefault();
       return;
@@ -126,21 +292,26 @@ export function ChessBoard({
     setDraggedPiece({ piece, from: square });
     setDraggedElement(e.currentTarget as HTMLElement);
     
+    // Show possible moves for the dragged piece
+    const legalMoves = getLegalMoves(square);
+    setPossibleMoves(legalMoves);
+    
     // Hide the dragged element
     setTimeout(() => {
       if (draggedElement) {
         draggedElement.style.opacity = '0.5';
       }
     }, 0);
-  }, [position, currentPlayer, isPlayerTurn, setDraggedPiece]);
+  }, [boardPosition, currentPlayer, isPlayerTurn, setDraggedPiece, getLegalMoves, setPossibleMoves, draggedElement]);
 
-  const handleDragEnd = useCallback((e: React.DragEvent) => {
+  const handleDragEnd = useCallback(() => {
     if (draggedElement) {
       draggedElement.style.opacity = '1';
     }
     setDraggedElement(null);
     setDraggedPiece(null);
-  }, [draggedElement, setDraggedPiece]);
+    setPossibleMoves([]);
+  }, [draggedElement, setDraggedPiece, setPossibleMoves]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -151,16 +322,95 @@ export function ChessBoard({
     
     if (!ui.draggedPiece) return;
 
-    const move: ChessMove = {
-      from: ui.draggedPiece.from,
-      to: square,
-      piece: ui.draggedPiece.piece,
-      captured: position[square] || undefined,
-      timestamp: Date.now()
-    };
+    // Check if this move requires promotion
+    if (requiresPromotion(ui.draggedPiece.from, square)) {
+      setPendingMove({ from: ui.draggedPiece.from, to: square });
+      showPromotionDialog(square);
+      return;
+    }
 
-    onMove(move);
-  }, [ui.draggedPiece, position, onMove]);
+    // Validate move using appropriate engine
+    try {
+      let moveResult: ChessMove | null = null;
+      
+      if (chessEngine instanceof WraparoundChessEngine) {
+        moveResult = chessEngine.makeMove(ui.draggedPiece.from, square);
+      } else {
+        const chessMove = chess.move({
+          from: toChessJSSquare(ui.draggedPiece.from),
+          to: toChessJSSquare(square)
+        });
+        
+        if (chessMove) {
+          moveResult = {
+            from: ui.draggedPiece.from,
+            to: square,
+            piece: ui.draggedPiece.piece,
+            captured: boardPosition[square] || undefined,
+            promotion: chessMove.promotion as PieceType | undefined,
+            castling: chessMove.san.includes('O-O-O') ? 'queenside' : 
+                     chessMove.san.includes('O-O') ? 'kingside' : undefined,
+            enPassant: chessMove.san.includes('e.p.') || chessMove.captured === 'p',
+            timestamp: Date.now()
+          };
+        }
+      }
+      
+      if (moveResult) {
+        onMove(moveResult);
+      }
+    } catch (error) {
+      console.warn('Invalid drop move attempted:', error);
+    }
+  }, [ui.draggedPiece, boardPosition, onMove, chess, chessEngine, toChessJSSquare, requiresPromotion, showPromotionDialog]);
+
+  const handlePromotion = useCallback((piece: PieceType) => {
+    if (!pendingMove) return;
+
+    try {
+      let moveResult: ChessMove | null = null;
+      
+      if (chessEngine instanceof WraparoundChessEngine) {
+        moveResult = chessEngine.makeMove(pendingMove.from, pendingMove.to, piece);
+      } else {
+        const chessMove = chess.move({
+          from: toChessJSSquare(pendingMove.from),
+          to: toChessJSSquare(pendingMove.to),
+          promotion: piece
+        });
+        
+        if (chessMove) {
+          moveResult = {
+            from: pendingMove.from,
+            to: pendingMove.to,
+            piece: boardPosition[pendingMove.from]!,
+            captured: boardPosition[pendingMove.to] || undefined,
+            promotion: piece,
+            timestamp: Date.now()
+          };
+        }
+      }
+      
+      if (moveResult) {
+        onMove(moveResult);
+      }
+    } catch (error) {
+      console.warn('Invalid promotion move:', error);
+    }
+
+    // Clean up
+    setPendingMove(null);
+    hidePromotionDialog();
+    setSelectedSquare(null);
+    setPossibleMoves([]);
+  }, [pendingMove, chess, chessEngine, boardPosition, onMove, toChessJSSquare, hidePromotionDialog, setSelectedSquare, setPossibleMoves]);
+
+  const handlePromotionCancel = useCallback(() => {
+    setPendingMove(null);
+    hidePromotionDialog();
+    setSelectedSquare(null);
+    setPossibleMoves([]);
+  }, [hidePromotionDialog, setSelectedSquare, setPossibleMoves]);
 
   const renderPiece = (piece: ChessPiece | null, square: Square) => {
     if (!piece) return null;
@@ -184,10 +434,14 @@ export function ChessBoard({
 
   const renderSquare = (file: string, rank: string) => {
     const square = getSquareName(file, rank);
-    const piece = position[square];
+    const piece = boardPosition[square];
     const isSelected = ui.selectedSquare === square;
     const isPossibleMove = ui.possibleMoves.includes(square);
     const isLastMove = false; // TODO: Implement last move highlighting
+    
+    // Check if this square would be a wraparound move
+    const isWraparoundTarget = ui.selectedSquare && isWraparoundMove(ui.selectedSquare, square);
+    const wraparoundType = ui.selectedSquare ? getWraparoundIndicators(ui.selectedSquare, square) : null;
 
     return (
       <div
@@ -196,7 +450,8 @@ export function ChessBoard({
           relative aspect-square cursor-pointer transition-all duration-200
           ${getSquareColor(file, rank)}
           ${isSelected ? 'ring-4 ring-yellow-400 ring-inset' : ''}
-          ${isPossibleMove ? 'ring-2 ring-blue-400 ring-inset' : ''}
+          ${isPossibleMove && !isWraparoundTarget ? 'ring-2 ring-blue-400 ring-inset' : ''}
+          ${isPossibleMove && isWraparoundTarget ? 'ring-2 ring-purple-500 ring-inset bg-purple-100 bg-opacity-30' : ''}
           ${isLastMove ? 'ring-2 ring-green-400 ring-inset' : ''}
         `}
         onClick={() => handleSquareClick(square)}
@@ -222,7 +477,24 @@ export function ChessBoard({
         {/* Possible move indicator */}
         {isPossibleMove && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className={`w-6 h-6 rounded-full ${piece ? 'ring-4 ring-blue-400' : 'bg-blue-400 opacity-60'}`} />
+            <div className={`w-6 h-6 rounded-full ${
+              isWraparoundTarget 
+                ? piece ? 'ring-4 ring-purple-500' : 'bg-purple-500 opacity-60'
+                : piece ? 'ring-4 ring-blue-400' : 'bg-blue-400 opacity-60'
+            }`} />
+          </div>
+        )}
+
+        {/* Wraparound indicator */}
+        {isWraparoundTarget && wraparoundType && (
+          <div className="absolute top-1 right-1">
+            <div className="w-3 h-3 bg-purple-500 rounded-full flex items-center justify-center">
+              <span className="text-xs text-white font-bold">
+                {wraparoundType === 'horizontal-wrap' ? '↔' : 
+                 wraparoundType === 'vertical-wrap' ? '↕' : 
+                 wraparoundType === 'diagonal-wrap' ? '⤡' : '⟲'}
+              </span>
+            </div>
           </div>
         )}
 
@@ -237,9 +509,34 @@ export function ChessBoard({
       {/* Board */}
       <div 
         ref={boardRef}
-        className="relative bg-amber-900 p-4 rounded-lg shadow-2xl"
+        className={`relative p-4 rounded-lg shadow-2xl ${
+          isWraparoundMode ? 'bg-purple-900' : 'bg-amber-900'
+        }`}
       >
-        <div className="grid grid-cols-8 gap-0 w-96 h-96 border-2 border-amber-900">
+        {/* Wraparound indicators */}
+        {isWraparoundMode && (
+          <>
+            {/* Top-bottom connection indicators */}
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 text-purple-300 text-sm font-bold">
+              ↕ Wraps ↕
+            </div>
+            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-purple-300 text-sm font-bold">
+              ↕ Wraps ↕
+            </div>
+            
+            {/* Left-right connection indicators */}
+            <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 -rotate-90 text-purple-300 text-sm font-bold">
+              ↔ Wraps ↔
+            </div>
+            <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 -rotate-90 text-purple-300 text-sm font-bold">
+              ↔ Wraps ↔
+            </div>
+          </>
+        )}
+        
+        <div className={`grid grid-cols-8 gap-0 w-96 h-96 border-2 ${
+          isWraparoundMode ? 'border-purple-900' : 'border-amber-900'
+        }`}>
           {RANKS.map(rank => 
             FILES.map(file => renderSquare(file, rank))
           )}
@@ -287,8 +584,21 @@ export function ChessBoard({
         </Button>
       </div>
 
-      {/* Turn indicator */}
-      <div className="text-center">
+      {/* Game mode and turn indicator */}
+      <div className="text-center space-y-2">
+        {/* Mode indicator */}
+        <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+          isWraparoundMode 
+            ? 'bg-purple-100 text-purple-800 border border-purple-300' 
+            : 'bg-amber-100 text-amber-800 border border-amber-300'
+        }`}>
+          <RefreshCw size={14} />
+          <span className="font-medium">
+            {isWraparoundMode ? 'Chess Unboxed' : 'Classic Chess'}
+          </span>
+        </div>
+        
+        {/* Turn indicator */}
         <div className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full ${
           isPlayerTurn ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
         }`}>
@@ -298,6 +608,14 @@ export function ChessBoard({
           </span>
         </div>
       </div>
+
+      {/* Promotion Dialog */}
+      <PromotionDialog
+        isOpen={ui.showPromotionDialog}
+        color={currentPlayer}
+        onPromote={handlePromotion}
+        onCancel={handlePromotionCancel}
+      />
     </div>
   );
 }

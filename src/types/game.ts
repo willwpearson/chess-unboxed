@@ -3,10 +3,26 @@ export type PieceType = 'pawn' | 'rook' | 'knight' | 'bishop' | 'queen' | 'king'
 export type PieceColor = 'white' | 'black';
 export type Square = string; // e.g., 'e4', 'a1'
 
+// Chess.js integration types
+export interface ChessJSMoveInfo {
+  from: Square;
+  to: Square;
+  promotion?: PieceType;
+  flags: string;
+  piece: PieceType;
+  captured?: PieceType;
+  san: string;
+  lan: string;
+}
+
 export interface ChessPiece {
   type: PieceType;
   color: PieceColor;
 }
+
+// Move annotation types
+export type MoveAnnotation = '!' | '?' | '!!' | '??' | '!?' | '?!';
+export type MoveEvaluation = 'blunder' | 'mistake' | 'inaccuracy' | 'good' | 'excellent' | 'brilliant';
 
 export interface ChessMove {
   from: Square;
@@ -16,7 +32,27 @@ export interface ChessMove {
   promotion?: PieceType;
   castling?: 'kingside' | 'queenside';
   enPassant?: boolean;
+  isWraparound?: boolean;
+  wraparoundType?: 'horizontal' | 'vertical' | 'diagonal' | 'knight';
   timestamp: number;
+  // Enhanced move information
+  isCheck?: boolean;
+  isCheckmate?: boolean;
+  isStalemate?: boolean;
+  annotation?: MoveAnnotation;
+  evaluation?: MoveEvaluation;
+  evaluationScore?: number; // Centipawn evaluation
+  san?: string; // Standard Algebraic Notation
+  lan?: string; // Long Algebraic Notation
+  uci?: string; // Universal Chess Interface notation
+  disambiguation?: {
+    file?: boolean;
+    rank?: boolean;
+    both?: boolean;
+  };
+  // Wraparound specific
+  wraparoundPath?: Square[]; // Path taken for wraparound moves
+  wraparoundDistance?: number; // Distance traveled including wraparound
 }
 
 export interface GamePosition {
@@ -35,21 +71,29 @@ export interface GamePosition {
 
 // Game state types
 export type GameMode = 'bot' | 'multiplayer' | 'endless';
+export type GameVariant = 'classic' | 'unboxed' | 'programming' | 'programming_unboxed';
 export type GameStatus = 'waiting' | 'active' | 'paused' | 'finished' | 'abandoned';
 export type GameResult = 'white-wins' | 'black-wins' | 'draw' | 'ongoing';
+export type GameEndReason = 'checkmate' | 'stalemate' | 'resignation' | 'timeout' | 'draw-agreement' | 'insufficient-material' | 'fifty-move-rule' | 'threefold-repetition' | 'abandoned';
 
 export interface GameState {
   gameId: string;
   mode: GameMode;
+  variant: GameVariant;
   status: GameStatus;
   result: GameResult;
+  endReason?: GameEndReason;
   position: GamePosition;
   moves: ChessMove[];
+  moveHistory: string[]; // PGN algebraic notation
   players: {
     white: Player;
     black: Player;
   };
   timeControl?: TimeControl;
+  startedAt?: number;
+  endedAt?: number;
+  lastMoveAt?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -101,6 +145,7 @@ export interface Lobby {
   isPrivate: boolean;
   status: 'waiting' | 'full' | 'in-game';
   gameMode: GameMode;
+  gameVariant: GameVariant;
   timeControl?: TimeControl;
   createdAt: number;
 }
@@ -183,4 +228,79 @@ export interface BotConfig {
   difficulty: BotDifficulty;
   thinkingTime: number; // ms
   personality: 'aggressive' | 'defensive' | 'balanced';
+}
+
+// Programming Chess types
+export interface ProgrammingChessContext {
+  board: Record<Square, ChessPiece | null>;
+  pieces: {
+    white: Square[];
+    black: Square[];
+  };
+  gameState: {
+    turn: PieceColor;
+    moveNumber: number;
+    isCheck: boolean;
+    isCheckmate: boolean;
+    lastMove?: ChessMove;
+    castlingRights: {
+      whiteKingside: boolean;
+      whiteQueenside: boolean;
+      blackKingside: boolean;
+      blackQueenside: boolean;
+    };
+    enPassantTarget?: Square;
+  };
+  history: ChessMove[];
+}
+
+export interface ProgrammingChessMove {
+  from: Square;
+  to: Square;
+  piece: PieceType;
+  promotion?: PieceType;
+}
+
+export interface ProgrammingChessFunction {
+  name: string;
+  description: string;
+  parameters: string[];
+  returnType: string;
+  example: string;
+}
+
+export interface CodeExecutionResult {
+  success: boolean;
+  move?: ProgrammingChessMove;
+  error?: string;
+  executionTime: number;
+  logs: string[];
+}
+
+export interface ProgrammingChessPlayer extends Player {
+  code: string;
+  codeExecutionHistory: CodeExecutionResult[];
+  debugMode: boolean;
+  selectedTemplate?: string;
+}
+
+export interface CodeTemplate {
+  id: string;
+  name: string;
+  description: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  category: 'basic' | 'opening' | 'middlegame' | 'endgame' | 'tactical' | 'positional';
+  code: string;
+  explanation: string;
+}
+
+export type ProgrammingChessExecutionMode = 'manual' | 'automatic' | 'step-by-step';
+
+export interface ProgrammingChessSettings {
+  executionMode: ProgrammingChessExecutionMode;
+  timeLimit: number; // milliseconds
+  memoryLimit: number; // bytes
+  allowedAPIs: string[];
+  enableDebugging: boolean;
+  showExecutionLogs: boolean;
 }
