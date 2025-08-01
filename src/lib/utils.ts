@@ -61,8 +61,74 @@ export const PIECE_SYMBOLS: Record<PieceColor, Record<PieceType, string>> = {
   },
 };
 
-export function getPieceSymbol(type: PieceType, color: PieceColor): string {
-  return PIECE_SYMBOLS[color][type];
+export function normalizeColor(color: string): PieceColor {
+  if (color === 'w') return 'white';
+  if (color === 'b') return 'black';
+  if (color === 'white' || color === 'black') return color as PieceColor;
+  console.error(`Unknown piece color: ${color}`);
+  return 'white'; // fallback
+}
+
+export function normalizePieceType(type: string): PieceType {
+  switch (type) {
+    case 'p': return 'pawn';
+    case 'r': return 'rook';
+    case 'n': return 'knight';
+    case 'b': return 'bishop';
+    case 'q': return 'queen';
+    case 'k': return 'king';
+    case 'pawn':
+    case 'rook':
+    case 'knight':
+    case 'bishop':
+    case 'queen':
+    case 'king':
+      return type as PieceType;
+    default:
+      console.error(`Unknown piece type: ${type}`);
+      return 'pawn'; // fallback
+  }
+}
+
+export function getPieceSymbol(type: PieceType | string, color: PieceColor | string): string {
+  // Handle chess.js single letter colors ('w'/'b') vs our full names ('white'/'black')
+  let normalizedColor: PieceColor;
+  if (color === 'w') {
+    normalizedColor = 'white';
+  } else if (color === 'b') {
+    normalizedColor = 'black';
+  } else if (color === 'white' || color === 'black') {
+    normalizedColor = color as PieceColor;
+  } else {
+    console.error(`Unknown piece color: ${color}`);
+    normalizedColor = 'white'; // fallback
+  }
+  
+  // Handle chess.js single letter types vs our full names
+  let normalizedType: PieceType;
+  switch (type) {
+    case 'p': normalizedType = 'pawn'; break;
+    case 'r': normalizedType = 'rook'; break;
+    case 'n': normalizedType = 'knight'; break;
+    case 'b': normalizedType = 'bishop'; break;
+    case 'q': normalizedType = 'queen'; break;
+    case 'k': normalizedType = 'king'; break;
+    case 'pawn':
+    case 'rook':
+    case 'knight':
+    case 'bishop':
+    case 'queen':
+    case 'king':
+      normalizedType = type as PieceType;
+      break;
+    default:
+      console.error(`Unknown piece type: ${type}`);
+      normalizedType = 'pawn'; // fallback
+  }
+  
+  const symbol = PIECE_SYMBOLS[normalizedColor][normalizedType];
+  console.log(`getPieceSymbol(${type}, ${color}) -> normalizedType: ${normalizedType}, normalizedColor: ${normalizedColor}, symbol: ${symbol}`);
+  return symbol;
 }
 
 // Time formatting utilities

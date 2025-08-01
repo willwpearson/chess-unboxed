@@ -45,8 +45,12 @@ export default function BotGamePage() {
   const handleMove = async (move: ChessMove) => {
     if (!currentGame) return;
 
+    console.log('handleMove called with:', move);
+    console.log('Current game turn:', currentGame.position.turn);
+    console.log('Current game status:', currentGame.status);
     try {
       const success = await makeMove(move.from, move.to, move.promotion);
+      console.log('makeMove result:', success);
       if (!success) {
         console.warn('Move rejected by game manager');
       }

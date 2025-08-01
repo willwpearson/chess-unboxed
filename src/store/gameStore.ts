@@ -113,7 +113,12 @@ export const useGameStore = create<GameStore>()(
 
         try {
           // Make player move
+          const currentGameState = gameManager.getGameState();
+          console.log('GameStore: calling gameManager.makeMove with:', { from, to, promotion });
+          console.log('GameManager current turn:', currentGameState.position.turn);
+          console.log('GameManager current game state:', currentGameState);
           const result = gameManager.makeMove(from, to, promotion as any);
+          console.log('GameManager makeMove result:', result);
           
           if (!result.isValid) {
             console.warn('Invalid move:', result.error);

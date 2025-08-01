@@ -5,6 +5,7 @@
 
 import { Chess } from 'chess.js';
 import { WraparoundChessEngine } from './chessEngine';
+import { normalizeColor } from './utils';
 import { 
   GameState, 
   GameMode, 
@@ -171,11 +172,13 @@ export class GameManager {
       const currentPlayer = this.getCurrentPlayer();
       const piece = this.gameState.position.board[from];
       
+      console.log('GameManager validation - currentPlayer:', currentPlayer, 'piece.color:', piece?.color, 'match:', piece?.color === currentPlayer);
+      
       if (!piece) {
         return { isValid: false, error: 'No piece at source square' };
       }
 
-      if (piece.color !== currentPlayer) {
+      if (normalizeColor(piece.color) !== currentPlayer) {
         return { isValid: false, error: 'Not your turn' };
       }
 

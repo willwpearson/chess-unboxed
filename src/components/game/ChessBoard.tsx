@@ -9,6 +9,7 @@ import { Chess, Square as ChessJSSquare } from 'chess.js';
 import { ChessPiece, Square, ChessMove, PieceType, PieceColor, GameVariant } from '@/types/game';
 import { WraparoundChessEngine } from '@/lib/chessEngine';
 import { useGameStore } from '@/store/gameStore';
+import { getPieceSymbol, normalizeColor, normalizePieceType } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { PromotionDialog } from './PromotionDialog';
 import { Crown, RotateCcw, Flag, Users, RefreshCw } from 'lucide-react';
@@ -27,14 +28,6 @@ interface ChessBoardProps {
   boardTheme?: 'classic' | 'modern' | 'wood';
 }
 
-const PIECE_SYMBOLS: Record<PieceType, Record<PieceColor, string>> = {
-  king: { white: '♔', black: '♚' },
-  queen: { white: '♕', black: '♛' },
-  rook: { white: '♖', black: '♜' },
-  bishop: { white: '♗', black: '♝' },
-  knight: { white: '♘', black: '♞' },
-  pawn: { white: '♙', black: '♟' },
-};
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'];
@@ -133,8 +126,8 @@ export function ChessBoard({
     const fromRank = parseInt(from[1]);
     const toRank = parseInt(to[1]);
     
-    return (piece.color === 'white' && fromRank === 7 && toRank === 8) ||
-           (piece.color === 'black' && fromRank === 2 && toRank === 1);
+    return (normalizeColor(piece.color) === 'white' && fromRank === 7 && toRank === 8) ||
+           (normalizeColor(piece.color) === 'black' && fromRank === 2 && toRank === 1);
   }, [boardPosition]);
 
   const getSquareColor = (file: string, rank: string) => {
@@ -206,9 +199,11 @@ export function ChessBoard({
   }, [isWraparoundMove]);
 
   const handleSquareClick = useCallback((square: Square) => {
+    console.log('Square clicked:', square, 'isPlayerTurn:', isPlayerTurn, 'currentPlayer:', currentPlayer);
     if (!isPlayerTurn) return;
 
     const piece = boardPosition[square];
+    console.log('Piece on clicked square:', piece);
     
     if (ui.selectedSquare) {
       if (ui.selectedSquare === square) {
@@ -216,64 +211,93 @@ export function ChessBoard({
         setSelectedSquare(null);
         setPossibleMoves([]);
       } else if (ui.possibleMoves.includes(square)) {
+        console.log('Attempting move from', ui.selectedSquare, 'to', square);
         // Check if this move requires promotion
         if (requiresPromotion(ui.selectedSquare, square)) {
+          console.log('Move requires promotion');
           setPendingMove({ from: ui.selectedSquare, to: square });
           showPromotionDialog(square);
           return;
         }
 
         // Validate and make move using appropriate engine
+        console.log('Making move with engine:', chessEngine instanceof WraparoundChessEngine ? 'WraparoundChessEngine' : 'Chess.js');
         try {
           let moveResult: ChessMove | null = null;
           
           if (chessEngine instanceof WraparoundChessEngine) {
+            console.log('Using WraparoundChessEngine');
             moveResult = chessEngine.makeMove(ui.selectedSquare, square);
+            console.log('WraparoundChessEngine moveResult:', moveResult);
           } else {
+            console.log('Using Chess.js, converting squares:', ui.selectedSquare, '->', toChessJSSquare(ui.selectedSquare), square, '->', toChessJSSquare(square));
             const chessMove = chess.move({
               from: toChessJSSquare(ui.selectedSquare),
               to: toChessJSSquare(square)
             });
+            console.log('Chess.js moveResult:', chessMove);
             
             if (chessMove) {
+              // Convert chess.js captured piece format to our format
+              let capturedPiece: ChessPiece | undefined = undefined;
+              if (chessMove.captured) {
+                capturedPiece = {
+                  type: normalizePieceType(chessMove.captured),
+                  color: normalizeColor(chessMove.color) === 'white' ? 'black' : 'white' // captured piece is opposite color
+                };
+              }
+              
+              const sourcePiece = boardPosition[ui.selectedSquare]!;
               moveResult = {
                 from: ui.selectedSquare,
                 to: square,
-                piece: boardPosition[ui.selectedSquare]!,
-                captured: piece || undefined,
-                promotion: chessMove.promotion as PieceType | undefined,
+                piece: {
+                  type: normalizePieceType(sourcePiece.type),
+                  color: normalizeColor(sourcePiece.color)
+                },
+                captured: capturedPiece,
+                promotion: chessMove.promotion ? normalizePieceType(chessMove.promotion) : undefined,
                 castling: chessMove.san.includes('O-O-O') ? 'queenside' : 
                          chessMove.san.includes('O-O') ? 'kingside' : undefined,
-                enPassant: chessMove.san.includes('e.p.') || chessMove.captured === 'p',
+                enPassant: chessMove.flags.includes('e'),
                 timestamp: Date.now()
               };
+              console.log('Converted moveResult:', moveResult);
             }
           }
           
           if (moveResult) {
+            console.log('Calling onMove with moveResult:', moveResult);
             onMove(moveResult);
             setSelectedSquare(null);
             setPossibleMoves([]);
+          } else {
+            console.log('No moveResult generated');
           }
         } catch (error) {
           console.warn('Invalid move attempted:', error);
           setSelectedSquare(null);
           setPossibleMoves([]);
         }
-      } else if (piece && piece.color === currentPlayer) {
+      } else if (piece && normalizeColor(piece.color) === currentPlayer) {
         // Select new piece and calculate legal moves
+        console.log('Selecting piece - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
         setSelectedSquare(square);
         const legalMoves = getLegalMoves(square);
         setPossibleMoves(legalMoves);
       } else {
+        console.log('Cannot select piece - piece.color:', piece?.color, 'currentPlayer:', currentPlayer, 'match:', piece?.color === currentPlayer);
         setSelectedSquare(null);
         setPossibleMoves([]);
       }
-    } else if (piece && piece.color === currentPlayer) {
+    } else if (piece && normalizeColor(piece.color) === currentPlayer) {
       // Select piece and calculate legal moves
+      console.log('Selecting piece (no previous selection) - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
       setSelectedSquare(square);
       const legalMoves = getLegalMoves(square);
       setPossibleMoves(legalMoves);
+    } else if (piece) {
+      console.log('Cannot select piece (no previous selection) - piece.color:', piece.color, 'currentPlayer:', currentPlayer, 'match:', piece.color === currentPlayer);
     }
   }, [ui.selectedSquare, ui.possibleMoves, boardPosition, currentPlayer, isPlayerTurn, onMove, setSelectedSquare, setPossibleMoves, chess, chessEngine, getLegalMoves, toChessJSSquare, requiresPromotion, showPromotionDialog]);
 
@@ -284,7 +308,7 @@ export function ChessBoard({
     }
 
     const piece = boardPosition[square];
-    if (!piece || piece.color !== currentPlayer) {
+    if (!piece || normalizeColor(piece.color) !== currentPlayer) {
       e.preventDefault();
       return;
     }
@@ -415,7 +439,9 @@ export function ChessBoard({
   const renderPiece = (piece: ChessPiece | null, square: Square) => {
     if (!piece) return null;
 
-    const symbol = PIECE_SYMBOLS[piece.type][piece.color];
+    console.log('Rendering piece:', piece, 'on square:', square);
+    const symbol = getPieceSymbol(piece.type, piece.color);
+    console.log('Symbol:', symbol);
     const isDragged = ui.draggedPiece?.from === square;
 
     return (
@@ -423,9 +449,10 @@ export function ChessBoard({
         className={`absolute inset-0 flex items-center justify-center text-4xl cursor-pointer select-none transition-opacity ${
           isDragged ? 'opacity-50' : ''
         }`}
-        draggable={isPlayerTurn && piece.color === currentPlayer}
+        draggable={isPlayerTurn && normalizeColor(piece.color) === currentPlayer}
         onDragStart={(e) => handleDragStart(e, square)}
         onDragEnd={handleDragEnd}
+        onClick={() => handleSquareClick(square)}
       >
         {symbol}
       </div>
@@ -435,6 +462,9 @@ export function ChessBoard({
   const renderSquare = (file: string, rank: string) => {
     const square = getSquareName(file, rank);
     const piece = boardPosition[square];
+    if (square === 'e1' || square === 'e8') {
+      console.log(`Square ${square}:`, piece, 'from boardPosition:', boardPosition);
+    }
     const isSelected = ui.selectedSquare === square;
     const isPossibleMove = ui.possibleMoves.includes(square);
     const isLastMove = false; // TODO: Implement last move highlighting
