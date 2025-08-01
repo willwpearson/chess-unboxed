@@ -151,8 +151,11 @@ export const useGameStore = create<GameStore>()(
                   console.log('Bot move result:', botResult);
                   if (botResult.isValid) {
                     const finalGameState = gameManager.getGameState();
+                    console.log('Bot move completed - final game state turn:', finalGameState.position.turn, 'status:', finalGameState.status);
                     set({ currentGame: finalGameState });
                     get().addToHistory(finalGameState);
+                  } else {
+                    console.log('Bot move was invalid:', botResult.error);
                   }
                 }
               } catch (error) {

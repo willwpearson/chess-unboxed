@@ -45,7 +45,7 @@ export function ChessBoard({
   showCoordinates = true,
   boardTheme = 'classic'
 }: ChessBoardProps) {
-  const { ui, setSelectedSquare, setPossibleMoves, setDraggedPiece, showPromotionDialog, hidePromotionDialog } = useGameStore();
+  const { ui, setSelectedSquare, setPossibleMoves, setDraggedPiece, showPromotionDialog, hidePromotionDialog, getLegalMoves: storeLegalMoves } = useGameStore();
   const [draggedElement, setDraggedElement] = useState<HTMLElement | null>(null);
   const [pendingMove, setPendingMove] = useState<{ from: Square; to: Square } | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -63,10 +63,14 @@ export function ChessBoard({
       const instance = new Chess();
       if (fen) {
         try {
+          console.log('Loading FEN into chess instance:', fen);
           instance.load(fen);
+          console.log('Chess instance after loading FEN:', instance.fen());
         } catch (error) {
           console.warn('Invalid FEN provided, using default position:', error);
         }
+      } else {
+        console.log('No FEN provided, using default starting position');
       }
       return instance;
     }
@@ -283,7 +287,8 @@ export function ChessBoard({
         // Select new piece and calculate legal moves
         console.log('Selecting piece - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
         setSelectedSquare(square);
-        const legalMoves = getLegalMoves(square);
+        const legalMoves = storeLegalMoves ? storeLegalMoves(square) : getLegalMoves(square);
+        console.log('Legal moves for', square, ':', legalMoves, '(using store:', !!storeLegalMoves, ')');
         setPossibleMoves(legalMoves);
       } else {
         console.log('Cannot select piece - piece.color:', piece?.color, 'currentPlayer:', currentPlayer, 'match:', piece?.color === currentPlayer);
@@ -294,7 +299,8 @@ export function ChessBoard({
       // Select piece and calculate legal moves
       console.log('Selecting piece (no previous selection) - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
       setSelectedSquare(square);
-      const legalMoves = getLegalMoves(square);
+      const legalMoves = storeLegalMoves ? storeLegalMoves(square) : getLegalMoves(square);
+      console.log('Legal moves for', square, '(no prev selection):', legalMoves, '(using store:', !!storeLegalMoves, ')');
       setPossibleMoves(legalMoves);
     } else if (piece) {
       console.log('Cannot select piece (no previous selection) - piece.color:', piece.color, 'currentPlayer:', currentPlayer, 'match:', piece.color === currentPlayer);
