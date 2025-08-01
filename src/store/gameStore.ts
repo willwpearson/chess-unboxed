@@ -139,12 +139,16 @@ export const useGameStore = create<GameStore>()(
           }
 
           // Make bot move if it's bot's turn
+          console.log('Bot move check - botManager:', !!botManager, 'turn:', updatedGameState.position.turn, 'gameOver:', gameManager.isGameOver());
           if (botManager && updatedGameState.position.turn === 'black' && !gameManager.isGameOver()) {
+            console.log('Making bot move...');
             setTimeout(async () => {
               try {
                 const botMove = await botManager.generateMove();
+                console.log('Bot generated move:', botMove);
                 if (botMove) {
                   const botResult = gameManager.makeMove(botMove.from, botMove.to, botMove.promotion);
+                  console.log('Bot move result:', botResult);
                   if (botResult.isValid) {
                     const finalGameState = gameManager.getGameState();
                     set({ currentGame: finalGameState });

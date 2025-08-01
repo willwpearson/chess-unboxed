@@ -579,7 +579,9 @@ export class BotManager {
     await new Promise(resolve => setTimeout(resolve, thinkingTime));
 
     const legalMoves = this.getAllLegalMoves();
+    console.log('Bot getAllLegalMoves result:', legalMoves, 'length:', legalMoves.length);
     if (legalMoves.length === 0) {
+      console.log('No legal moves found for bot');
       return null;
     }
 
@@ -613,7 +615,7 @@ export class BotManager {
     
     for (const square in gameState.position.board) {
       const piece = gameState.position.board[square as Square];
-      if (piece && piece.color === gameState.position.turn) {
+      if (piece && normalizeColor(piece.color) === gameState.position.turn) {
         const legalMoves = this.gameManager.getLegalMovesForSquare(square as Square);
         for (const to of legalMoves) {
           moves.push({ from: square as Square, to, piece });
