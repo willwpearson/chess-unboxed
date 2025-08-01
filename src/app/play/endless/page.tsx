@@ -69,10 +69,12 @@ export default function EndlessGamePage() {
       const newGame: GameState = {
         gameId: `endless-game-${Date.now()}`,
         mode: 'endless',
+        variant: 'classic',
         status: 'active',
         result: 'ongoing',
         position: INITIAL_POSITION,
         moves: [],
+        moveHistory: [],
         players: {
           white: humanPlayer,
           black: botPlayer

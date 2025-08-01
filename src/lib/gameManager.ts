@@ -156,7 +156,7 @@ export class GameManager {
         blackKingside: chess.getCastlingRights('b').k,
         blackQueenside: chess.getCastlingRights('b').q,
       },
-      enPassantTarget: chess.getEnPassantTarget() as Square | undefined,
+      enPassantTarget: undefined, // TODO: Extract from FEN when available
       halfmoveClock: 0, // TODO: Extract from FEN
       fullmoveNumber: chess.moveNumber()
     };
@@ -315,7 +315,7 @@ export class GameManager {
           blackKingside: chess.getCastlingRights('b').k,
           blackQueenside: chess.getCastlingRights('b').q,
         },
-        enPassantTarget: chess.getEnPassantTarget() as Square | undefined,
+        enPassantTarget: undefined, // TODO: Extract from FEN when available
         halfmoveClock: 0, // TODO: Extract from FEN
         fullmoveNumber: chess.moveNumber()
       };
@@ -517,7 +517,7 @@ export class GameManager {
     if (this.engine instanceof WraparoundChessEngine) {
       return this.engine.getLegalMoves(square);
     } else {
-      const moves = this.engine.moves({ square: square, verbose: true });
+      const moves = this.engine.moves({ square: square as any, verbose: true });
       return moves.map(move => move.to as Square);
     }
   }

@@ -17,7 +17,7 @@ interface CodeEditorProps {
 }
 
 // Chess API definitions for TypeScript IntelliSense
-const CHESS_API_DEFINITIONS = `
+const getChessAPIDefinitions = (variant: 'classic' | 'unboxed') => `
 declare interface ChessBoard {
   [square: string]: ChessPiece | null;
 }
@@ -182,7 +182,7 @@ export default function CodeEditor({
 
     // Add chess API definitions for IntelliSense
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
-      CHESS_API_DEFINITIONS,
+      getChessAPIDefinitions(variant),
       'chess-api.d.ts'
     );
 
@@ -194,7 +194,6 @@ export default function CodeEditor({
       wordWrap: 'on',
       lineNumbers: 'on',
       folding: true,
-      bracketColoring: true,
       autoIndent: 'full',
       formatOnPaste: true,
       formatOnType: true,
