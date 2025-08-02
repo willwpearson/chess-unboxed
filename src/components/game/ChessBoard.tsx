@@ -74,7 +74,7 @@ export function ChessBoard({
       }
       return instance;
     }
-  }, [propChess, fen, isWraparoundMode]);
+  }, [propChess, fen, isWraparoundMode, currentPlayer]); // Add currentPlayer to force refresh on turn changes
 
   // For backward compatibility, maintain chess reference
   const chess = chessEngine instanceof WraparoundChessEngine ? chessEngine.getChessJS() : chessEngine;
@@ -114,13 +114,18 @@ export function ChessBoard({
   
   // Helper function to get legal moves for a square
   const getLegalMoves = useCallback((square: Square): Square[] => {
+    // Prefer using the store's legal moves function if available (for GameManager integration)
+    if (storeLegalMoves) {
+      return storeLegalMoves(square);
+    }
+    
     if (chessEngine instanceof WraparoundChessEngine) {
       return chessEngine.getLegalMoves(square);
     } else {
       const moves = chess.moves({ square: toChessJSSquare(square), verbose: true });
       return moves.map(move => move.to as Square);
     }
-  }, [chess, chessEngine, toChessJSSquare]);
+  }, [chess, chessEngine, toChessJSSquare, storeLegalMoves]);
   
   // Helper function to check if a move requires promotion
   const requiresPromotion = useCallback((from: Square, to: Square): boolean => {
@@ -287,8 +292,8 @@ export function ChessBoard({
         // Select new piece and calculate legal moves
         console.log('Selecting piece - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
         setSelectedSquare(square);
-        const legalMoves = storeLegalMoves ? storeLegalMoves(square) : getLegalMoves(square);
-        console.log('Legal moves for', square, ':', legalMoves, '(using store:', !!storeLegalMoves, ')');
+        const legalMoves = getLegalMoves(square);
+        console.log('Legal moves for', square, ':', legalMoves);
         setPossibleMoves(legalMoves);
       } else {
         console.log('Cannot select piece - piece.color:', piece?.color, 'currentPlayer:', currentPlayer, 'match:', piece?.color === currentPlayer);
@@ -299,8 +304,8 @@ export function ChessBoard({
       // Select piece and calculate legal moves
       console.log('Selecting piece (no previous selection) - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
       setSelectedSquare(square);
-      const legalMoves = storeLegalMoves ? storeLegalMoves(square) : getLegalMoves(square);
-      console.log('Legal moves for', square, '(no prev selection):', legalMoves, '(using store:', !!storeLegalMoves, ')');
+      const legalMoves = getLegalMoves(square);
+      console.log('Legal moves for', square, '(no prev selection):', legalMoves);
       setPossibleMoves(legalMoves);
     } else if (piece) {
       console.log('Cannot select piece (no previous selection) - piece.color:', piece.color, 'currentPlayer:', currentPlayer, 'match:', piece.color === currentPlayer);

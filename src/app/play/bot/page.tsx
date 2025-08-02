@@ -16,7 +16,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function BotGamePage() {
   const router = useRouter();
-  const { currentGame, initializeGame, makeMove, resignGame, offerDraw } = useGameStore();
+  const { currentGame, initializeGame, makeMove, resignGame, offerDraw, getCurrentFEN } = useGameStore();
   const [gameStarted, setGameStarted] = useState(false);
   const [botConfig, setBotConfig] = useState<BotConfig | null>(null);
   const [gameVariant, setGameVariant] = useState<GameVariant>('classic');
@@ -183,6 +183,7 @@ export default function BotGamePage() {
             <div className="lg:col-span-2 flex justify-center">
               <ChessBoard
                 position={currentGame.position.board}
+                fen={getCurrentFEN() || undefined}
                 gameVariant={currentGame.variant}
                 onMove={handleMove}
                 onResign={handleResign}

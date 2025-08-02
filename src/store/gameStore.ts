@@ -24,6 +24,7 @@ interface GameStore {
   resignGame: () => void;
   offerDraw: () => void;
   getLegalMoves: (square: Square) => Square[];
+  getCurrentFEN: () => string | null;
   
   // Legacy actions (for backward compatibility)
   setCurrentGame: (game: GameState | null) => void;
@@ -199,6 +200,13 @@ export const useGameStore = create<GameStore>()(
         if (!gameManager) return [];
 
         return gameManager.getLegalMovesForSquare(square);
+      },
+
+      getCurrentFEN: (): string | null => {
+        const { gameManager } = get();
+        if (!gameManager) return null;
+
+        return gameManager.getFEN();
       },
 
       // Legacy actions (for backward compatibility)
