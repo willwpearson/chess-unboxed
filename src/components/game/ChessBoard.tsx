@@ -114,7 +114,7 @@ export function ChessBoard({
   
   // Helper function to get legal moves for a square
   const getLegalMoves = useCallback((square: Square): Square[] => {
-    // Prefer using the store's legal moves function if available (for GameManager integration)
+    // Prefer using the store's legal moves function if available (for GameManager integration)  
     if (storeLegalMoves) {
       return storeLegalMoves(square);
     }
@@ -169,19 +169,13 @@ export function ChessBoard({
     if (!isWraparoundMode) return false;
     
     const fromFile = from.charCodeAt(0) - 97; // a=0, b=1, etc.
-    const fromRank = parseInt(from[1]) - 1;   // 1=0, 2=1, etc.
     const toFile = to.charCodeAt(0) - 97;
-    const toRank = parseInt(to[1]) - 1;
     
-    // Check for horizontal wraparound (file difference > 4 means likely wraparound)
+    // Check for horizontal wraparound only (file difference > 4 means likely wraparound)
     const fileDiff = Math.abs(toFile - fromFile);
     const horizontalWrap = fileDiff > 4;
     
-    // Check for vertical wraparound (rank difference > 4 means likely wraparound)
-    const rankDiff = Math.abs(toRank - fromRank);
-    const verticalWrap = rankDiff > 4;
-    
-    return horizontalWrap || verticalWrap;
+    return horizontalWrap;
   }, [isWraparoundMode]);
 
   // Helper function to get wraparound visual indicators
@@ -189,19 +183,12 @@ export function ChessBoard({
     if (!isWraparoundMove(from, to)) return null;
     
     const fromFile = from.charCodeAt(0) - 97;
-    const fromRank = parseInt(from[1]) - 1;
     const toFile = to.charCodeAt(0) - 97;
-    const toRank = parseInt(to[1]) - 1;
     
     const fileDiff = Math.abs(toFile - fromFile);
-    const rankDiff = Math.abs(toRank - fromRank);
     
-    if (fileDiff > 4 && rankDiff > 4) {
-      return 'diagonal-wrap';
-    } else if (fileDiff > 4) {
+    if (fileDiff > 4) {
       return 'horizontal-wrap';
-    } else if (rankDiff > 4) {
-      return 'vertical-wrap';
     }
     
     return null;
@@ -229,65 +216,23 @@ export function ChessBoard({
           return;
         }
 
-        // Validate and make move using appropriate engine
-        console.log('Making move with engine:', chessEngine instanceof WraparoundChessEngine ? 'WraparoundChessEngine' : 'Chess.js');
-        try {
-          let moveResult: ChessMove | null = null;
-          
-          if (chessEngine instanceof WraparoundChessEngine) {
-            console.log('Using WraparoundChessEngine');
-            moveResult = chessEngine.makeMove(ui.selectedSquare, square);
-            console.log('WraparoundChessEngine moveResult:', moveResult);
-          } else {
-            console.log('Using Chess.js, converting squares:', ui.selectedSquare, '->', toChessJSSquare(ui.selectedSquare), square, '->', toChessJSSquare(square));
-            const chessMove = chess.move({
-              from: toChessJSSquare(ui.selectedSquare),
-              to: toChessJSSquare(square)
-            });
-            console.log('Chess.js moveResult:', chessMove);
-            
-            if (chessMove) {
-              // Convert chess.js captured piece format to our format
-              let capturedPiece: ChessPiece | undefined = undefined;
-              if (chessMove.captured) {
-                capturedPiece = {
-                  type: normalizePieceType(chessMove.captured),
-                  color: normalizeColor(chessMove.color) === 'white' ? 'black' : 'white' // captured piece is opposite color
-                };
-              }
-              
-              const sourcePiece = boardPosition[ui.selectedSquare]!;
-              moveResult = {
-                from: ui.selectedSquare,
-                to: square,
-                piece: {
-                  type: normalizePieceType(sourcePiece.type),
-                  color: normalizeColor(sourcePiece.color)
-                },
-                captured: capturedPiece,
-                promotion: chessMove.promotion ? normalizePieceType(chessMove.promotion) : undefined,
-                castling: chessMove.san.includes('O-O-O') ? 'queenside' : 
-                         chessMove.san.includes('O-O') ? 'kingside' : undefined,
-                enPassant: chessMove.flags.includes('e'),
-                timestamp: Date.now()
-              };
-              console.log('Converted moveResult:', moveResult);
-            }
-          }
-          
-          if (moveResult) {
-            console.log('Calling onMove with moveResult:', moveResult);
-            onMove(moveResult);
-            setSelectedSquare(null);
-            setPossibleMoves([]);
-          } else {
-            console.log('No moveResult generated');
-          }
-        } catch (error) {
-          console.warn('Invalid move attempted:', error);
-          setSelectedSquare(null);
-          setPossibleMoves([]);
-        }
+        // Always use onMove callback - let the GameManager handle the move validation
+        console.log('Calling onMove to let GameManager handle the move');
+        const sourcePiece = boardPosition[ui.selectedSquare]!;
+        const moveToAttempt: ChessMove = {
+          from: ui.selectedSquare,
+          to: square,
+          piece: {
+            type: sourcePiece.type,
+            color: sourcePiece.color
+          },
+          timestamp: Date.now()
+        };
+        
+        console.log('Calling onMove with move:', moveToAttempt);
+        onMove(moveToAttempt);
+        setSelectedSquare(null);
+        setPossibleMoves([]);
       } else if (piece && normalizeColor(piece.color) === currentPlayer) {
         // Select new piece and calculate legal moves
         console.log('Selecting piece - piece.color:', piece.color, 'currentPlayer:', currentPlayer);
@@ -364,74 +309,33 @@ export function ChessBoard({
       return;
     }
 
-    // Validate move using appropriate engine
-    try {
-      let moveResult: ChessMove | null = null;
-      
-      if (chessEngine instanceof WraparoundChessEngine) {
-        moveResult = chessEngine.makeMove(ui.draggedPiece.from, square);
-      } else {
-        const chessMove = chess.move({
-          from: toChessJSSquare(ui.draggedPiece.from),
-          to: toChessJSSquare(square)
-        });
-        
-        if (chessMove) {
-          moveResult = {
-            from: ui.draggedPiece.from,
-            to: square,
-            piece: ui.draggedPiece.piece,
-            captured: boardPosition[square] || undefined,
-            promotion: chessMove.promotion as PieceType | undefined,
-            castling: chessMove.san.includes('O-O-O') ? 'queenside' : 
-                     chessMove.san.includes('O-O') ? 'kingside' : undefined,
-            enPassant: chessMove.san.includes('e.p.') || chessMove.captured === 'p',
-            timestamp: Date.now()
-          };
-        }
-      }
-      
-      if (moveResult) {
-        onMove(moveResult);
-      }
-    } catch (error) {
-      console.warn('Invalid drop move attempted:', error);
-    }
+    // Always use onMove callback - let the GameManager handle the move validation
+    const moveToAttempt: ChessMove = {
+      from: ui.draggedPiece.from,
+      to: square,
+      piece: ui.draggedPiece.piece,
+      timestamp: Date.now()
+    };
+    
+    console.log('Drag-drop: Calling onMove with move:', moveToAttempt);
+    onMove(moveToAttempt);
   }, [ui.draggedPiece, boardPosition, onMove, chess, chessEngine, toChessJSSquare, requiresPromotion, showPromotionDialog]);
 
   const handlePromotion = useCallback((piece: PieceType) => {
     if (!pendingMove) return;
 
-    try {
-      let moveResult: ChessMove | null = null;
-      
-      if (chessEngine instanceof WraparoundChessEngine) {
-        moveResult = chessEngine.makeMove(pendingMove.from, pendingMove.to, piece);
-      } else {
-        const chessMove = chess.move({
-          from: toChessJSSquare(pendingMove.from),
-          to: toChessJSSquare(pendingMove.to),
-          promotion: piece
-        });
-        
-        if (chessMove) {
-          moveResult = {
-            from: pendingMove.from,
-            to: pendingMove.to,
-            piece: boardPosition[pendingMove.from]!,
-            captured: boardPosition[pendingMove.to] || undefined,
-            promotion: piece,
-            timestamp: Date.now()
-          };
-        }
-      }
-      
-      if (moveResult) {
-        onMove(moveResult);
-      }
-    } catch (error) {
-      console.warn('Invalid promotion move:', error);
-    }
+    // Always use onMove callback - let the GameManager handle the move validation
+    const sourcePiece = boardPosition[pendingMove.from]!;
+    const moveToAttempt: ChessMove = {
+      from: pendingMove.from,
+      to: pendingMove.to,
+      piece: sourcePiece,
+      promotion: piece,
+      timestamp: Date.now()
+    };
+    
+    console.log('Promotion: Calling onMove with move:', moveToAttempt);
+    onMove(moveToAttempt);
 
     // Clean up
     setPendingMove(null);
@@ -531,9 +435,7 @@ export function ChessBoard({
           <div className="absolute top-1 right-1">
             <div className="w-3 h-3 bg-purple-500 rounded-full flex items-center justify-center">
               <span className="text-xs text-white font-bold">
-                {wraparoundType === 'horizontal-wrap' ? '↔' : 
-                 wraparoundType === 'vertical-wrap' ? '↕' : 
-                 wraparoundType === 'diagonal-wrap' ? '⤡' : '⟲'}
+                {wraparoundType === 'horizontal-wrap' ? '↔' : '⟲'}
               </span>
             </div>
           </div>
@@ -554,17 +456,9 @@ export function ChessBoard({
           isWraparoundMode ? 'bg-purple-900' : 'bg-amber-900'
         }`}
       >
-        {/* Wraparound indicators */}
+        {/* Wraparound indicators - only left-right */}
         {isWraparoundMode && (
           <>
-            {/* Top-bottom connection indicators */}
-            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 text-purple-300 text-sm font-bold">
-              ↕ Wraps ↕
-            </div>
-            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-purple-300 text-sm font-bold">
-              ↕ Wraps ↕
-            </div>
-            
             {/* Left-right connection indicators */}
             <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 -rotate-90 text-purple-300 text-sm font-bold">
               ↔ Wraps ↔

@@ -167,6 +167,8 @@ export class GameManager {
    * Validate and make a move
    */
   public makeMove(from: Square, to: Square, promotion?: PieceType): MoveValidationResult {
+    console.log(`GameManager.makeMove: ${from} -> ${to}`);
+    
     try {
       // Validate it's the correct player's turn
       const currentPlayer = this.getCurrentPlayer();
@@ -175,10 +177,12 @@ export class GameManager {
       console.log('GameManager validation - currentPlayer:', currentPlayer, 'piece.color:', piece?.color, 'match:', piece?.color === currentPlayer);
       
       if (!piece) {
+        console.log('GameManager: No piece at source square');
         return { isValid: false, error: 'No piece at source square' };
       }
 
       if (normalizeColor(piece.color) !== currentPlayer) {
+        console.log('GameManager: Not your turn');
         return { isValid: false, error: 'Not your turn' };
       }
 
@@ -186,8 +190,11 @@ export class GameManager {
       let moveResult: ChessMove | null = null;
       let algebraicNotation = '';
 
+      console.log('GameManager: Attempting move with engine type:', this.engine instanceof WraparoundChessEngine ? 'WraparoundChessEngine' : 'Chess.js');
+
       if (this.engine instanceof WraparoundChessEngine) {
         moveResult = this.engine.makeMove(from, to, promotion);
+        console.log('WraparoundChessEngine moveResult:', moveResult);
         if (moveResult) {
           algebraicNotation = this.generateAlgebraicNotation(moveResult);
         }
@@ -218,8 +225,11 @@ export class GameManager {
       }
 
       if (!moveResult) {
+        console.log('GameManager: Move failed - no moveResult');
         return { isValid: false, error: 'Invalid move' };
       }
+
+      console.log('GameManager: Move successful, updating game state');
 
       // Update game state
       this.updateGameStateAfterMove(moveResult, algebraicNotation);
@@ -236,6 +246,7 @@ export class GameManager {
         this.endGame(analysis.gameResult, analysis.endReason!);
       }
 
+      console.log('GameManager: Returning successful move result');
       return {
         isValid: true,
         move: moveResult,
@@ -377,6 +388,12 @@ export class GameManager {
    * Check for threefold repetition
    */
   private checkThreefoldRepetition(): boolean {
+    // For wraparound mode, disable threefold repetition for now
+    // since FEN generation isn't properly implemented
+    if (this.engine instanceof WraparoundChessEngine) {
+      return false;
+    }
+    
     const currentPosition = this.engine.fen().split(' ')[0]; // Board position only
     let count = 0;
     
@@ -439,8 +456,21 @@ export class GameManager {
    */
   private getLegalMoves(): string[] {
     if (this.engine instanceof WraparoundChessEngine) {
-      // TODO: Implement comprehensive legal move generation for wraparound
-      return [];
+      // Generate all legal moves for wraparound mode
+      const moves: string[] = [];
+      const currentPlayer = this.getCurrentPlayer();
+      
+      for (const square in this.gameState.position.board) {
+        const piece = this.gameState.position.board[square as Square];
+        if (piece && normalizeColor(piece.color) === currentPlayer) {
+          const legalMoves = this.engine.getLegalMoves(square as Square);
+          for (const to of legalMoves) {
+            moves.push(`${square}${to}`); // Simple move notation
+          }
+        }
+      }
+      
+      return moves;
     } else {
       return this.engine.moves();
     }
