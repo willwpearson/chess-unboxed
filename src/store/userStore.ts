@@ -19,6 +19,7 @@ interface UserState {
 }
 
 const defaultPreferences: UserPreferences = {
+  theme: 'light',
   boardTheme: 'classic',
   pieceSet: 'classic',
   showCoordinates: true,

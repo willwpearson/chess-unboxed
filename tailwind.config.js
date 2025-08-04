@@ -34,6 +34,18 @@ module.exports = {
         success: '#10b981',
         warning: '#f59e0b',
         error: '#ef4444',
+        // Gaming theme colors
+        gaming: {
+          'bg-primary': 'var(--gaming-bg-primary)',
+          'bg-secondary': 'var(--gaming-bg-secondary)',
+          'bg-tertiary': 'var(--gaming-bg-tertiary)',
+          'accent-primary': 'var(--gaming-accent-primary)',
+          'accent-secondary': 'var(--gaming-accent-secondary)',
+          'accent-danger': 'var(--gaming-accent-danger)',
+          'text-primary': 'var(--gaming-text-primary)',
+          'text-secondary': 'var(--gaming-text-secondary)',
+          'border': 'var(--gaming-border)',
+        },
         // Background variants
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -56,6 +68,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        gaming: ['var(--font-gaming)', 'Orbitron', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'SF Mono', 'Monaco', 'monospace'],
       },
       animation: {

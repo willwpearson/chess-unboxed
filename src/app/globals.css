@@ -2,16 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
 :root {
+  /* Base theme colors */
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
+  --primary: 262 83% 58%;
   --primary-foreground: 210 40% 98%;
   --secondary: 210 40% 96%;
   --secondary-foreground: 222.2 84% 4.9%;
@@ -23,32 +24,57 @@
   --destructive-foreground: 210 40% 98%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 0.5rem;
+  --ring: 262 83% 58%;
+  --radius: 0.75rem;
+  
+  /* Gaming theme colors */
+  --gaming-bg-primary: #ffffff;
+  --gaming-bg-secondary: #f8fafc;
+  --gaming-bg-tertiary: #e2e8f0;
+  --gaming-accent-primary: #7c3aed;
+  --gaming-accent-secondary: #059669;
+  --gaming-accent-danger: #dc2626;
+  --gaming-text-primary: #1f2937;
+  --gaming-text-secondary: #6b7280;
+  --gaming-border: #d1d5db;
+  
+  /* Fonts */
   --font-inter: 'Inter', sans-serif;
+  --font-gaming: 'Orbitron', 'Inter', sans-serif;
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 212.7 26.8% 83.9%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 262 83% 58%;
+  
+  /* Gaming theme colors - dark mode */
+  --gaming-bg-primary: #0f0f1a;
+  --gaming-bg-secondary: #1a1a2e;
+  --gaming-bg-tertiary: #16213e;
+  --gaming-accent-primary: #7c3aed;
+  --gaming-accent-secondary: #06d6a0;  
+  --gaming-accent-danger: #ef4444;
+  --gaming-text-primary: #ffffff;
+  --gaming-text-secondary: #a1a1aa;
+  --gaming-border: #374151;
 }
 
 * {
@@ -59,6 +85,87 @@ body {
   color: hsl(var(--foreground));
   background: hsl(var(--background));
   font-family: var(--font-inter);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Gaming UI Components */
+.gaming-card {
+  background: var(--gaming-bg-secondary);
+  border: 2px solid var(--gaming-border);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.gaming-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+  border-color: var(--gaming-accent-primary);
+}
+
+.gaming-button {
+  background: linear-gradient(135deg, var(--gaming-accent-primary), var(--gaming-accent-secondary));
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-family: var(--font-gaming);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.gaming-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4);
+}
+
+.gaming-button:active {
+  transform: translateY(0);
+}
+
+.gaming-button-secondary {
+  background: var(--gaming-bg-tertiary);
+  color: var(--gaming-text-primary);
+  border: 2px solid var(--gaming-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gaming-button-secondary:hover {
+  border-color: var(--gaming-accent-primary);
+  background: var(--gaming-bg-secondary);
+}
+
+.gaming-title {
+  font-family: var(--font-gaming);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gaming-accent-primary), var(--gaming-accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gaming-glow {
+  position: relative;
+}
+
+.gaming-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, var(--gaming-accent-primary), var(--gaming-accent-secondary));
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.gaming-glow:hover::before {
+  opacity: 0.3;
 }
 
 /* Chess board specific styles */
@@ -66,14 +173,56 @@ body {
   @apply relative flex items-center justify-center cursor-pointer transition-all duration-200;
 }
 
-.chess-square.light {
+/* Classic board theme */
+.chess-square.classic.light {
   background-color: #f0d9b5;
 }
 
-.chess-square.dark {
+.chess-square.classic.dark {
   background-color: #b58863;
 }
 
+/* Modern board theme */
+.chess-square.modern.light {
+  background-color: #ffffff;
+}
+
+.chess-square.modern.dark {
+  background-color: #64748b;
+}
+
+/* Wood board theme */
+.chess-square.wood.light {
+  background-color: #deb887;
+}
+
+.chess-square.wood.dark {
+  background-color: #8b4513;
+}
+
+/* Neon board theme */
+.chess-square.neon.light {
+  background-color: #0f0f23;
+  border: 1px solid #00ffff;
+}
+
+.chess-square.neon.dark {
+  background-color: #1a0033;
+  border: 1px solid #ff00ff;
+}
+
+/* Cyberpunk board theme */
+.chess-square.cyberpunk.light {
+  background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+  border: 1px solid #7c3aed;
+}
+
+.chess-square.cyberpunk.dark {
+  background: linear-gradient(135deg, #16213e, #0f0f1a);
+  border: 1px solid #06d6a0;
+}
+
+/* Board interaction states */
 .chess-square.highlighted {
   box-shadow: inset 0 0 0 3px #ffff00;
 }
@@ -133,4 +282,48 @@ body {
   40% { content: '.'; }
   60% { content: '..'; }
   80%, 100% { content: '...'; }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .gaming-card {
+    border-radius: 0.75rem;
+    padding: 1rem;
+  }
+  
+  .gaming-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .gaming-title {
+    font-size: 2rem;
+  }
+  
+  /* Make chess board more mobile-friendly */
+  .chess-square {
+    min-height: 40px;
+    min-width: 40px;
+  }
+  
+  /* Adjust font sizes for mobile */
+  .font-gaming {
+    letter-spacing: 0.025em;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .gaming-title {
+    font-size: 1.75rem;
+  }
+  
+  .chess-square {
+    min-height: 35px;
+    min-width: 35px;
+  }
+  
+  .chess-piece {
+    font-size: 1.5rem;
+  }
 }

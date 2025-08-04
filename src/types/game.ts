@@ -128,7 +128,8 @@ export interface PlayerStats {
 }
 
 export interface UserPreferences {
-  boardTheme: 'classic' | 'modern' | 'wood';
+  theme: 'light' | 'dark';
+  boardTheme: 'classic' | 'modern' | 'wood' | 'neon' | 'cyberpunk';
   pieceSet: 'classic' | 'modern' | 'symbols';
   showCoordinates: boolean;
   showPossibleMoves: boolean;

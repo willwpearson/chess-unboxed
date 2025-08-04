@@ -25,7 +25,7 @@ interface ChessBoardProps {
   currentPlayer: PieceColor;
   isPlayerTurn: boolean;
   showCoordinates?: boolean;
-  boardTheme?: 'classic' | 'modern' | 'wood';
+  boardTheme?: 'classic' | 'modern' | 'wood' | 'neon' | 'cyberpunk';
 }
 
 
@@ -144,22 +144,8 @@ export function ChessBoard({
     const rankIndex = parseInt(rank);
     const isLight = (fileIndex + rankIndex) % 2 === 0;
     
-    const themes = {
-      classic: {
-        light: 'bg-amber-100',
-        dark: 'bg-amber-800'
-      },
-      modern: {
-        light: 'bg-slate-100',
-        dark: 'bg-slate-600'
-      },
-      wood: {
-        light: 'bg-yellow-200',
-        dark: 'bg-yellow-800'
-      }
-    };
-    
-    return isLight ? themes[boardTheme].light : themes[boardTheme].dark;
+    // Use CSS classes that match our global styles
+    return `chess-square ${boardTheme} ${isLight ? 'light' : 'dark'}`;
   };
 
   const getSquareName = (file: string, rank: string): Square => `${file}${rank}`;

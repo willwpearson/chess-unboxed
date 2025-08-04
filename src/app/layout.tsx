@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className={`font-sans antialiased bg-background text-foreground`}>
+      <body className={`font-sans antialiased bg-background text-foreground transition-colors duration-300`}>
         <Providers>
           <div className="min-h-screen flex flex-col">
             {children}

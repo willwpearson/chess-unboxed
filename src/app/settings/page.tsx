@@ -16,9 +16,7 @@ export default function SettingsPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <SettingsPanel />
-      </main>
+      <SettingsPanel />
       <Footer />
     </>
   );
