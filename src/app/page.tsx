@@ -60,21 +60,21 @@ const subModes: SubModeConfig[] = [
     title: 'Play vs Bot',
     description: 'Challenge AI opponents with adjustable difficulty',
     icon: Bot,
-    route: (gameMode) => gameMode === 'programming' ? '/play/programming' : '/play/bot'
+    route: (gameMode) => `/play/${gameMode}/bot`
   },
   {
     id: 'multiplayer',
     title: 'Host Multiplayer',
     description: 'Create lobbies and play against other players',
     icon: Users,
-    route: () => '/lobby'
+    route: (gameMode) => `/play/${gameMode}/multiplayer`
   },
   {
     id: 'endless',
     title: 'Endless Mode',
     description: 'Survive as long as you can - one loss ends it all',
     icon: Infinity,
-    route: () => '/play/endless'
+    route: (gameMode) => `/play/${gameMode}/endless`
   }
 ];
 
@@ -89,9 +89,6 @@ export default function HomePage() {
     setIsLoading(subMode);
     
     try {
-      // Store the selected game mode in localStorage for the game pages to use
-      localStorage.setItem('selectedGameMode', selectedGameMode);
-      
       // Navigate to the appropriate route
       const route = subModes.find(s => s.id === subMode)?.route(selectedGameMode);
       if (route) {

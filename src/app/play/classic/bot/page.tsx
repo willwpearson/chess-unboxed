@@ -8,20 +8,17 @@ import { BotDifficultySelector } from '@/components/game/BotDifficultySelector';
 import { ChessBoard } from '@/components/game/ChessBoard';
 import { MoveHistory } from '@/components/game/MoveHistory';
 import { GameInfo } from '@/components/game/GameInfo';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { BotConfig, GameState, ChessMove, Player, GameVariant } from '@/types/game';
+import { BotConfig, GameState, ChessMove, Player } from '@/types/game';
 import { useGameStore } from '@/store/gameStore';
 import { useUserStore } from '@/store/userStore';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Crown } from 'lucide-react';
 
-export default function BotGamePage() {
+export default function ClassicBotGamePage() {
   const router = useRouter();
   const { currentGame, initializeGame, makeMove, resignGame, offerDraw, getCurrentFEN } = useGameStore();
   const { user } = useUserStore();
   const [gameStarted, setGameStarted] = useState(false);
   const [botConfig, setBotConfig] = useState<BotConfig | null>(null);
-  const [gameVariant, setGameVariant] = useState<GameVariant>('classic');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleStartGame = async (config: BotConfig) => {
@@ -29,7 +26,7 @@ export default function BotGamePage() {
     setBotConfig(config);
 
     try {
-      const success = await initializeGame('bot', gameVariant, config);
+      const success = await initializeGame('bot', 'classic', config);
       
       if (success) {
         setGameStarted(true);
@@ -96,38 +93,15 @@ export default function BotGamePage() {
               </div>
               
               <div className="space-y-8">
-                {/* Game Variant Selection */}
-                <div className="gaming-card p-8">
-                  <h2 className="text-3xl font-gaming font-bold gaming-title mb-6 text-center">Select Game Variant</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <button
-                      onClick={() => setGameVariant('classic')}
-                      className={`gaming-card gaming-glow p-6 text-left transition-all ${
-                        gameVariant === 'classic' 
-                          ? 'border-gaming-accent-primary bg-gaming-accent-primary/10' 
-                          : 'hover:border-gaming-accent-primary/50'
-                      }`}
-                    >
-                      <h3 className="font-gaming font-bold text-xl text-gaming-text-primary mb-2">Classic Chess</h3>
-                      <p className="text-gaming-text-secondary">
-                        Traditional chess with standard 8x8 board rules and classic gameplay
-                      </p>
-                    </button>
-                    
-                    <button
-                      onClick={() => setGameVariant('unboxed')}
-                      className={`gaming-card gaming-glow p-6 text-left transition-all ${
-                        gameVariant === 'unboxed' 
-                          ? 'border-gaming-accent-primary bg-gaming-accent-primary/10' 
-                          : 'hover:border-gaming-accent-primary/50'
-                      }`}
-                    >
-                      <h3 className="font-gaming font-bold text-xl text-gaming-text-primary mb-2">Chess Unboxed</h3>
-                      <p className="text-gaming-text-secondary">
-                        Revolutionary toroidal chess - pieces wrap around board edges for infinite possibilities
-                      </p>
-                    </button>
+                {/* Game Mode Header */}
+                <div className="gaming-card p-8 text-center">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white mb-6">
+                    <Crown size={40} />
                   </div>
+                  <h2 className="text-3xl font-gaming font-bold gaming-title mb-4">Classic Chess vs Bot</h2>
+                  <p className="text-gaming-text-secondary text-lg">
+                    Traditional chess with standard 8x8 board rules. Choose your AI opponent difficulty below.
+                  </p>
                 </div>
 
                 <BotDifficultySelector
@@ -160,7 +134,7 @@ export default function BotGamePage() {
 
             <div className="text-center">
               <h1 className="text-xl font-gaming font-bold text-gaming-text-primary">
-                {currentGame.variant === 'unboxed' ? 'Chess Unboxed' : 'Classic Chess'} vs {botConfig?.difficulty} Bot
+                Classic Chess vs {botConfig?.difficulty} Bot
               </h1>
               {currentGame.status === 'finished' && (
                 <div className={`mt-1 text-lg font-gaming font-bold ${
@@ -189,7 +163,7 @@ export default function BotGamePage() {
                 <ChessBoard
                   position={currentGame.position.board}
                   fen={getCurrentFEN() || undefined}
-                  gameVariant={currentGame.variant}
+                  gameVariant="classic"
                   onMove={handleMove}
                   onResign={handleResign}
                   onOfferDraw={handleOfferDraw}
