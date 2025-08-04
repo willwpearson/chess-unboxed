@@ -131,12 +131,26 @@ body {
   background: var(--gaming-bg-tertiary);
   color: var(--gaming-text-primary);
   border: 2px solid var(--gaming-border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-family: var(--font-gaming);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .gaming-button-secondary:hover {
+  transform: translateY(-2px);
   border-color: var(--gaming-accent-primary);
   background: var(--gaming-bg-secondary);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.2);
+}
+
+.gaming-button-secondary:active {
+  transform: translateY(0);
 }
 
 .gaming-title {
@@ -292,6 +306,11 @@ body {
   }
   
   .gaming-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .gaming-button-secondary {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
