@@ -86,16 +86,18 @@ export function Header() {
             {/* Authentication */}
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-3">
-                <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg" style={{ background: 'var(--gaming-bg-tertiary)' }}>
-                  <div className="flex flex-col">
-                    <div className="text-sm font-medium" style={{ color: 'var(--gaming-text-primary)' }}>
-                      {user.display_name || user.username}
-                    </div>
-                    <div className="text-xs" style={{ color: 'var(--gaming-text-secondary)' }}>
-                      Rating: {user.current_rating}
+                <Link href="/profile">
+                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg hover:bg-gaming-bg-tertiary transition-colors duration-300 cursor-pointer" style={{ background: 'var(--gaming-bg-tertiary)' }}>
+                    <div className="flex flex-col">
+                      <div className="text-sm font-medium" style={{ color: 'var(--gaming-text-primary)' }}>
+                        {user.display_name || user.username}
+                      </div>
+                      <div className="text-xs" style={{ color: 'var(--gaming-text-secondary)' }}>
+                        Rating: {user.current_rating}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-1 p-2 rounded-lg hover:bg-gaming-bg-tertiary transition-colors duration-300"
