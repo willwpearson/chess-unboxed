@@ -23,26 +23,127 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 export interface Database {
   public: {
     Tables: {
-      players: {
+      users: {
         Row: {
           id: string;
           created_at: string;
-          nickname: string | null;
-          score: number;
+          updated_at: string;
+          email: string | null;
+          username: string;
+          display_name: string | null;
+          bio: string | null;
+          avatar_url: string | null;
+          country: string | null;
+          timezone: string | null;
+          birth_date: string | null;
+          is_verified: boolean;
           is_active: boolean;
+          last_seen: string;
+          premium_until: string | null;
+          fide_rating: number | null;
+          preferred_time_control: string | null;
+          playstyle_tags: string[] | null;
+          total_games: number;
+          wins: number;
+          losses: number;
+          draws: number;
+          current_rating: number;
+          peak_rating: number;
+          profile_visibility: 'public' | 'friends' | 'private';
+          allow_friend_requests: boolean;
+          show_online_status: boolean;
+          password_hash: string;
         };
         Insert: {
           id?: string;
           created_at?: string;
-          nickname?: string | null;
-          score?: number;
+          updated_at?: string;
+          email?: string | null;
+          username: string;
+          display_name?: string | null;
+          bio?: string | null;
+          avatar_url?: string | null;
+          country?: string | null;
+          timezone?: string | null;
+          birth_date?: string | null;
+          is_verified?: boolean;
           is_active?: boolean;
+          last_seen?: string;
+          premium_until?: string | null;
+          fide_rating?: number | null;
+          preferred_time_control?: string | null;
+          playstyle_tags?: string[] | null;
+          total_games?: number;
+          wins?: number;
+          losses?: number;
+          draws?: number;
+          current_rating?: number;
+          peak_rating?: number;
+          profile_visibility?: 'public' | 'friends' | 'private';
+          allow_friend_requests?: boolean;
+          show_online_status?: boolean;
+          password_hash?: string;
         };
         Update: {
           id?: string;
           created_at?: string;
-          nickname?: string | null;
-          score?: number;
+          updated_at?: string;
+          email?: string | null;
+          username?: string;
+          display_name?: string | null;
+          bio?: string | null;
+          avatar_url?: string | null;
+          country?: string | null;
+          timezone?: string | null;
+          birth_date?: string | null;
+          is_verified?: boolean;
+          is_active?: boolean;
+          last_seen?: string;
+          premium_until?: string | null;
+          fide_rating?: number | null;
+          preferred_time_control?: string | null;
+          playstyle_tags?: string[] | null;
+          total_games?: number;
+          wins?: number;
+          losses?: number;
+          draws?: number;
+          current_rating?: number;
+          peak_rating?: number;
+          profile_visibility?: 'public' | 'friends' | 'private';
+          allow_friend_requests?: boolean;
+          show_online_status?: boolean;
+          password_hash?: string;
+        };
+      };
+      user_sessions: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          device_info: any;
+          ip_address: string | null;
+          user_agent: string | null;
+          created_at: string;
+          expires_at: string | null;
+          is_active: boolean;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          device_info?: any;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          is_active?: boolean;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          device_info?: any;
+          ip_address?: string | null;
+          user_agent?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
           is_active?: boolean;
         };
       };
@@ -52,8 +153,8 @@ export interface Database {
           created_at: string;
           ended_at: string | null;
           mode: 'bot' | 'pvp' | 'endless';
-          player1_id: string | null;
-          player2_id: string | null;
+          white_player_id: string | null;
+          black_player_id: string | null;
           winner_id: string | null;
           status: 'in_progress' | 'completed' | 'abandoned';
           moves: any; // jsonb
@@ -63,8 +164,8 @@ export interface Database {
           created_at?: string;
           ended_at?: string | null;
           mode: 'bot' | 'pvp' | 'endless';
-          player1_id?: string | null;
-          player2_id?: string | null;
+          white_player_id?: string | null;
+          black_player_id?: string | null;
           winner_id?: string | null;
           status?: 'in_progress' | 'completed' | 'abandoned';
           moves?: any;
@@ -74,8 +175,8 @@ export interface Database {
           created_at?: string;
           ended_at?: string | null;
           mode?: 'bot' | 'pvp' | 'endless';
-          player1_id?: string | null;
-          player2_id?: string | null;
+          white_player_id?: string | null;
+          black_player_id?: string | null;
           winner_id?: string | null;
           status?: 'in_progress' | 'completed' | 'abandoned';
           moves?: any;
@@ -107,7 +208,7 @@ export interface Database {
       endless_sessions: {
         Row: {
           id: string;
-          player_id: string | null;
+          user_id: string | null;
           score: number;
           active: boolean;
           started_at: string;
@@ -115,7 +216,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          player_id?: string | null;
+          user_id?: string | null;
           score?: number;
           active?: boolean;
           started_at?: string;
@@ -123,7 +224,7 @@ export interface Database {
         };
         Update: {
           id?: string;
-          player_id?: string | null;
+          user_id?: string | null;
           score?: number;
           active?: boolean;
           started_at?: string;
@@ -139,7 +240,8 @@ export type InsertTables<T extends keyof Database['public']['Tables']> = Databas
 export type UpdateTables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update'];
 
 // Type helpers
-export type Player = Tables<'players'>;
+export type User = Tables<'users'>;
+export type UserSession = Tables<'user_sessions'>;
 export type Game = Tables<'games'>;
 export type Lobby = Tables<'lobbies'>;
 export type EndlessSession = Tables<'endless_sessions'>;

@@ -63,7 +63,7 @@ export function Modal({
         )}
         
         {/* Content */}
-        <div className="p-6">
+        <div className={title || showCloseButton ? "p-6" : "p-0"}>
           {children}
         </div>
       </div>

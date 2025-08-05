@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/Button';
-import { Crown, Zap, Brain, Users, Bot, Infinity } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Crown, Zap, Brain, Users, Bot, Infinity, LogIn, UserPlus, Trophy, Gamepad2 } from 'lucide-react';
 
 type GameMode = 'classic' | 'unboxed' | 'programming';
 type SubMode = 'bot' | 'multiplayer' | 'endless';
@@ -82,6 +84,7 @@ export default function HomePage() {
   const [selectedGameMode, setSelectedGameMode] = useState<GameMode | null>(null);
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const router = useRouter();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   const handleSubModeClick = async (subMode: SubMode) => {
     if (!selectedGameMode) return;
@@ -116,7 +119,100 @@ export default function HomePage() {
                 Experience chess like never before. Choose your game mode, pick your challenge, 
                 and dominate the board with style.
               </p>
+              
+              {/* Authentication CTA for non-authenticated users */}
+              {!authLoading && !isAuthenticated && (
+                <div className="mt-8 space-y-4">
+                  <p className="text-gaming-text-secondary">
+                    Join thousands of players worldwide
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <Link href="/register" className="gaming-button inline-flex items-center">
+                      <UserPlus size={20} className="mr-2" />
+                      Create Account
+                    </Link>
+                    <Link href="/login" className="gaming-button-secondary inline-flex items-center">
+                      <LogIn size={20} className="mr-2" />
+                      Sign In
+                    </Link>
+                  </div>
+                </div>
+              )}
+              
+              {/* Welcome back message for authenticated users */}
+              {!authLoading && isAuthenticated && user && (
+                <div className="mt-8">
+                  <p className="text-gaming-accent-primary text-xl">
+                    Welcome back, <span className="font-bold">{user.display_name || user.username}</span>!
+                  </p>
+                  <p className="text-gaming-text-secondary mt-2">
+                    Rating: {user.current_rating} • Games Played: {user.total_games}
+                  </p>
+                </div>
+              )}
             </div>
+
+            {/* Quick Actions for Authenticated Users */}
+            {!authLoading && isAuthenticated && !selectedGameMode && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-gaming font-bold text-center text-gaming-text-primary mb-6">
+                  Quick Actions
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                  <Link href="/lobby" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <Users size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Join Lobby</h3>
+                    <p className="text-sm text-gaming-text-secondary">Find opponents</p>
+                  </Link>
+                  <Link href="/leaderboard" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <Trophy size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Leaderboard</h3>
+                    <p className="text-sm text-gaming-text-secondary">See rankings</p>
+                  </Link>
+                  <Link href="/stats" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <Gamepad2 size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">My Stats</h3>
+                    <p className="text-sm text-gaming-text-secondary">View progress</p>
+                  </Link>
+                  <Link href="/settings" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
+                    <Crown size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Settings</h3>
+                    <p className="text-sm text-gaming-text-secondary">Customize</p>
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Guest Features Preview */}
+            {!authLoading && !isAuthenticated && !selectedGameMode && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-gaming font-bold text-center text-gaming-text-primary mb-6">
+                  What You'll Get
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                  <div className="gaming-card gaming-glow p-4 text-center">
+                    <Users size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Multiplayer</h3>
+                    <p className="text-sm text-gaming-text-secondary">Play with friends worldwide</p>
+                  </div>
+                  <div className="gaming-card gaming-glow p-4 text-center">
+                    <Trophy size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Rankings</h3>
+                    <p className="text-sm text-gaming-text-secondary">Climb the leaderboard</p>
+                  </div>
+                  <div className="gaming-card gaming-glow p-4 text-center">
+                    <Gamepad2 size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Progress</h3>
+                    <p className="text-sm text-gaming-text-secondary">Track your improvement</p>
+                  </div>
+                  <div className="gaming-card gaming-glow p-4 text-center">
+                    <Crown size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
+                    <h3 className="font-bold text-gaming-text-primary mb-1">Customize</h3>
+                    <p className="text-sm text-gaming-text-secondary">Personalize your experience</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Game Mode Selection */}
             {!selectedGameMode ? (
