@@ -10,6 +10,7 @@ export interface User {
   bio?: string;
   avatar_url?: string;
   country?: string;
+  website?: string;
   current_rating: number;
   peak_rating: number;
   total_games: number;

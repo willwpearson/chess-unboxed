@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { UserProfile } from '@/components/user/UserProfile';
+import { UserProfile, ProfileEditor } from '@/components/user';
 import { LoadingSpinner } from '@/components/ui/Loading';
+import { Edit, User } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, isLoading, isAuthenticated } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading) {
     return (
@@ -31,10 +33,41 @@ export default function ProfilePage() {
     );
   }
 
+  const handleEditComplete = () => {
+    setIsEditing(false);
+  };
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
       <div className="container mx-auto px-4 py-8">
-        <UserProfile user={user} isOwnProfile={true} />
+        {/* Header with Edit Toggle */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-gaming font-bold text-gaming-text-primary flex items-center gap-3">
+            <User size={32} style={{ color: 'var(--gaming-accent-primary)' }} />
+            {isEditing ? 'Edit Profile' : 'My Profile'}
+          </h1>
+          
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className={`${
+              isEditing ? 'gaming-button-secondary' : 'gaming-button'
+            } flex items-center space-x-2`}
+          >
+            <Edit size={16} />
+            <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
+          </button>
+        </div>
+
+        {/* Content */}
+        {isEditing ? (
+          <ProfileEditor 
+            user={user}
+            onSave={handleEditComplete}
+            onCancel={handleEditComplete}
+          />
+        ) : (
+          <UserProfile user={user} isOwnProfile={true} />
+        )}
       </div>
     </div>
   );

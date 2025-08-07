@@ -19,7 +19,7 @@ export async function GET(
     const { data: user, error } = await supabaseAdmin
       .from('users')
       .select(`
-        id, email, username, display_name, bio, avatar_url, country,
+        id, email, username, display_name, bio, avatar_url, country, website,
         current_rating, peak_rating, total_games, wins, losses, draws,
         is_verified, created_at, last_seen
       `)
@@ -43,6 +43,7 @@ export async function GET(
       bio: user.bio,
       avatar_url: user.avatar_url,
       country: user.country,
+      website: user.website,
       current_rating: user.current_rating || 1200,
       peak_rating: user.peak_rating || user.current_rating || 1200,
       total_games: user.total_games || 0,
