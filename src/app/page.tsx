@@ -1,321 +1,295 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
-import { Crown, Zap, Brain, Users, Bot, Infinity, LogIn, UserPlus, Trophy, Gamepad2 } from 'lucide-react';
+import { Crown, Zap, Brain, Users, Bot, Infinity, LogIn, UserPlus, Trophy, Gamepad2, UserCheck, Play, Star, Shield, Sparkles, CheckCircle } from 'lucide-react';
 
 type GameMode = 'classic' | 'unboxed' | 'programming';
-type SubMode = 'bot' | 'multiplayer' | 'endless';
 
 interface GameModeConfig {
   id: GameMode;
   title: string;
-  description: string;
+  shortDescription: string;
+  fullDescription: string;
   icon: any;
   color: string;
   gradient: string;
-}
-
-interface SubModeConfig {
-  id: SubMode;
-  title: string;
-  description: string;
-  icon: any;
-  route: (gameMode: GameMode) => string;
+  features: string[];
+  difficulty: string;
 }
 
 const gameModes: GameModeConfig[] = [
   {
     id: 'classic',
     title: 'Chess Classic',
-    description: 'Traditional chess with standard 8x8 board rules',
+    shortDescription: 'Traditional chess with standard 8x8 board rules',
+    fullDescription: 'Experience the timeless game of chess in its purest form. Perfect for players who love traditional strategy and want to master the fundamentals.',
     icon: Crown,
     color: 'from-amber-500 to-orange-600',
-    gradient: 'bg-gradient-to-br from-amber-500/20 to-orange-600/20'
+    gradient: 'bg-gradient-to-br from-amber-500/20 to-orange-600/20',
+    features: ['Standard 8x8 board', 'Traditional piece movement', 'Classic rules & gameplay', 'Perfect for beginners'],
+    difficulty: 'Beginner to Master'
   },
   {
     id: 'unboxed',
     title: 'Chess Unboxed',
-    description: 'Revolutionary toroidal chess - pieces wrap around board edges',
+    shortDescription: 'Revolutionary toroidal chess - pieces wrap around board edges',
+    fullDescription: 'Break free from traditional boundaries! In Chess Unboxed, the board wraps around itself - pieces can move off one edge and appear on the opposite side, creating mind-bending strategic possibilities.',
     icon: Zap,
     color: 'from-purple-500 to-pink-600',
-    gradient: 'bg-gradient-to-br from-purple-500/20 to-pink-600/20'
+    gradient: 'bg-gradient-to-br from-purple-500/20 to-pink-600/20',
+    features: ['Toroidal board topology', 'Edge-wrapping movement', 'Unique tactical patterns', 'Revolutionary gameplay'],
+    difficulty: 'Intermediate to Expert'
   },
   {
     id: 'programming',
     title: 'Programming Chess',
-    description: 'Code your strategy with JavaScript functions',
+    shortDescription: 'Code your strategy with JavaScript functions',
+    fullDescription: 'The ultimate fusion of chess and coding! Write JavaScript functions to control your pieces, automate your strategy, and battle other programmers in a completely new way to play chess.',
     icon: Brain,
     color: 'from-emerald-500 to-teal-600',
-    gradient: 'bg-gradient-to-br from-emerald-500/20 to-teal-600/20'
-  }
-];
-
-const subModes: SubModeConfig[] = [
-  {
-    id: 'bot',
-    title: 'Play vs Bot',
-    description: 'Challenge AI opponents with adjustable difficulty',
-    icon: Bot,
-    route: (gameMode) => `/play/${gameMode}/bot`
-  },
-  {
-    id: 'multiplayer',
-    title: 'Host Multiplayer',
-    description: 'Create lobbies and play against other players',
-    icon: Users,
-    route: (gameMode) => `/play/${gameMode}/multiplayer`
-  },
-  {
-    id: 'endless',
-    title: 'Endless Mode',
-    description: 'Survive as long as you can - one loss ends it all',
-    icon: Infinity,
-    route: (gameMode) => `/play/${gameMode}/endless`
+    gradient: 'bg-gradient-to-br from-emerald-500/20 to-teal-600/20',
+    features: ['JavaScript-powered moves', 'Automated strategies', 'Code vs code battles', 'For developer minds'],
+    difficulty: 'Advanced Programmers'
   }
 ];
 
 export default function HomePage() {
-  const [selectedGameMode, setSelectedGameMode] = useState<GameMode | null>(null);
-  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [guestLoading, setGuestLoading] = useState(false);
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, createGuestUser } = useAuth();
 
-  const handleSubModeClick = async (subMode: SubMode) => {
-    if (!selectedGameMode) return;
-    
-    setIsLoading(subMode);
-    
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  const handleGuestAccess = async () => {
+    setGuestLoading(true);
     try {
-      // Navigate to the appropriate route
-      const route = subModes.find(s => s.id === subMode)?.route(selectedGameMode);
-      if (route) {
-        router.push(route);
+      const result = await createGuestUser();
+      if (result.success) {
+        router.push('/dashboard');
+      } else {
+        console.error('Guest access error:', result.error);
       }
     } catch (error) {
-      console.error('Navigation error:', error);
+      console.error('Guest access error:', error);
     } finally {
-      setIsLoading(null);
+      setGuestLoading(false);
     }
   };
+
+  // Don't render anything while checking auth status
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gaming-accent-primary"></div>
+      </div>
+    );
+  }
+
+  // Redirect already authenticated users
+  if (isAuthenticated) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
     <>
       <Header />
       <main className="flex-1 min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-6xl mx-auto">
-            {/* Hero Section */}
-            <div className="text-center mb-12 md:mb-16">
-              <h1 className="text-4xl md:text-6xl font-gaming font-bold mb-4 md:mb-6 gaming-title">
-                Chess Unboxed
-              </h1>
-              <p className="text-lg md:text-xl text-gaming-text-secondary max-w-3xl mx-auto leading-relaxed px-4">
-                Experience chess like never before. Choose your game mode, pick your challenge, 
-                and dominate the board with style.
-              </p>
-              
-              {/* Authentication CTA for non-authenticated users */}
-              {!authLoading && !isAuthenticated && (
-                <div className="mt-8 space-y-4">
-                  <p className="text-gaming-text-secondary">
-                    Join thousands of players worldwide
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <Link href="/register" className="gaming-button inline-flex items-center">
-                      <UserPlus size={20} className="mr-2" />
-                      Create Account
-                    </Link>
-                    <Link href="/login" className="gaming-button-secondary inline-flex items-center">
-                      <LogIn size={20} className="mr-2" />
-                      Sign In
-                    </Link>
-                  </div>
-                </div>
-              )}
-              
-              {/* Welcome back message for authenticated users */}
-              {!authLoading && isAuthenticated && user && (
-                <div className="mt-8">
-                  <p className="text-gaming-accent-primary text-xl">
-                    Welcome back, <span className="font-bold">{user.display_name || user.username}</span>!
-                  </p>
-                  <p className="text-gaming-text-secondary mt-2">
-                    Rating: {user.current_rating} • Games Played: {user.total_games}
-                  </p>
-                </div>
-              )}
+        {/* Hero Section */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-5xl md:text-7xl font-gaming font-bold mb-6 gaming-title">
+              Chess Unboxed
+            </h1>
+            <p className="text-xl md:text-2xl text-gaming-text-secondary mb-8 leading-relaxed">
+              Experience chess like never before with three revolutionary game modes that redefine strategy gaming
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto mb-12">
+              <Link href="/register" className="gaming-button inline-flex items-center w-full sm:w-auto">
+                <UserPlus size={20} className="mr-2" />
+                Start Playing Free
+              </Link>
+              <Link href="/login" className="gaming-button-secondary inline-flex items-center w-full sm:w-auto">
+                <LogIn size={20} className="mr-2" />
+                Sign In
+              </Link>
             </div>
-
-            {/* Quick Actions for Authenticated Users */}
-            {!authLoading && isAuthenticated && !selectedGameMode && (
-              <div className="mb-12">
-                <h2 className="text-2xl font-gaming font-bold text-center text-gaming-text-primary mb-6">
-                  Quick Actions
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                  <Link href="/lobby" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
-                    <Users size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Join Lobby</h3>
-                    <p className="text-sm text-gaming-text-secondary">Find opponents</p>
-                  </Link>
-                  <Link href="/leaderboard" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
-                    <Trophy size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Leaderboard</h3>
-                    <p className="text-sm text-gaming-text-secondary">See rankings</p>
-                  </Link>
-                  <Link href="/stats" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
-                    <Gamepad2 size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">My Stats</h3>
-                    <p className="text-sm text-gaming-text-secondary">View progress</p>
-                  </Link>
-                  <Link href="/settings" className="gaming-card gaming-glow p-4 text-center hover:scale-105 transition-transform duration-300">
-                    <Crown size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Settings</h3>
-                    <p className="text-sm text-gaming-text-secondary">Customize</p>
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {/* Guest Features Preview */}
-            {!authLoading && !isAuthenticated && !selectedGameMode && (
-              <div className="mb-12">
-                <h2 className="text-2xl font-gaming font-bold text-center text-gaming-text-primary mb-6">
-                  What You'll Get
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                  <div className="gaming-card gaming-glow p-4 text-center">
-                    <Users size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Multiplayer</h3>
-                    <p className="text-sm text-gaming-text-secondary">Play with friends worldwide</p>
-                  </div>
-                  <div className="gaming-card gaming-glow p-4 text-center">
-                    <Trophy size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Rankings</h3>
-                    <p className="text-sm text-gaming-text-secondary">Climb the leaderboard</p>
-                  </div>
-                  <div className="gaming-card gaming-glow p-4 text-center">
-                    <Gamepad2 size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Progress</h3>
-                    <p className="text-sm text-gaming-text-secondary">Track your improvement</p>
-                  </div>
-                  <div className="gaming-card gaming-glow p-4 text-center">
-                    <Crown size={32} className="mx-auto mb-2 text-gaming-accent-primary" />
-                    <h3 className="font-bold text-gaming-text-primary mb-1">Customize</h3>
-                    <p className="text-sm text-gaming-text-secondary">Personalize your experience</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Game Mode Selection */}
-            {!selectedGameMode ? (
-              <div className="space-y-8">
-                <h2 className="text-3xl font-gaming font-bold text-center text-gaming-text-primary mb-8">
-                  Choose Your Game Mode
-                </h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {gameModes.map((mode) => {
-                    const IconComponent = mode.icon;
-                    return (
-                      <div
-                        key={mode.id}
-                        className={`gaming-card gaming-glow cursor-pointer p-8 text-center ${mode.gradient}`}
-                        onClick={() => setSelectedGameMode(mode.id)}
-                      >
-                        <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r ${mode.color} text-white mb-6`}>
-                          <IconComponent size={40} />
-                        </div>
-                        
-                        <h3 className="text-2xl font-gaming font-bold text-gaming-text-primary mb-4">
-                          {mode.title}
-                        </h3>
-                        
-                        <p className="text-gaming-text-secondary leading-relaxed">
-                          {mode.description}
-                        </p>
-                        
-                        <div className="mt-6">
-                          <button className="gaming-button">
-                            Select Mode
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              /* Sub-Mode Selection */
-              <div className="space-y-8">
-                <div className="text-center">
-                  <button 
-                    onClick={() => setSelectedGameMode(null)}
-                    className="gaming-button-secondary mb-6"
-                  >
-                    ← Back to Game Modes
-                  </button>
-                  
-                  <h2 className="text-3xl font-gaming font-bold text-gaming-text-primary mb-4">
-                    {gameModes.find(m => m.id === selectedGameMode)?.title}
-                  </h2>
-                  
-                  <p className="text-gaming-text-secondary">
-                    Choose how you want to play
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  {subModes.map((subMode) => {
-                    const IconComponent = subMode.icon;
-                    const selectedMode = gameModes.find(m => m.id === selectedGameMode);
-                    
-                    return (
-                      <div
-                        key={subMode.id}
-                        className={`gaming-card gaming-glow cursor-pointer p-8 text-center ${selectedMode?.gradient}`}
-                        onClick={() => handleSubModeClick(subMode.id)}
-                      >
-                        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${selectedMode?.color} text-white mb-6`}>
-                          <IconComponent size={32} />
-                        </div>
-                        
-                        <h3 className="text-xl font-gaming font-bold text-gaming-text-primary mb-4">
-                          {subMode.title}
-                        </h3>
-                        
-                        <p className="text-gaming-text-secondary mb-6 leading-relaxed">
-                          {subMode.description}
-                        </p>
-                        
-                        <button 
-                          className={`gaming-button ${isLoading === subMode.id ? 'opacity-50' : ''}`}
-                          disabled={isLoading === subMode.id}
-                        >
-                          {isLoading === subMode.id ? (
-                            <div className="flex items-center justify-center">
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                              Loading...
-                            </div>
-                          ) : (
-                            'Start Playing'
-                          )}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+            <button
+              onClick={handleGuestAccess}
+              disabled={guestLoading}
+              className="text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors inline-flex items-center"
+            >
+              {guestLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                  Setting up guest account...
+                </>
+              ) : (
+                <>
+                  <UserCheck size={16} className="mr-2" />
+                  Or continue as guest
+                </>
+              )}
+            </button>
           </div>
-        </div>
+        </section>
+
+        {/* Game Modes Showcase */}
+        <section className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-gaming font-bold text-gaming-text-primary mb-6">
+                Three Ways to Master Chess
+              </h2>
+              <p className="text-xl text-gaming-text-secondary max-w-3xl mx-auto">
+                From traditional gameplay to mind-bending innovations, discover your perfect chess experience
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+              {gameModes.map((mode, index) => {
+                const IconComponent = mode.icon;
+                return (
+                  <div
+                    key={mode.id}
+                    className={`gaming-card gaming-glow p-8 ${mode.gradient} relative overflow-hidden`}
+                  >
+                    {/* Background decoration */}
+                    <div className="absolute top-4 right-4 opacity-10">
+                      <IconComponent size={80} />
+                    </div>
+                    
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${mode.color} text-white mb-6 relative z-10`}>
+                      <IconComponent size={32} />
+                    </div>
+                    
+                    <h3 className="text-2xl font-gaming font-bold text-gaming-text-primary mb-4">
+                      {mode.title}
+                    </h3>
+                    
+                    <p className="text-gaming-text-secondary mb-6 leading-relaxed">
+                      {mode.fullDescription}
+                    </p>
+
+                    <div className="mb-6">
+                      <div className="flex items-center mb-3">
+                        <Shield size={16} className="text-gaming-accent-primary mr-2" />
+                        <span className="text-sm font-medium text-gaming-text-primary">Difficulty: {mode.difficulty}</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {mode.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center text-sm text-gaming-text-secondary">
+                            <CheckCircle size={14} className="text-gaming-accent-primary mr-2 flex-shrink-0" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="container mx-auto px-4 py-16" style={{ background: 'var(--gaming-bg-secondary)' }}>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-gaming font-bold text-gaming-text-primary mb-6">
+                Everything You Need to Dominate
+              </h2>
+              <p className="text-xl text-gaming-text-secondary max-w-3xl mx-auto">
+                Advanced features designed for chess enthusiasts, competitive players, and coding minds
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Bot size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Smart AI Opponents</h3>
+                <p className="text-sm text-gaming-text-secondary">Challenge adaptive AI with multiple difficulty levels</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Users size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Global Multiplayer</h3>
+                <p className="text-sm text-gaming-text-secondary">Play against thousands of players worldwide</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Trophy size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Competitive Rankings</h3>
+                <p className="text-sm text-gaming-text-secondary">Climb leaderboards in each game mode</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Infinity size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Endless Challenges</h3>
+                <p className="text-sm text-gaming-text-secondary">Survive as long as possible in endless mode</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Gamepad2 size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Performance Analytics</h3>
+                <p className="text-sm text-gaming-text-secondary">Track your progress with detailed statistics</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Star size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Rating System</h3>
+                <p className="text-sm text-gaming-text-secondary">Accurate ELO-based skill matching</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Shield size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Fair Play</h3>
+                <p className="text-sm text-gaming-text-secondary">Anti-cheat protection and moderation</p>
+              </div>
+              <div className="gaming-card gaming-glow p-6 text-center">
+                <Sparkles size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <h3 className="font-bold text-gaming-text-primary mb-2">Custom Themes</h3>
+                <p className="text-sm text-gaming-text-secondary">Personalize your gaming experience</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-gaming font-bold text-gaming-text-primary mb-6">
+              Ready to Revolutionize Your Chess Game?
+            </h2>
+            <p className="text-xl text-gaming-text-secondary mb-8">
+              Join thousands of players already experiencing the future of chess
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto">
+              <Link href="/register" className="gaming-button inline-flex items-center w-full sm:w-auto">
+                <Play size={20} className="mr-2" />
+                Start Your Journey
+              </Link>
+              <button
+                onClick={handleGuestAccess}
+                disabled={guestLoading}
+                className="gaming-button-secondary inline-flex items-center w-full sm:w-auto"
+              >
+                {guestLoading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2"></div>
+                ) : (
+                  <UserCheck size={20} className="mr-2" />
+                )}
+                {guestLoading ? 'Setting up...' : 'Try as Guest'}
+              </button>
+            </div>
+            <p className="text-sm text-gaming-text-secondary mt-4">
+              Already have an account? <Link href="/login" className="text-gaming-accent-primary hover:underline">Sign in here</Link>
+            </p>
+          </div>
+        </section>
       </main>
       <Footer />
     </>

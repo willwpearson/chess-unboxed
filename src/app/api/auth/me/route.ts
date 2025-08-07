@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Verify and decode token
     let decoded;
     try {
-      decoded = jwt.verify(token, JWT_SECRET) as { userId: string; username: string; email: string };
+      decoded = jwt.verify(token, JWT_SECRET) as { userId: string; username: string; email?: string; isGuest?: boolean };
     } catch (jwtError) {
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
@@ -64,7 +64,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: { user: userWithoutPassword },
+      data: { 
+        user: userWithoutPassword,
+        isGuest: decoded.isGuest || false 
+      },
       timestamp: Date.now(),
     });
 

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
-import { Trophy, Users, Gamepad2, Crown, TrendingUp, Target, Clock, Zap } from 'lucide-react';
+import { Trophy, Users, Gamepad2, Crown, TrendingUp, Target, Clock, Zap, Brain, Bot, Infinity, Play } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -126,28 +126,115 @@ export default function DashboardPage() {
 
             {/* Game Modes */}
             <div>
-              <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary mb-6">Game Modes</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Link href="/play/classic/bot" className="gaming-card gaming-glow p-6 hover:scale-105 transition-transform duration-300">
-                  <Crown size={32} className="mb-4 text-gaming-accent-primary" />
-                  <h3 className="text-xl font-bold text-gaming-text-primary mb-2">Chess Classic</h3>
-                  <p className="text-gaming-text-secondary mb-4">Traditional chess with standard 8x8 board rules</p>
-                  <div className="gaming-button w-full text-center">Play Now</div>
-                </Link>
+              <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary mb-6">Choose Your Game Mode</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="gaming-card gaming-glow p-6 bg-gradient-to-br from-amber-500/20 to-orange-600/20 relative overflow-hidden">
+                  <div className="absolute top-4 right-4 opacity-10">
+                    <Crown size={60} />
+                  </div>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white mb-6 relative z-10">
+                    <Crown size={32} />
+                  </div>
+                  <h3 className="text-xl font-gaming font-bold text-gaming-text-primary mb-2">Chess Classic</h3>
+                  <p className="text-gaming-text-secondary mb-6">Traditional chess with standard 8x8 board rules. Perfect for mastering the fundamentals.</p>
+                  
+                  <div className="space-y-3">
+                    <Link href="/play/classic/bot" className="gaming-button w-full text-center inline-flex items-center justify-center">
+                      <Bot size={16} className="mr-2" />
+                      Play vs Bot
+                    </Link>
+                    <Link href="/play/classic/multiplayer" className="gaming-button-secondary w-full text-center inline-flex items-center justify-center">
+                      <Users size={16} className="mr-2" />
+                      Multiplayer
+                    </Link>
+                    <Link href="/play/classic/endless" className="gaming-button-secondary w-full text-center inline-flex items-center justify-center">
+                      <Infinity size={16} className="mr-2" />
+                      Endless Mode
+                    </Link>
+                  </div>
 
-                <Link href="/play/unboxed/bot" className="gaming-card gaming-glow p-6 hover:scale-105 transition-transform duration-300">
-                  <Zap size={32} className="mb-4 text-gaming-accent-primary" />
-                  <h3 className="text-xl font-bold text-gaming-text-primary mb-2">Chess Unboxed</h3>
-                  <p className="text-gaming-text-secondary mb-4">Revolutionary toroidal chess - pieces wrap around board edges</p>
-                  <div className="gaming-button w-full text-center">Play Now</div>
-                </Link>
+                  <div className="mt-4 flex justify-center gap-2">
+                    <Link href="/lobby/classic" className="text-xs text-gaming-text-secondary hover:text-gaming-accent-primary">
+                      Lobbies
+                    </Link>
+                    <span className="text-xs text-gaming-text-secondary">•</span>
+                    <Link href="/leaderboard/classic" className="text-xs text-gaming-text-secondary hover:text-gaming-accent-primary">
+                      Rankings
+                    </Link>
+                  </div>
+                </div>
 
-                <Link href="/play/programming/bot" className="gaming-card gaming-glow p-6 hover:scale-105 transition-transform duration-300">
-                  <Gamepad2 size={32} className="mb-4 text-gaming-accent-primary" />
-                  <h3 className="text-xl font-bold text-gaming-text-primary mb-2">Programming Chess</h3>
-                  <p className="text-gaming-text-secondary mb-4">Code your strategy with JavaScript functions</p>
-                  <div className="gaming-button w-full text-center">Play Now</div>
-                </Link>
+                <div className="gaming-card gaming-glow p-6 bg-gradient-to-br from-purple-500/20 to-pink-600/20 relative overflow-hidden">
+                  <div className="absolute top-4 right-4 opacity-10">
+                    <Zap size={60} />
+                  </div>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6 relative z-10">
+                    <Zap size={32} />
+                  </div>
+                  <h3 className="text-xl font-gaming font-bold text-gaming-text-primary mb-2">Chess Unboxed</h3>
+                  <p className="text-gaming-text-secondary mb-6">Revolutionary toroidal chess - pieces wrap around board edges for mind-bending strategy.</p>
+                  
+                  <div className="space-y-3">
+                    <Link href="/play/unboxed/bot" className="gaming-button w-full text-center inline-flex items-center justify-center">
+                      <Bot size={16} className="mr-2" />
+                      Play vs Bot
+                    </Link>
+                    <Link href="/play/unboxed/multiplayer" className="gaming-button-secondary w-full text-center inline-flex items-center justify-center">
+                      <Users size={16} className="mr-2" />
+                      Multiplayer
+                    </Link>
+                    <Link href="/play/unboxed/endless" className="gaming-button-secondary w-full text-center inline-flex items-center justify-center">
+                      <Infinity size={16} className="mr-2" />
+                      Endless Mode
+                    </Link>
+                  </div>
+
+                  <div className="mt-4 flex justify-center gap-2">
+                    <Link href="/lobby/unboxed" className="text-xs text-gaming-text-secondary hover:text-gaming-accent-primary">
+                      Lobbies
+                    </Link>
+                    <span className="text-xs text-gaming-text-secondary">•</span>
+                    <Link href="/leaderboard/unboxed" className="text-xs text-gaming-text-secondary hover:text-gaming-accent-primary">
+                      Rankings
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="gaming-card gaming-glow p-6 bg-gradient-to-br from-emerald-500/20 to-teal-600/20 relative overflow-hidden">
+                  <div className="absolute top-4 right-4 opacity-10">
+                    <Brain size={60} />
+                  </div>
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white mb-6 relative z-10">
+                    <Brain size={32} />
+                  </div>
+                  <h3 className="text-xl font-gaming font-bold text-gaming-text-primary mb-2">Programming Chess</h3>
+                  <p className="text-gaming-text-secondary mb-6">Code your strategy with JavaScript functions. The ultimate fusion of chess and coding.</p>
+                  
+                  <div className="space-y-3">
+                    <Link href="/play/programming/bot" className="gaming-button w-full text-center inline-flex items-center justify-center">
+                      <Bot size={16} className="mr-2" />
+                      Play vs Bot
+                    </Link>
+                    <Link href="/play/programming/multiplayer" className="gaming-button-secondary w-full text-center inline-flex items-center justify-center">
+                      <Users size={16} className="mr-2" />
+                      Code vs Code
+                    </Link>
+                    <Link href="/play/programming/endless" className="gaming-button-secondary w-full text-center inline-flex items-center justify-center">
+                      <Infinity size={16} className="mr-2" />
+                      Endless Mode
+                    </Link>
+                  </div>
+
+                  <div className="mt-4 flex justify-center gap-2">
+                    <Link href="/lobby/programming" className="text-xs text-gaming-text-secondary hover:text-gaming-accent-primary">
+                      Lobbies
+                    </Link>
+                    <span className="text-xs text-gaming-text-secondary">•</span>
+                    <Link href="/leaderboard/programming" className="text-xs text-gaming-text-secondary hover:text-gaming-accent-primary">
+                      Rankings
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

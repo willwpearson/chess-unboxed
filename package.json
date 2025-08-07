@@ -33,6 +33,7 @@
     "framer-motion": "^10.18.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.284.0",
+    "nanoid": "^5.1.5",
     "next": "^15.1.0",
     "postcss": "^8.4.0",
     "postgres": "^3.4.0",

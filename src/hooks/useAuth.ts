@@ -4,7 +4,7 @@ import { useState, useEffect, createContext, useContext } from 'react';
 
 export interface User {
   id: string;
-  email: string;
+  email: string | null;
   username: string;
   display_name: string;
   bio?: string;
@@ -22,10 +22,15 @@ export interface User {
   last_seen: string;
 }
 
+export interface AuthUserData extends User {
+  isGuest?: boolean;
+}
+
 interface AuthState {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  isGuest: boolean;
 }
 
 interface AuthActions {
@@ -33,6 +38,7 @@ interface AuthActions {
   register: (email: string, username: string, password: string, displayName?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  createGuestUser: () => Promise<{ success: boolean; error?: string }>;
 }
 
 interface UseAuthReturn extends AuthState, AuthActions {}
@@ -62,6 +68,10 @@ class AuthService {
     const data = await response.json();
 
     if (!response.ok) {
+      // For auth endpoints, return error gracefully instead of throwing
+      if (endpoint === '/auth/me' && (response.status === 401 || response.status === 403)) {
+        return { success: false, error: data.error || 'Not authenticated' };
+      }
       throw new Error(data.error || `HTTP error! status: ${response.status}`);
     }
 
@@ -91,6 +101,12 @@ class AuthService {
   async getCurrentUser() {
     return this.request('/auth/me');
   }
+
+  async createGuestUser() {
+    return this.request('/auth/guest', {
+      method: 'POST',
+    });
+  }
 }
 
 const authService = new AuthService();
@@ -100,6 +116,7 @@ export function useAuth(): UseAuthReturn {
     user: null,
     isLoading: true,
     isAuthenticated: false,
+    isGuest: false,
   });
 
   const login = async (identifier: string, password: string) => {
@@ -113,6 +130,7 @@ export function useAuth(): UseAuthReturn {
           user: response.data.user,
           isLoading: false,
           isAuthenticated: true,
+          isGuest: response.data.isGuest || false,
         });
         return { success: true };
       }
@@ -120,7 +138,7 @@ export function useAuth(): UseAuthReturn {
       return { success: false, error: response.error || 'Login failed' };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({ ...prev, isLoading: false, isGuest: false }));
       return { success: false, error: errorMessage };
     }
   };
@@ -140,7 +158,7 @@ export function useAuth(): UseAuthReturn {
       return { success: false, error: response.error || 'Registration failed' };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';
-      setState(prev => ({ ...prev, isLoading: false }));
+      setState(prev => ({ ...prev, isLoading: false, isGuest: false }));
       return { success: false, error: errorMessage };
     }
   };
@@ -155,6 +173,7 @@ export function useAuth(): UseAuthReturn {
         user: null,
         isLoading: false,
         isAuthenticated: false,
+        isGuest: false,
       });
     } catch (error) {
       console.error('Logout error:', error);
@@ -163,6 +182,7 @@ export function useAuth(): UseAuthReturn {
         user: null,
         isLoading: false,
         isAuthenticated: false,
+        isGuest: false,
       });
     }
   };
@@ -178,21 +198,51 @@ export function useAuth(): UseAuthReturn {
           user: response.data.user,
           isLoading: false,
           isAuthenticated: true,
+          isGuest: response.data.isGuest || false,
         });
       } else {
         setState({
           user: null,
           isLoading: false,
           isAuthenticated: false,
+          isGuest: false,
         });
       }
     } catch (error) {
-      console.error('Refresh user error:', error);
+      // Only log actual errors, not expected authentication failures
+      if (error instanceof Error && !error.message.includes('Not authenticated') && !error.message.includes('No authentication token')) {
+        console.error('Refresh user error:', error);
+      }
       setState({
         user: null,
         isLoading: false,
         isAuthenticated: false,
+        isGuest: false,
       });
+    }
+  };
+
+  const createGuestUser = async () => {
+    try {
+      setState(prev => ({ ...prev, isLoading: true }));
+      
+      const response = await authService.createGuestUser();
+      
+      if (response.success && response.data?.user) {
+        setState({
+          user: response.data.user,
+          isLoading: false,
+          isAuthenticated: true,
+          isGuest: true,
+        });
+        return { success: true };
+      }
+      
+      return { success: false, error: response.error || 'Failed to create guest account' };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create guest account';
+      setState(prev => ({ ...prev, isLoading: false, isGuest: false }));
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -207,5 +257,6 @@ export function useAuth(): UseAuthReturn {
     register,
     logout,
     refreshUser,
+    createGuestUser,
   };
 }

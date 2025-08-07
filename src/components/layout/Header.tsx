@@ -42,35 +42,23 @@ export function Header() {
 
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {isAuthenticated && (
-              <Link 
-                href="/dashboard" 
-                className="flex items-center space-x-1 lg:space-x-2 text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
-              >
-                <LayoutDashboard size={18} />
-                <span className="font-medium text-sm lg:text-base">Dashboard</span>
-              </Link>
+              <>
+                <Link 
+                  href="/dashboard" 
+                  className="flex items-center space-x-1 lg:space-x-2 text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
+                >
+                  <LayoutDashboard size={18} />
+                  <span className="font-medium text-sm lg:text-base">Dashboard</span>
+                </Link>
+                <Link 
+                  href="/settings" 
+                  className="flex items-center space-x-1 lg:space-x-2 text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
+                >
+                  <Settings size={18} />
+                  <span className="font-medium text-sm lg:text-base">Settings</span>
+                </Link>
+              </>
             )}
-            <Link 
-              href="/lobby" 
-              className="flex items-center space-x-1 lg:space-x-2 text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
-            >
-              <Users size={18} />
-              <span className="font-medium text-sm lg:text-base">Lobbies</span>
-            </Link>
-            <Link 
-              href="/leaderboard" 
-              className="flex items-center space-x-1 lg:space-x-2 text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
-            >
-              <Trophy size={18} />
-              <span className="font-medium text-sm lg:text-base">Leaderboard</span>
-            </Link>
-            <Link 
-              href="/settings" 
-              className="flex items-center space-x-1 lg:space-x-2 text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
-            >
-              <Settings size={18} />
-              <span className="font-medium text-sm lg:text-base">Settings</span>
-            </Link>
           </nav>
 
           <div className="flex items-center space-x-4">
