@@ -4,7 +4,7 @@ This schema supports a full-featured multiplayer chess platform with social feat
 
 ## Core Features Supported:
 - **User Management**: Registration, guests, profiles, preferences
-- **Social Features**: Friends, blocking, messaging, notifications
+- **Social Features**: Friends, blocking, direct messaging, notifications
 - **Game System**: 3 game modes, spectating, analysis, history
 - **Lobby System**: Mode-specific lobbies with custom settings
 - **Tournament System**: Swiss, elimination, round-robin tournaments
@@ -481,64 +481,57 @@ CREATE TABLE tournament_pairings (
 -- MESSAGING & NOTIFICATIONS
 -- =============================================
 
--- Chat rooms (global, game-specific, private)
-CREATE TABLE chat_rooms (
+-- Direct messages between users
+CREATE TABLE messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(100),
-    room_type VARCHAR(20) NOT NULL CHECK (room_type IN ('global', 'game', 'private', 'lobby', 'tournament')),
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    recipient_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     
-    -- References
-    game_id UUID REFERENCES games(id) ON DELETE CASCADE,
-    lobby_id UUID REFERENCES lobbies(id) ON DELETE CASCADE,
-    tournament_id UUID REFERENCES tournaments(id) ON DELETE CASCADE,
-    
-    -- Settings
-    is_active BOOLEAN DEFAULT TRUE,
-    max_participants INTEGER,
-    
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
--- Chat messages
-CREATE TABLE chat_messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    room_id UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    
+    -- Message content
     content TEXT NOT NULL,
-    message_type VARCHAR(20) DEFAULT 'text' CHECK (message_type IN ('text', 'emote', 'system', 'move')),
+    message_type VARCHAR(20) DEFAULT 'text' CHECK (message_type IN ('text', 'game_invite', 'friend_request')),
     
-    -- Moderation
-    is_deleted BOOLEAN DEFAULT FALSE,
-    deleted_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    deleted_at TIMESTAMPTZ,
-    delete_reason VARCHAR(100),
+    -- Status
+    is_read BOOLEAN DEFAULT FALSE,
+    read_at TIMESTAMPTZ,
+    is_deleted_by_sender BOOLEAN DEFAULT FALSE,
+    is_deleted_by_recipient BOOLEAN DEFAULT FALSE,
     
     -- Metadata
     edited_at TIMESTAMPTZ,
-    reply_to UUID REFERENCES chat_messages(id) ON DELETE SET NULL,
+    reply_to UUID REFERENCES messages(id) ON DELETE SET NULL,
     
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    -- Related content (for game invites, etc.)
+    related_game_id UUID REFERENCES games(id) ON DELETE SET NULL,
+    related_data JSONB, -- Additional context for special message types
+    
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    
+    -- Ensure users can't message themselves
+    CHECK (sender_id != recipient_id)
 );
 
--- Chat room participants
-CREATE TABLE chat_room_participants (
+-- Message conversations (automatically created when users first message each other)
+CREATE TABLE conversations (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    room_id UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user1_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user2_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     
-    role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('admin', 'moderator', 'member')),
+    -- Status
+    is_archived_by_user1 BOOLEAN DEFAULT FALSE,
+    is_archived_by_user2 BOOLEAN DEFAULT FALSE,
+    is_blocked BOOLEAN DEFAULT FALSE, -- If either user blocks the other
     
-    joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    left_at TIMESTAMPTZ,
-    last_read_at TIMESTAMPTZ DEFAULT NOW(),
+    -- Metadata
+    last_message_id UUID REFERENCES messages(id) ON DELETE SET NULL,
+    last_message_at TIMESTAMPTZ,
     
-    -- Permissions
-    can_send_messages BOOLEAN DEFAULT TRUE,
-    muted_until TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     
-    UNIQUE(room_id, user_id)
+    -- Ensure unique conversation per user pair (regardless of order)
+    UNIQUE(LEAST(user1_id, user2_id), GREATEST(user1_id, user2_id)),
+    CHECK (user1_id != user2_id)
 );
 
 -- Notifications
@@ -807,9 +800,11 @@ CREATE INDEX idx_notifications_user ON notifications(user_id);
 CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read);
 CREATE INDEX idx_notifications_type ON notifications(type);
 
--- Chat indexes
-CREATE INDEX idx_chat_messages_room ON chat_messages(room_id, created_at);
-CREATE INDEX idx_chat_messages_user ON chat_messages(user_id);
+-- Messaging indexes
+CREATE INDEX idx_messages_conversation ON messages(sender_id, recipient_id, created_at);
+CREATE INDEX idx_messages_recipient ON messages(recipient_id, is_read, created_at);
+CREATE INDEX idx_messages_sender ON messages(sender_id, created_at);
+CREATE INDEX idx_conversations_users ON conversations(user1_id, user2_id);
 
 -- Activity indexes
 CREATE INDEX idx_user_activity_user ON user_activity(user_id, created_at);
@@ -832,7 +827,7 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECU
 CREATE TRIGGER update_user_preferences_updated_at BEFORE UPDATE ON user_preferences FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_user_ratings_updated_at BEFORE UPDATE ON user_ratings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_friendships_updated_at BEFORE UPDATE ON friendships FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_chat_rooms_updated_at BEFORE UPDATE ON chat_rooms FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_conversations_updated_at BEFORE UPDATE ON conversations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -845,7 +840,8 @@ ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_ratings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE friendships ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 
 -- Example RLS policies (customize based on your needs)
 -- Users can read their own data and public profiles of others
@@ -888,14 +884,7 @@ INSERT INTO achievements (key, name, description, category, points, rarity) VALU
 ('social_butterfly', '100 Friends', 'Have 100 friends', 'social', 250, 'rare'),
 ('chat_master', 'Conversationalist', 'Send 1000 chat messages', 'social', 50, 'uncommon');
 
--- Create default chat rooms
-INSERT INTO chat_rooms (name, room_type) VALUES
-('General', 'global'),
-('Classic Chess', 'global'),
-('Chess Unboxed', 'global'),
-('Programming Chess', 'global'),
-('Tournaments', 'global'),
-('Help & Support', 'global');
+-- No default messaging data needed - conversations are created automatically when users first message each other
 
 -- Set up default user preferences for existing users (if any)
 -- This would be handled by application logic during user registration
@@ -912,7 +901,7 @@ INSERT INTO chat_rooms (name, room_type) VALUES
 
 ✅ **Complete User System** - Registration, guests, profiles, preferences
 ✅ **Advanced Rating System** - Per-mode ratings with history tracking  
-✅ **Social Features** - Friends, blocking, chat, notifications
+✅ **Social Features** - Friends, blocking, direct messaging, notifications
 ✅ **Tournament System** - Swiss, elimination, round-robin tournaments
 ✅ **Achievement System** - Gamification with unlockable badges
 ✅ **Moderation Tools** - Reports, bans, chat moderation
