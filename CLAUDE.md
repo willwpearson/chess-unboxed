@@ -1,4 +1,4 @@
-# Chess Application Development Todo List
+We # Chess Application Development Todo List
 
 ## Progress Tracking
 - **Total Tasks**: 34

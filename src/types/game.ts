@@ -128,13 +128,42 @@ export interface PlayerStats {
 }
 
 export interface UserPreferences {
+  // Display settings
   theme: 'light' | 'dark';
+  language: 'en' | 'es' | 'fr' | 'de' | 'ru' | 'zh' | 'ja' | 'ko';
+  timezone: string;
+  dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD';
+  
+  // Game settings
   boardTheme: 'classic' | 'modern' | 'wood' | 'neon' | 'cyberpunk';
   pieceSet: 'classic' | 'modern' | 'symbols';
   showCoordinates: boolean;
   showPossibleMoves: boolean;
+  moveAnimationSpeed: 'slow' | 'normal' | 'fast' | 'instant';
   soundEnabled: boolean;
   autoQueen: boolean;
+  
+  // Notification settings
+  emailNotifications: {
+    gameInvites: boolean;
+    friendRequests: boolean;
+    tournaments: boolean;
+    dailyPuzzles: boolean;
+    weeklyDigest: boolean;
+  };
+  pushNotifications: {
+    moves: boolean;
+    gameStart: boolean;
+    gameEnd: boolean;
+    friendActivity: boolean;
+  };
+  
+  // Privacy settings
+  profileVisibility: 'public' | 'friends' | 'private';
+  showOnlineStatus: boolean;
+  allowFriendRequests: boolean;
+  showGameHistory: boolean;
+  showRatingHistory: boolean;
 }
 
 // Lobby types

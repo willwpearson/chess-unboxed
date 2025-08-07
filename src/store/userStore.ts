@@ -20,12 +20,34 @@ interface UserState {
 
 const defaultPreferences: UserPreferences = {
   theme: 'light',
+  language: 'en',
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  dateFormat: 'MM/DD/YYYY',
   boardTheme: 'classic',
   pieceSet: 'classic',
   showCoordinates: true,
   showPossibleMoves: true,
+  moveAnimationSpeed: 'normal',
   soundEnabled: true,
   autoQueen: true,
+  emailNotifications: {
+    gameInvites: true,
+    friendRequests: true,
+    tournaments: true,
+    dailyPuzzles: false,
+    weeklyDigest: true,
+  },
+  pushNotifications: {
+    moves: true,
+    gameStart: true,
+    gameEnd: true,
+    friendActivity: false,
+  },
+  profileVisibility: 'public',
+  showOnlineStatus: true,
+  allowFriendRequests: true,
+  showGameHistory: true,
+  showRatingHistory: true,
 };
 
 const defaultStats: PlayerStats = {
