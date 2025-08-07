@@ -63,7 +63,7 @@ CREATE TABLE users (
     allow_friend_requests BOOLEAN DEFAULT TRUE,
     show_online_status BOOLEAN DEFAULT TRUE,
     allow_game_spectators BOOLEAN DEFAULT TRUE,
-    allow_chat_invites BOOLEAN DEFAULT TRUE,
+    allow_message_invites BOOLEAN DEFAULT TRUE,
     
     -- Moderation
     is_banned BOOLEAN DEFAULT FALSE,
@@ -529,10 +529,16 @@ CREATE TABLE conversations (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     
-    -- Ensure unique conversation per user pair (regardless of order)
-    UNIQUE(LEAST(user1_id, user2_id), GREATEST(user1_id, user2_id)),
-    CHECK (user1_id != user2_id)
+    CHECK (user1_id != user2_id),
+    CHECK (user1_id < user2_id) -- Ensure user1_id is always smaller to maintain uniqueness
 );
+
+-- Create unique index to ensure only one conversation per user pair
+CREATE UNIQUE INDEX idx_conversations_unique_pair ON conversations(user1_id, user2_id);
+
+-- Note: When creating conversations in application logic, always ensure:
+-- user1_id = LEAST(userA_id, userB_id) and user2_id = GREATEST(userA_id, userB_id)
+-- This maintains the constraint that user1_id < user2_id
 
 -- Notifications
 CREATE TABLE notifications (
@@ -632,7 +638,7 @@ CREATE TABLE user_reports (
     
     -- Related Content
     game_id UUID REFERENCES games(id) ON DELETE SET NULL,
-    message_id UUID REFERENCES chat_messages(id) ON DELETE SET NULL,
+    message_id UUID REFERENCES messages(id) ON DELETE SET NULL,
     
     -- Status
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'investigating', 'resolved', 'dismissed')),
@@ -882,7 +888,7 @@ INSERT INTO achievements (key, name, description, category, points, rarity) VALU
 ('speedster', 'Lightning Fast', 'Win a game in under 10 moves', 'gameplay', 300, 'rare'),
 ('endurance', 'Marathon Player', 'Play for 6 hours in one day', 'gameplay', 100, 'uncommon'),
 ('social_butterfly', '100 Friends', 'Have 100 friends', 'social', 250, 'rare'),
-('chat_master', 'Conversationalist', 'Send 1000 chat messages', 'social', 50, 'uncommon');
+('chat_master', 'Conversationalist', 'Send 1000 messages to friends', 'social', 50, 'uncommon');
 
 -- No default messaging data needed - conversations are created automatically when users first message each other
 
