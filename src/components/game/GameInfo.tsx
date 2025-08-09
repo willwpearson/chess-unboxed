@@ -68,44 +68,48 @@ export function GameInfo({ game, timeControl, whiteTimeRemaining, blackTimeRemai
     const isCurrentTurn = game.position.turn === color;
     
     return (
-      <div className={`flex items-center justify-between p-3 rounded-lg border ${
-        isCurrentTurn ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'
+      <div className={`relative p-3 rounded-lg transition-all duration-200 ${
+        isCurrentTurn 
+          ? 'bg-green-50 border border-green-200 shadow-sm' 
+          : 'bg-white border border-gray-200'
       }`}>
-        <div className="flex items-center space-x-3">
-          <div className={`w-4 h-4 rounded-full ${color === 'white' ? 'bg-white border-2 border-gray-400' : 'bg-gray-800'}`} />
-          <div>
-            <div className="flex items-center space-x-2">
-              <User size={16} />
-              <span className="font-medium">{player.name}</span>
-              {player.isBot && (
-                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-                  BOT
-                </span>
+        {/* Current turn indicator */}
+        {isCurrentTurn && game.status === 'active' && (
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-sm" />
+        )}
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3 flex-1">
+            <div className={`w-3 h-3 rounded-full ${
+              color === 'white' ? 'bg-white border border-gray-400 shadow-sm' : 'bg-gray-800'
+            }`} />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-2">
+                <span className="font-medium text-gray-900 truncate">{player.name}</span>
+                {player.isBot && (
+                  <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">
+                    BOT
+                  </span>
+                )}
+              </div>
+              {player.rating && (
+                <div className="text-xs text-gray-500">
+                  {player.rating}
+                </div>
               )}
             </div>
-            {player.rating && (
-              <div className="text-sm text-gray-600">
-                Rating: {player.rating}
-              </div>
-            )}
           </div>
+          
+          {/* Timer */}
+          {timeControl && timeRemaining !== undefined && (
+            <div className={`flex items-center space-x-1 font-mono text-sm ${
+              timeRemaining < 60 ? 'text-red-600' : timeRemaining < 300 ? 'text-orange-600' : 'text-gray-800'
+            }`}>
+              <Clock size={14} />
+              <span>{formatTime(timeRemaining)}</span>
+            </div>
+          )}
         </div>
-        
-        {timeControl && timeRemaining !== undefined && (
-          <div className={`flex items-center space-x-1 font-mono text-lg ${
-            timeRemaining < 60 ? 'text-red-600' : timeRemaining < 300 ? 'text-orange-600' : 'text-gray-800'
-          }`}>
-            <Clock size={16} />
-            <span>{formatTime(timeRemaining)}</span>
-          </div>
-        )}
-        
-        {isCurrentTurn && game.status === 'active' && (
-          <div className="flex items-center space-x-1 text-blue-600">
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-            <span className="text-sm font-medium">Turn</span>
-          </div>
-        )}
       </div>
     );
   };
@@ -114,64 +118,59 @@ export function GameInfo({ game, timeControl, whiteTimeRemaining, blackTimeRemai
   const result = getResultDisplay();
 
   return (
-    <Card className="w-full max-w-md">
-      <CardContent className="p-4 space-y-4">
-        {/* Game Status */}
+    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
+      {/* Header */}
+      <div className="p-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Game Info</h3>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${status.color}`}>
+          <h3 className="text-sm font-semibold text-gray-900">Game Info</h3>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
             {status.text}
           </span>
         </div>
+      </div>
 
+      <div className="p-3 space-y-3">
         {/* Game Result */}
         {result && (
-          <div className={`flex items-center justify-center space-x-2 p-3 rounded-lg border ${
-            result.color.includes('yellow') ? 'bg-yellow-50 border-yellow-200' :
-            result.color.includes('gray') ? 'bg-gray-50 border-gray-200' :
-            'bg-blue-50 border-blue-200'
+          <div className={`flex items-center justify-center space-x-2 p-2.5 rounded-lg ${
+            result.color.includes('yellow') ? 'bg-yellow-50 border border-yellow-200' :
+            result.color.includes('gray') ? 'bg-gray-50 border border-gray-200' :
+            'bg-blue-50 border border-blue-200'
           }`}>
-            <result.icon size={20} className={result.color} />
-            <span className={`font-semibold ${result.color}`}>{result.text}</span>
+            <result.icon size={16} className={result.color} />
+            <span className={`text-sm font-semibold ${result.color}`}>{result.text}</span>
           </div>
         )}
 
         {/* Players */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {renderPlayer(game.players.white, 'white', whiteTimeRemaining)}
           {renderPlayer(game.players.black, 'black', blackTimeRemaining)}
         </div>
 
-        {/* Game Mode Info */}
-        <div className="grid grid-cols-2 gap-4 pt-2 border-t">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100">
           <div className="text-center">
-            <div className="text-sm text-gray-600">Mode</div>
-            <div className="font-medium capitalize">{game.mode}</div>
+            <div className="text-xs text-gray-500">Moves</div>
+            <div className="text-sm font-semibold text-gray-900">{game.moves.length}</div>
           </div>
           <div className="text-center">
-            <div className="text-sm text-gray-600">Moves</div>
-            <div className="font-medium">{game.moves.length}</div>
+            <div className="text-xs text-gray-500">Mode</div>
+            <div className="text-sm font-semibold text-gray-900 capitalize">{game.mode}</div>
           </div>
         </div>
 
         {/* Time Control */}
         {timeControl && (
-          <div className="text-center pt-2 border-t">
-            <div className="text-sm text-gray-600">Time Control</div>
-            <div className="font-medium">
+          <div className="text-center pt-2 border-t border-gray-100">
+            <div className="text-xs text-gray-500">Time Control</div>
+            <div className="text-sm font-semibold text-gray-900">
               {formatTime(timeControl.initialTime)}
-              {timeControl.increment > 0 && ` + ${timeControl.increment}s`}
+              {timeControl.increment > 0 && ` +${timeControl.increment}s`}
             </div>
           </div>
         )}
-
-        {/* Game ID */}
-        <div className="text-center pt-2 border-t">
-          <div className="text-xs text-gray-500">
-            Game ID: {game.gameId.slice(-8)}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

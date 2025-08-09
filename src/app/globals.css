@@ -346,3 +346,38 @@ body {
     font-size: 1.5rem;
   }
 }
+
+/* Custom color utilities for modern chess board */
+@layer utilities {
+  .bg-amber-150 {
+    background-color: rgb(254 243 199);
+  }
+  
+  .bg-amber-250 {
+    background-color: rgb(252 211 77);
+  }
+  
+  .bg-purple-150 {
+    background-color: rgb(243 232 255);
+  }
+  
+  .bg-purple-250 {
+    background-color: rgb(196 181 253);
+  }
+  
+  .hover\:bg-amber-150:hover {
+    background-color: rgb(254 243 199);
+  }
+  
+  .hover\:bg-amber-250:hover {
+    background-color: rgb(252 211 77);
+  }
+  
+  .hover\:bg-purple-150:hover {
+    background-color: rgb(243 232 255);
+  }
+  
+  .hover\:bg-purple-250:hover {
+    background-color: rgb(196 181 253);
+  }
+}

@@ -118,33 +118,32 @@ export default function ClassicBotGamePage() {
   }
 
   return (
-    <>
-      <Header />
-      <main className="flex-1 min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
-        <div className="container mx-auto px-4 py-4">
-          {/* Top Bar - Minimal */}
-          <div className="flex items-center justify-between mb-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Modern Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
             <button
               onClick={handleNewGame}
-              className="gaming-button-secondary flex items-center space-x-2"
+              className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ArrowLeft size={16} />
               <span>New Game</span>
             </button>
 
             <div className="text-center">
-              <h1 className="text-xl font-gaming font-bold text-gaming-text-primary">
+              <h1 className="text-lg font-semibold text-gray-900">
                 Classic Chess vs {botConfig?.difficulty} Bot
               </h1>
               {currentGame.status === 'finished' && (
-                <div className={`mt-1 text-lg font-gaming font-bold ${
-                  currentGame.result === 'white-wins' ? 'text-gaming-accent-secondary' :
-                  currentGame.result === 'black-wins' ? 'text-gaming-accent-danger' : 'text-yellow-500'
+                <div className={`text-sm font-medium ${
+                  currentGame.result === 'white-wins' ? 'text-green-600' :
+                  currentGame.result === 'black-wins' ? 'text-red-600' : 'text-yellow-600'
                 }`}>
-                  {currentGame.result === 'white-wins' ? 'Victory!' :
-                   currentGame.result === 'black-wins' ? 'Defeat!' : 'Draw!'}
+                  {currentGame.result === 'white-wins' ? '1-0 You won!' :
+                   currentGame.result === 'black-wins' ? '0-1 You lost' : '½-½ Draw'}
                   {currentGame.endReason && (
-                    <span className="text-sm text-gaming-text-secondary ml-2">
+                    <span className="text-gray-500 ml-1">
                       ({currentGame.endReason.replace('-', ' ')})
                     </span>
                   )}
@@ -152,42 +151,42 @@ export default function ClassicBotGamePage() {
               )}
             </div>
 
-            <div className="w-32"></div> {/* Spacer for centering */}
-          </div>
-
-          {/* Main Game Layout - Board Dominant */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-12rem)] min-h-[500px]">
-            {/* Chess Board - Takes majority of space */}
-            <div className="lg:col-span-3 flex items-center justify-center">
-              <div className="w-full max-w-2xl lg:max-w-3xl">
-                <ChessBoard
-                  position={currentGame.position.board}
-                  fen={getCurrentFEN() || undefined}
-                  gameVariant="classic"
-                  onMove={handleMove}
-                  onResign={handleResign}
-                  onOfferDraw={handleOfferDraw}
-                  currentPlayer={currentGame.position.turn}
-                  isPlayerTurn={currentGame.position.turn === 'white' && currentGame.status === 'active'}
-                  showCoordinates={user?.preferences?.showCoordinates ?? true}
-                  boardTheme={user?.preferences?.boardTheme ?? "classic"}
-                />
-              </div>
-            </div>
-
-            {/* Side Panel - Game Info and History */}
-            <div className="lg:col-span-1 space-y-4 overflow-y-auto max-h-[500px] lg:max-h-none">
-              <div className="gaming-card p-3 lg:p-4">
-                <GameInfo game={currentGame} />
-              </div>
-              
-              <div className="gaming-card p-3 lg:p-4">
-                <MoveHistory moves={currentGame.moves} />
-              </div>
-            </div>
+            <div className="w-24"></div> {/* Spacer for centering */}
           </div>
         </div>
-      </main>
-    </>
+      </div>
+
+      {/* Main Game Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Chess Board - Main Focus */}
+          <div className="flex-1 flex justify-center items-start">
+            <div className="w-full max-w-2xl">
+              <ChessBoard
+                position={currentGame.position.board}
+                fen={getCurrentFEN() || undefined}
+                gameVariant="classic"
+                onMove={handleMove}
+                onResign={handleResign}
+                onOfferDraw={handleOfferDraw}
+                currentPlayer={currentGame.position.turn}
+                isPlayerTurn={currentGame.position.turn === 'white' && currentGame.status === 'active'}
+                showCoordinates={user?.preferences?.showCoordinates ?? true}
+                boardTheme={user?.preferences?.boardTheme ?? "classic"}
+              />
+            </div>
+          </div>
+
+          {/* Side Panel - Modern and Compact */}
+          <div className="w-full lg:w-80 space-y-4">
+            <GameInfo game={currentGame} />
+            <MoveHistory 
+              moves={currentGame.moves}
+              isWraparoundMode={false}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

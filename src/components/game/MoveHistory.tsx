@@ -153,254 +153,126 @@ export function MoveHistory({
 
   if (moves.length === 0) {
     return (
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <ScrollText size={20} />
-            <h3 className="text-lg font-semibold">Move History</h3>
+      <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="p-3 border-b border-gray-100">
+          <h3 className="text-sm font-semibold text-gray-900">Move History</h3>
+        </div>
+        <div className="p-4">
+          <div className="text-center py-6 text-gray-500">
+            <ScrollText size={32} className="mx-auto mb-3 opacity-30" />
+            <p className="text-sm">No moves yet</p>
+            <p className="text-xs text-gray-400">Moves will appear here as the game progresses</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-gray-500">
-            <ScrollText size={48} className="mx-auto mb-4 opacity-30" />
-            <p>No moves yet</p>
-            <p className="text-sm">Moves will appear here as the game progresses</p>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
+    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
+      {/* Header */}
+      <div className="p-3 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <ScrollText size={20} />
-            <h3 className="text-lg font-semibold">
-              Move History
+            <h3 className="text-sm font-semibold text-gray-900">
+              Moves
               {isWraparoundMode && (
-                <span className="ml-2 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                <span className="ml-1 text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
                   Unboxed
                 </span>
               )}
             </h3>
+            <span className="text-xs text-gray-500">
+              {moves.length}
+            </span>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setShowSearch(!showSearch)}
-              className="p-1 hover:bg-gray-100 rounded"
-              title="Search moves"
-            >
-              <Search size={16} />
-            </button>
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className="p-1 hover:bg-gray-100 rounded"
-              title={showDetails ? "Hide details" : "Show details"}
-            >
-              {showDetails ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
+          
+          {/* Compact controls */}
+          <div className="flex items-center space-x-1">
             {gameInfo && (
               <button
                 onClick={handleExportPGN}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
                 title="Export PGN"
               >
-                <Download size={16} />
+                <Download size={14} />
               </button>
             )}
           </div>
         </div>
+      </div>
 
-        {showSearch && (
-          <div className="mt-3 space-y-2">
-            <input
-              type="text"
-              placeholder="Search moves..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border rounded text-sm"
-            />
-            <div className="flex space-x-2">
-              {['all', 'captures', 'checks', 'wraparound'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setFilterType(type as any)}
-                  className={`px-2 py-1 text-xs rounded capitalize ${
-                    filterType === type 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
+      {/* Move List */}
+      <div className="p-2">
+        <div className="max-h-80 overflow-y-auto">
+          {filteredMoves.length === 0 ? (
+            <div className="text-center py-4 text-gray-500">
+              <p className="text-xs">No moves match your filters</p>
             </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between mt-2 text-sm text-gray-500">
-          <span>
-            {filteredMoves.length} of {moves.length} move{moves.length !== 1 ? 's' : ''}
-          </span>
-          {searchTerm || filterType !== 'all' ? (
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setFilterType('all');
-              }}
-              className="text-blue-600 hover:text-blue-800 text-xs"
-            >
-              Clear filters
-            </button>
-          ) : null}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <div className="max-h-96 overflow-y-auto space-y-1">
-          {filteredMoves.map((move) => {
-            const isCurrentMove = currentMoveIndex === move.index;
-            const isWhiteMove = move.index % 2 === 0;
-            
-            return (
-              <div
-                key={move.index}
-                className={`
-                  relative p-2 rounded cursor-pointer transition-all duration-200
-                  ${isCurrentMove 
-                    ? 'bg-blue-100 border border-blue-300 shadow-sm' 
-                    : 'hover:bg-gray-50'
-                  }
-                  ${onMoveClick ? 'cursor-pointer' : 'cursor-default'}
-                `}
-                onClick={() => onMoveClick?.(move.index)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3 flex-1">
+          ) : (
+            <div className="space-y-0.5">
+              {/* Group moves by pairs (white, black) */}
+              {Array.from({ length: Math.ceil(filteredMoves.length / 2) }, (_, pairIndex) => {
+                const whiteMove = filteredMoves.find(m => m.index === pairIndex * 2);
+                const blackMove = filteredMoves.find(m => m.index === pairIndex * 2 + 1);
+                
+                return (
+                  <div key={pairIndex} className="flex items-center space-x-1 text-xs">
                     {/* Move number */}
-                    <span className="text-xs font-mono text-gray-500 w-8">
-                      {formatMoveNumber(move.index)}
+                    <span className="text-gray-400 font-mono w-6 text-right">
+                      {pairIndex + 1}.
                     </span>
                     
-                    {/* Player indicator */}
-                    <div className={`w-3 h-3 rounded-full ${
-                      isWhiteMove ? 'bg-gray-200 border border-gray-400' : 'bg-gray-800'
-                    }`} />
-                    
-                    {/* Move notation */}
-                    <div className="flex items-center space-x-2 flex-1">
-                      <span className="font-mono text-sm font-medium">
-                        {move.notation}
-                      </span>
-                      
-                      {/* Move icon */}
-                      {getMoveIcon(move)}
-                      
-                      {/* Annotations */}
-                      {move.annotation && (
-                        <span className="text-xs text-blue-600 font-bold">
-                          {move.annotation}
-                        </span>
+                    {/* White move */}
+                    <div 
+                      className={`flex-1 p-1.5 rounded cursor-pointer transition-colors ${
+                        whiteMove && currentMoveIndex === whiteMove.index 
+                          ? 'bg-blue-50 text-blue-900' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => whiteMove && onMoveClick?.(whiteMove.index)}
+                    >
+                      {whiteMove ? (
+                        <div className="flex items-center space-x-1">
+                          <span className="font-mono font-medium">{whiteMove.notation}</span>
+                          {whiteMove.captured && <span className="text-red-500">×</span>}
+                          {whiteMove.isCheck && <span className="text-orange-500">+</span>}
+                          {whiteMove.isCheckmate && <span className="text-red-500">#</span>}
+                          {whiteMove.isWraparound && <span className="text-purple-500">↺</span>}
+                        </div>
+                      ) : (
+                        <span className="text-gray-300">—</span>
                       )}
-                      
-                      {/* Evaluation */}
-                      {showEvaluations && move.evaluation && typeof move.evaluation === 'object' && (
-                        <span className={`text-xs px-1 rounded ${move.evaluation.color} ${move.evaluation.bg}`}>
-                          {move.evaluation.symbol}
-                        </span>
+                    </div>
+                    
+                    {/* Black move */}
+                    <div 
+                      className={`flex-1 p-1.5 rounded cursor-pointer transition-colors ${
+                        blackMove && currentMoveIndex === blackMove.index 
+                          ? 'bg-blue-50 text-blue-900' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => blackMove && onMoveClick?.(blackMove.index)}
+                    >
+                      {blackMove ? (
+                        <div className="flex items-center space-x-1">
+                          <span className="font-mono font-medium">{blackMove.notation}</span>
+                          {blackMove.captured && <span className="text-red-500">×</span>}
+                          {blackMove.isCheck && <span className="text-orange-500">+</span>}
+                          {blackMove.isCheckmate && <span className="text-red-500">#</span>}
+                          {blackMove.isWraparound && <span className="text-purple-500">↺</span>}
+                        </div>
+                      ) : (
+                        <span className="text-gray-300">—</span>
                       )}
                     </div>
                   </div>
-                  
-                  {/* Timing */}
-                  {showTimings && (
-                    <span className="text-xs text-gray-400 font-mono ml-2">
-                      {formatTime(move.timestamp)}
-                    </span>
-                  )}
-                </div>
-
-                {/* Additional move details */}
-                {showDetails && (
-                  <div className="mt-2 flex flex-wrap items-center gap-1">
-                    {/* Captured piece */}
-                    {move.captured && (
-                      <span className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
-                        ×{move.captured.type}
-                      </span>
-                    )}
-                    
-                    {/* Promotion */}
-                    {move.promotion && (
-                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                        ={move.promotion}
-                      </span>
-                    )}
-                    
-                    {/* En passant */}
-                    {move.enPassant && (
-                      <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                        e.p.
-                      </span>
-                    )}
-                    
-                    {/* Wraparound info */}
-                    {showWraparoundInfo && move.isWraparound && move.wraparoundInfo && (
-                      <div className="flex items-center space-x-1">
-                        <span className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded flex items-center space-x-1">
-                          <span>{move.wraparoundInfo.symbol}</span>
-                          <span>{move.wraparoundInfo.type}</span>
-                          {move.wraparoundInfo.distance && (
-                            <span>[{move.wraparoundInfo.distance}]</span>
-                          )}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {/* Evaluation score */}
-                    {showEvaluations && move.evaluation && typeof move.evaluation === 'object' && move.evaluation.score && (
-                      <span className="text-xs text-gray-500">
-                        {move.evaluation.score > 0 ? '+' : ''}{(move.evaluation.score / 100).toFixed(1)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-        
-        {moves.length > 10 && (
-          <div className="mt-3 pt-3 border-t text-center">
-            <span className="text-xs text-gray-500">
-              {filteredMoves.length < moves.length 
-                ? `Showing ${filteredMoves.length} of ${moves.length} moves`
-                : 'Scroll to see all moves'
-              }
-            </span>
-          </div>
-        )}
-      </CardContent>
-
-      {/* Footer with game statistics */}
-      {gameInfo && (
-        <CardFooter>
-          <div className="w-full text-xs text-gray-500 space-y-1">
-            <div className="flex justify-between">
-              <span>{gameInfo.white} vs {gameInfo.black}</span>
-              <span>{gameInfo.result}</span>
+                );
+              })}
             </div>
-            {(gameInfo.event || gameInfo.site) && (
-              <div className="flex justify-between">
-                {gameInfo.event && <span>{gameInfo.event}</span>}
-                {gameInfo.site && <span>{gameInfo.site}</span>}
-              </div>
-            )}
-          </div>
-        </CardFooter>
-      )}
-    </Card>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
