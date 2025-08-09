@@ -5,7 +5,7 @@
 
 import { Chess } from 'chess.js';
 import { WraparoundChessEngine } from './chessEngine';
-import { normalizeColor } from './utils';
+import { normalizeColor, normalizePieceType } from './utils';
 import { 
   GameState, 
   GameMode, 
@@ -139,8 +139,8 @@ export class GameManager {
         
         if (piece) {
           position[square] = {
-            type: piece.type as PieceType,
-            color: piece.color as PieceColor
+            type: normalizePieceType(piece.type),
+            color: normalizeColor(piece.color)
           };
         } else {
           position[square] = null;
@@ -167,7 +167,7 @@ export class GameManager {
    * Validate and make a move
    */
   public makeMove(from: Square, to: Square, promotion?: PieceType): MoveValidationResult {
-    console.log(`GameManager.makeMove: ${from} -> ${to}`);
+    console.log(`[DEBUG] GameManager.makeMove: ${from} -> ${to}, promotion=${promotion}, engine type=${this.engine instanceof WraparoundChessEngine ? 'WraparoundChessEngine' : 'Chess.js'}`);
     
     try {
       // Validate it's the correct player's turn
@@ -199,10 +199,13 @@ export class GameManager {
           algebraicNotation = this.generateAlgebraicNotation(moveResult);
         }
       } else {
+        // Convert promotion piece type to chess.js format
+        const chessPromotion = promotion ? this.convertToChessJSPromotion(promotion) : undefined;
+        
         const chessMove = this.engine.move({
           from: from,
           to: to,
-          promotion: promotion
+          promotion: chessPromotion
         });
 
         if (chessMove) {
@@ -311,8 +314,8 @@ export class GameManager {
           
           if (piece) {
             position[square] = {
-              type: piece.type as PieceType,
-              color: piece.color as PieceColor
+              type: normalizePieceType(piece.type),
+              color: normalizeColor(piece.color)
             };
           } else {
             position[square] = null;
@@ -473,6 +476,19 @@ export class GameManager {
       return moves;
     } else {
       return this.engine.moves();
+    }
+  }
+
+  /**
+   * Convert our promotion piece type to chess.js format
+   */
+  private convertToChessJSPromotion(piece: PieceType): string {
+    switch (piece) {
+      case 'queen': return 'q';
+      case 'rook': return 'r';
+      case 'bishop': return 'b';
+      case 'knight': return 'n';
+      default: return 'q'; // Default to queen
     }
   }
 

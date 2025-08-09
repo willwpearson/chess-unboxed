@@ -81,7 +81,21 @@ export function ChessBoard({
   
   // Convert chess engine board to our position format
   const boardPosition = useMemo(() => {
-    if (position) return position;
+    if (position) {
+      // Normalize the position prop if it contains raw chess.js piece types
+      const normalizedPosition: Record<Square, ChessPiece | null> = {};
+      for (const [square, piece] of Object.entries(position)) {
+        if (piece) {
+          normalizedPosition[square as Square] = {
+            type: normalizePieceType(piece.type as string),
+            color: normalizeColor(piece.color as string)
+          };
+        } else {
+          normalizedPosition[square as Square] = null;
+        }
+      }
+      return normalizedPosition;
+    }
     
     if (chessEngine instanceof WraparoundChessEngine) {
       return chessEngine.getPosition();
@@ -97,8 +111,8 @@ export function ChessBoard({
         
         if (piece) {
           pos[square] = {
-            type: piece.type as PieceType,
-            color: piece.color as PieceColor
+            type: normalizePieceType(piece.type),
+            color: normalizeColor(piece.color)
           };
         } else {
           pos[square] = null;
@@ -135,8 +149,8 @@ export function ChessBoard({
     const fromRank = parseInt(from[1]);
     const toRank = parseInt(to[1]);
     
-    return (normalizeColor(piece.color) === 'white' && fromRank === 7 && toRank === 8) ||
-           (normalizeColor(piece.color) === 'black' && fromRank === 2 && toRank === 1);
+    return (piece.color === 'white' && fromRank === 7 && toRank === 8) ||
+           (piece.color === 'black' && fromRank === 2 && toRank === 1);
   }, [boardPosition]);
 
   const getSquareColor = (file: string, rank: string) => {
