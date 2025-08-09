@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Bot, Users, Zap, Crown, Play, Brain, Code } from 'lucide-react';
+import { Bot, Users, Zap, Crown, Play } from 'lucide-react';
 
 interface GameMode {
   id: string;
@@ -23,7 +23,7 @@ const gameModes: GameMode[] = [
     description: 'Practice against AI opponents with different difficulty levels',
     icon: Bot,
     color: 'bg-blue-500',
-    route: '/play/bot',
+    route: '/play/unboxed/bot',
     features: ['Multiple difficulty levels', 'Perfect for practice', 'Instant matches']
   },
   {
@@ -41,17 +41,8 @@ const gameModes: GameMode[] = [
     description: 'Challenge yourself - one loss and you\'re out!',
     icon: Zap,
     color: 'bg-purple-500',
-    route: '/play/endless',
+    route: '/play/unboxed/endless',
     features: ['Progressive difficulty', 'Leaderboard competition', 'Ultimate challenge']
-  },
-  {
-    id: 'programming',
-    title: 'Programming Chess',
-    description: 'Code your chess strategy with JavaScript functions',
-    icon: Brain,
-    color: 'bg-indigo-500',
-    route: '/play/programming',
-    features: ['Write JavaScript AI', 'Educational programming', 'Both classic & unboxed modes']
   }
 ];
 
@@ -115,14 +106,14 @@ export default function GameModeSelector() {
     <div className="w-full max-w-4xl mx-auto p-6">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Choose Your Game Mode
+          Choose Your Unboxed Mode
         </h1>
         <p className="text-lg text-gray-600">
-          Select how you want to play chess today
+          Select how you want to play wraparound chess today
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {gameModes.map((mode) => {
           const IconComponent = mode.icon;
           const isSelected = selectedMode === mode.id;

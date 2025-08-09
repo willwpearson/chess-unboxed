@@ -26,8 +26,7 @@ export default function ClassicBotGamePage() {
     setBotConfig(config);
 
     try {
-      const success = await initializeGame('bot', 'classic', config);
-      
+      const success = await initializeGame('bot', 'unboxed', config);
       if (success) {
         setGameStarted(true);
       } else {
@@ -165,7 +164,7 @@ export default function ClassicBotGamePage() {
               <ChessBoard
                 position={currentGame.position.board}
                 fen={getCurrentFEN() || undefined}
-                gameVariant="classic"
+                gameVariant="unboxed"
                 onMove={handleMove}
                 onResign={handleResign}
                 onOfferDraw={handleOfferDraw}

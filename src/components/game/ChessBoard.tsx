@@ -36,7 +36,7 @@ export function ChessBoard({
   position,
   chess: propChess,
   fen,
-  gameVariant = 'classic',
+  gameVariant = 'unboxed',
   onMove,
   onResign,
   onOfferDraw,

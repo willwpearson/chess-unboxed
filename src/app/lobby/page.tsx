@@ -43,7 +43,7 @@ export default function LobbyPage() {
           isPrivate: false,
           status: lobby.status === 'in_game' ? 'in-game' : lobby.status as 'waiting' | 'full' | 'in-game',
           gameMode: 'multiplayer' as GameMode,
-          gameVariant: 'classic',
+          gameVariant: 'unboxed',
           timeControl: {
             initialTime: 600,
             increment: 5,

@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
-import { Crown, Zap, Brain, Users, Bot, Infinity, LogIn, UserPlus, Trophy, Gamepad2, UserCheck, Play, Star, Shield, Sparkles, CheckCircle } from 'lucide-react';
+import { Zap, Users, Bot, Infinity, LogIn, UserPlus, Trophy, Gamepad2, UserCheck, Play, Star, Shield, Sparkles, CheckCircle } from 'lucide-react';
 
-type GameMode = 'classic' | 'unboxed' | 'programming';
+type GameMode = 'unboxed';
 
 interface GameModeConfig {
   id: GameMode;
@@ -24,17 +24,6 @@ interface GameModeConfig {
 
 const gameModes: GameModeConfig[] = [
   {
-    id: 'classic',
-    title: 'Chess Classic',
-    shortDescription: 'Traditional chess with standard 8x8 board rules',
-    fullDescription: 'Experience the timeless game of chess in its purest form. Perfect for players who love traditional strategy and want to master the fundamentals.',
-    icon: Crown,
-    color: 'from-amber-500 to-orange-600',
-    gradient: 'bg-gradient-to-br from-amber-500/20 to-orange-600/20',
-    features: ['Standard 8x8 board', 'Traditional piece movement', 'Classic rules & gameplay', 'Perfect for beginners'],
-    difficulty: 'Beginner to Master'
-  },
-  {
     id: 'unboxed',
     title: 'Chess Unboxed',
     shortDescription: 'Revolutionary toroidal chess - pieces wrap around board edges',
@@ -44,17 +33,6 @@ const gameModes: GameModeConfig[] = [
     gradient: 'bg-gradient-to-br from-purple-500/20 to-pink-600/20',
     features: ['Toroidal board topology', 'Edge-wrapping movement', 'Unique tactical patterns', 'Revolutionary gameplay'],
     difficulty: 'Intermediate to Expert'
-  },
-  {
-    id: 'programming',
-    title: 'Programming Chess',
-    shortDescription: 'Code your strategy with JavaScript functions',
-    fullDescription: 'The ultimate fusion of chess and coding! Write JavaScript functions to control your pieces, automate your strategy, and battle other programmers in a completely new way to play chess.',
-    icon: Brain,
-    color: 'from-emerald-500 to-teal-600',
-    gradient: 'bg-gradient-to-br from-emerald-500/20 to-teal-600/20',
-    features: ['JavaScript-powered moves', 'Automated strategies', 'Code vs code battles', 'For developer minds'],
-    difficulty: 'Advanced Programmers'
   }
 ];
 
@@ -111,7 +89,7 @@ export default function HomePage() {
               Chess Unboxed
             </h1>
             <p className="text-xl md:text-2xl text-gaming-text-secondary mb-8 leading-relaxed">
-              Experience chess like never before with three revolutionary game modes that redefine strategy gaming
+              Experience chess like never before with revolutionary wraparound gameplay that breaks all boundaries
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto mb-12">
               <Link href="/register" className="gaming-button inline-flex items-center w-full sm:w-auto">
@@ -148,14 +126,15 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-gaming font-bold text-gaming-text-primary mb-6">
-                Three Ways to Master Chess
+                Revolutionary Chess Experience
               </h2>
               <p className="text-xl text-gaming-text-secondary max-w-3xl mx-auto">
-                From traditional gameplay to mind-bending innovations, discover your perfect chess experience
+                Break free from traditional boundaries with wraparound chess where pieces transcend board edges
               </p>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div className="flex justify-center mb-16">
+              <div className="max-w-lg w-full">
               {gameModes.map((mode, index) => {
                 const IconComponent = mode.icon;
                 return (
@@ -197,6 +176,7 @@ export default function HomePage() {
                   </div>
                 );
               })}
+              </div>
             </div>
           </div>
         </section>
