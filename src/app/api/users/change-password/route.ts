@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
@@ -46,8 +46,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const supabase = createClient();
 
     // Get current user data
     const { data: user, error: fetchError } = await supabase

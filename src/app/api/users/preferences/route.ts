@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import jwt from 'jsonwebtoken';
 import { UserPreferences } from '@/types/game';
 
@@ -28,7 +28,6 @@ async function verifyToken(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const userId = await verifyToken(request);
-    const supabase = createClient();
 
     // Get user preferences from database
     const { data: user, error } = await supabase
@@ -126,8 +125,6 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    const supabase = createClient();
 
     // Update user preferences in database
     const { data, error } = await supabase
