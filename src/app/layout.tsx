@@ -21,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className={`font-sans antialiased bg-background text-foreground transition-colors duration-300`}>
+      <body className={`font-sans antialiased transition-colors duration-300`} style={{ background: 'var(--color-background)', color: 'var(--color-foreground)' }}>
         <Providers>
           <div className="min-h-screen flex flex-col">
             {children}

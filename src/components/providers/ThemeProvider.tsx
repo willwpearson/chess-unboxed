@@ -12,7 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const { user, updatePreferences } = useUserStore();
-  const theme = user?.preferences.theme || 'light';
+  const theme = user?.preferences.theme || 'dark';
 
   const setTheme = (newTheme: 'light' | 'dark') => {
     updatePreferences({ theme: newTheme });
@@ -26,6 +26,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     
     // Update CSS custom properties for gaming theme
     if (theme === 'dark') {
+      // Gaming theme variables
       root.style.setProperty('--gaming-bg-primary', '#0f0f1a');
       root.style.setProperty('--gaming-bg-secondary', '#1a1a2e');
       root.style.setProperty('--gaming-bg-tertiary', '#16213e');
@@ -36,6 +37,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       root.style.setProperty('--gaming-text-secondary', '#a1a1aa');
       root.style.setProperty('--gaming-border', '#374151');
     } else {
+      // Light theme overrides
       root.style.setProperty('--gaming-bg-primary', '#ffffff');
       root.style.setProperty('--gaming-bg-secondary', '#f8fafc');
       root.style.setProperty('--gaming-bg-tertiary', '#e2e8f0');
