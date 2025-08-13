@@ -38,12 +38,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
+    <div className="min-h-screen bg-[var(--gaming-bg-primary)]">
       <div className="container mx-auto px-4 py-8">
         {/* Header with Edit Toggle */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-gaming font-bold text-gaming-text-primary flex items-center gap-3">
-            <User size={32} style={{ color: 'var(--gaming-accent-primary)' }} />
+            <User size={32} className="text-[var(--gaming-accent-primary)]" />
             {isEditing ? 'Edit Profile' : 'My Profile'}
           </h1>
           

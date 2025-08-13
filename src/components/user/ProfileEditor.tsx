@@ -268,7 +268,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
       {/* Header */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <User size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <User size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">
             Edit Profile
           </h2>

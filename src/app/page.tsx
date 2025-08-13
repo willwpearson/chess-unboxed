@@ -67,7 +67,7 @@ export default function HomePage() {
   // Don't render anything while checking auth status
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--color-background)' }}>
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gaming-accent-primary"></div>
       </div>
     );
@@ -81,7 +81,7 @@ export default function HomePage() {
   return (
     <>
       <Header />
-      <main className="flex-1 min-h-screen" style={{ background: 'var(--color-background)' }}>
+      <main className="flex-1 min-h-screen bg-background">
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
@@ -182,7 +182,7 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="container mx-auto px-4 py-16" style={{ background: 'var(--color-card)' }}>
+        <section className="container mx-auto px-4 py-16 bg-card">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-gaming font-bold text-gaming-text-primary mb-6">

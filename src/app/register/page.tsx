@@ -32,7 +32,7 @@ export default function RegisterPage() {
     return (
       <>
         <Header />
-        <main className="flex-1 min-h-screen flex items-center justify-center" style={{ background: 'var(--gaming-bg-primary)' }}>
+        <main className="flex-1 min-h-screen flex items-center justify-center bg-[var(--gaming-bg-primary)]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gaming-accent-primary"></div>
         </main>
         <Footer />
@@ -47,7 +47,7 @@ export default function RegisterPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
+      <main className="flex-1 min-h-screen bg-[var(--gaming-bg-primary)]">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-md mx-auto">
             {/* Back button */}

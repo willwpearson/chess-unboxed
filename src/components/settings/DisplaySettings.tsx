@@ -89,12 +89,7 @@ const SelectDropdown = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all"
-      style={{ 
-        background: 'var(--gaming-bg-tertiary)', 
-        border: '2px solid var(--gaming-border)',
-        color: 'var(--gaming-text-primary)'
-      }}
+      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -117,8 +112,8 @@ export function DisplaySettings({ preferences, onUpdatePreference }: DisplaySett
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
           {theme === 'light' ? 
-            <Sun size={24} style={{ color: 'var(--gaming-accent-primary)' }} /> : 
-            <Moon size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+            <Sun size={24} className="text-[var(--gaming-accent-primary)]" /> : 
+            <Moon size={24} className="text-[var(--gaming-accent-primary)]" />
           }
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">App Theme</h2>
         </div>
@@ -132,7 +127,7 @@ export function DisplaySettings({ preferences, onUpdatePreference }: DisplaySett
             }`}
             onClick={() => onUpdatePreference('theme', 'light')}
           >
-            <Sun size={32} className="mx-auto mb-3" style={{ color: 'var(--gaming-accent-secondary)' }} />
+            <Sun size={32} className="mx-auto mb-3 text-[var(--gaming-accent-secondary)]" />
             <h3 className="font-gaming font-bold text-gaming-text-primary mb-2">Light Mode</h3>
             <p className="text-sm text-gaming-text-secondary">Clean and bright interface</p>
           </div>
@@ -145,7 +140,7 @@ export function DisplaySettings({ preferences, onUpdatePreference }: DisplaySett
             }`}
             onClick={() => onUpdatePreference('theme', 'dark')}
           >
-            <Moon size={32} className="mx-auto mb-3" style={{ color: 'var(--gaming-accent-primary)' }} />
+            <Moon size={32} className="mx-auto mb-3 text-[var(--gaming-accent-primary)]" />
             <h3 className="font-gaming font-bold text-gaming-text-primary mb-2">Dark Mode</h3>
             <p className="text-sm text-gaming-text-secondary">Easy on the eyes, gaming aesthetic</p>
           </div>
@@ -155,7 +150,7 @@ export function DisplaySettings({ preferences, onUpdatePreference }: DisplaySett
       {/* Language and Region */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Languages size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <Languages size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Language & Region</h2>
         </div>
         

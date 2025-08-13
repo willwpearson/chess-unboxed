@@ -267,7 +267,7 @@ export function SettingsPanel() {
 
   // Main render
   return (
-    <div className="min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
+    <div className="min-h-screen bg-[var(--gaming-bg-primary)]">
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-6xl mx-auto">
           {/* Header */}

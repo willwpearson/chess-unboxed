@@ -114,13 +114,13 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
               <div className="space-y-2 mb-4 relative z-10">
                 {config.features.map((feature, index) => (
                   <div key={index} className="flex items-center text-sm text-gaming-text-secondary justify-center">
-                    <Zap size={14} className="mr-2" style={{ color: 'var(--gaming-accent-secondary)' }} />
+                    <Zap size={14} className="mr-2 text-[var(--gaming-accent-secondary)]" />
                     {feature}
                   </div>
                 ))}
               </div>
               
-              <div className="pt-3 border-t relative z-10" style={{ borderColor: 'var(--gaming-border)' }}>
+              <div className="pt-3 border-t relative z-10 border-t-[var(--gaming-border)]">
                 <span className="text-xs text-gaming-text-secondary">
                   Thinking time: {config.thinkingTime / 1000}s
                 </span>
@@ -134,7 +134,7 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
       {selectedDifficulty && (
         <div className="mt-8 gaming-card p-6">
           <div className="flex items-center space-x-3 mb-6">
-            <Settings size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+            <Settings size={24} className="text-[var(--gaming-accent-primary)]" />
             <h3 className="text-2xl font-gaming font-bold text-gaming-text-primary">Bot Personality</h3>
           </div>
           <p className="text-gaming-text-secondary mb-6">

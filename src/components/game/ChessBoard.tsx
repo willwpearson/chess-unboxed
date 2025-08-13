@@ -481,7 +481,7 @@ export function ChessBoard({
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
                   <div className="absolute inset-0 rounded-full border-3 border-purple-400 shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
-                  <div className="absolute inset-1 rounded-full border-2 border-indigo-400 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute inset-1 rounded-full border-2 border-indigo-400 animate-pulse [animation-delay:0.5s]"></div>
                   
                   {/* Portal center */}
                   <div className="absolute inset-3 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 shadow-inner animate-pulse"></div>
@@ -529,7 +529,7 @@ export function ChessBoard({
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
                   <div className="absolute inset-0 rounded-full border-3 border-purple-400 shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
-                  <div className="absolute inset-1 rounded-full border-2 border-indigo-400 animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                  <div className="absolute inset-1 rounded-full border-2 border-indigo-400 animate-pulse [animation-delay:0.5s]"></div>
                   
                   {/* Portal center */}
                   <div className="absolute inset-3 rounded-full bg-gradient-to-l from-purple-600 to-indigo-600 shadow-inner animate-pulse"></div>

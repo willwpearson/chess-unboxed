@@ -127,7 +127,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
       {/* User Information */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <User size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <User size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Account Information</h2>
         </div>
         
@@ -139,12 +139,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
             <input
               type="email"
               value={user?.email || ''}
-              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all"
-              style={{ 
-                background: 'var(--gaming-bg-tertiary)', 
-                border: '2px solid var(--gaming-border)',
-                color: 'var(--gaming-text-primary)'
-              }}
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
               readOnly
             />
             <p className="text-xs text-gaming-text-secondary mt-1">
@@ -159,12 +154,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
             <input
               type="text"
               value={user?.username || ''}
-              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all"
-              style={{ 
-                background: 'var(--gaming-bg-tertiary)', 
-                border: '2px solid var(--gaming-border)',
-                color: 'var(--gaming-text-primary)'
-              }}
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
               readOnly
             />
             <p className="text-xs text-gaming-text-secondary mt-1">
@@ -193,7 +183,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
       {/* Danger Zone */}
       <div className="gaming-card p-6 border-gaming-accent-danger">
         <div className="flex items-center space-x-3 mb-6">
-          <AlertTriangle size={24} style={{ color: 'var(--gaming-accent-danger)' }} />
+          <AlertTriangle size={24} className="text-[var(--gaming-accent-danger)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-accent-danger">Danger Zone</h2>
         </div>
         
@@ -226,14 +216,9 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
                 type="password"
                 value={passwordData.currentPassword}
                 onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all ${
-                  passwordErrors.currentPassword ? 'border-gaming-accent-danger' : 'border-gaming-border'
+                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 text-[var(--gaming-text-primary)] ${
+                  passwordErrors.currentPassword ? 'border-gaming-accent-danger' : 'border-[var(--gaming-border)]'
                 }`}
-                style={{ 
-                  background: 'var(--gaming-bg-tertiary)', 
-                  border: '2px solid var(--gaming-border)',
-                  color: 'var(--gaming-text-primary)'
-                }}
               />
               {passwordErrors.currentPassword && (
                 <p className="text-sm text-gaming-accent-danger mt-1">{passwordErrors.currentPassword}</p>
@@ -248,14 +233,9 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
                 type="password"
                 value={passwordData.newPassword}
                 onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all ${
-                  passwordErrors.newPassword ? 'border-gaming-accent-danger' : 'border-gaming-border'
+                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 text-[var(--gaming-text-primary)] ${
+                  passwordErrors.newPassword ? 'border-gaming-accent-danger' : 'border-[var(--gaming-border)]'
                 }`}
-                style={{ 
-                  background: 'var(--gaming-bg-tertiary)', 
-                  border: '2px solid var(--gaming-border)',
-                  color: 'var(--gaming-text-primary)'
-                }}
               />
               {passwordErrors.newPassword && (
                 <p className="text-sm text-gaming-accent-danger mt-1">{passwordErrors.newPassword}</p>
@@ -270,14 +250,9 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
                 type="password"
                 value={passwordData.confirmPassword}
                 onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all ${
-                  passwordErrors.confirmPassword ? 'border-gaming-accent-danger' : 'border-gaming-border'
+                className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 text-[var(--gaming-text-primary)] ${
+                  passwordErrors.confirmPassword ? 'border-gaming-accent-danger' : 'border-[var(--gaming-border)]'
                 }`}
-                style={{ 
-                  background: 'var(--gaming-bg-tertiary)', 
-                  border: '2px solid var(--gaming-border)',
-                  color: 'var(--gaming-text-primary)'
-                }}
               />
               {passwordErrors.confirmPassword && (
                 <p className="text-sm text-gaming-accent-danger mt-1">{passwordErrors.confirmPassword}</p>
@@ -338,12 +313,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder="Type DELETE to confirm"
-                className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-danger transition-all border-gaming-accent-danger"
-                style={{ 
-                  background: 'var(--gaming-bg-tertiary)', 
-                  border: '2px solid var(--gaming-accent-danger)',
-                  color: 'var(--gaming-text-primary)'
-                }}
+                className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-danger transition-all border-2 border-[var(--gaming-accent-danger)] bg-[var(--gaming-bg-tertiary)] text-[var(--gaming-text-primary)]"
               />
             </div>
 

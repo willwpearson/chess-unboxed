@@ -79,7 +79,7 @@ export default function UnboxedBotGamePage() {
     return (
       <>
         <Header />
-        <main className="flex-1 min-h-screen" style={{ background: 'var(--gaming-bg-primary)' }}>
+        <main className="flex-1 min-h-screen bg-[var(--gaming-bg-primary)]">
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-4xl mx-auto">
               <div className="mb-8">

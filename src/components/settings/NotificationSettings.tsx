@@ -30,7 +30,7 @@ const ToggleSwitch = ({
   <div className="gaming-card flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div style={{ color: 'var(--gaming-accent-primary)' }}>
+        <div className="text-[var(--gaming-accent-primary)]">
           {icon}
         </div>
       )}
@@ -62,7 +62,7 @@ export function NotificationSettings({ preferences, onToggleNestedPreference }: 
       {/* Email Notifications */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Mail size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <Mail size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Email Notifications</h2>
         </div>
         
@@ -112,7 +112,7 @@ export function NotificationSettings({ preferences, onToggleNestedPreference }: 
       {/* Push Notifications */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Smartphone size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <Smartphone size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Push Notifications</h2>
         </div>
         

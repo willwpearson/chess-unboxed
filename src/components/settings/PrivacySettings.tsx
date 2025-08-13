@@ -26,7 +26,7 @@ const ToggleSwitch = ({
   <div className="gaming-card flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div style={{ color: 'var(--gaming-accent-primary)' }}>
+        <div className="text-[var(--gaming-accent-primary)]">
           {icon}
         </div>
       )}
@@ -73,12 +73,7 @@ const SelectDropdown = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all"
-      style={{ 
-        background: 'var(--gaming-bg-tertiary)', 
-        border: '2px solid var(--gaming-border)',
-        color: 'var(--gaming-text-primary)'
-      }}
+      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -98,7 +93,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
       {/* Profile Visibility */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Shield size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <Shield size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Profile Visibility</h2>
         </div>
         
@@ -118,7 +113,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
       {/* Privacy Options */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Lock size={24} style={{ color: 'var(--gaming-accent-primary)' }} />
+          <Lock size={24} className="text-[var(--gaming-accent-primary)]" />
           <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Privacy Options</h2>
         </div>
         

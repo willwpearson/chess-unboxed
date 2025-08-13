@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
 @theme {
@@ -782,5 +781,71 @@ body {
   .surface-gaming-elevated {
     background: var(--color-game-surface-elevated);
     border: 2px solid var(--color-game-border-accent);
+  }
+
+  /* Gaming Color Utilities for replacing inline styles */
+  .text-gaming-accent-primary {
+    color: var(--gaming-accent-primary);
+  }
+  
+  .text-gaming-accent-secondary {
+    color: var(--gaming-accent-secondary);
+  }
+  
+  .text-gaming-accent-danger {
+    color: var(--gaming-accent-danger);
+  }
+  
+  .text-gaming-text-primary {
+    color: var(--gaming-text-primary);
+  }
+  
+  .text-gaming-text-secondary {
+    color: var(--gaming-text-secondary);
+  }
+  
+  .bg-gaming-primary {
+    background: var(--gaming-bg-primary);
+  }
+  
+  .bg-gaming-secondary {
+    background: var(--gaming-bg-secondary);
+  }
+  
+  .bg-gaming-tertiary {
+    background: var(--gaming-bg-tertiary);
+  }
+  
+  .bg-gaming-accent-primary {
+    background: var(--gaming-accent-primary);
+  }
+  
+  .bg-gaming-accent-secondary {
+    background: var(--gaming-accent-secondary);
+  }
+  
+  .bg-gaming-accent-danger {
+    background: var(--gaming-accent-danger);
+  }
+  
+  .border-gaming-border {
+    border-color: var(--gaming-border);
+  }
+  
+  /* Animation delay utilities */
+  .animate-delay-500 {
+    animation-delay: 0.5s;
+  }
+  
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+  
+  .animate-delay-300 {
+    animation-delay: 0.3s;
+  }
+  
+  .animate-delay-400 {
+    animation-delay: 0.4s;
   }
 }
