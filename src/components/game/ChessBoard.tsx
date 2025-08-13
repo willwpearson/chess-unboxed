@@ -472,9 +472,7 @@ export function ChessBoard({
       <div className="relative w-full max-w-[min(100vw-2rem,100vh-8rem)] aspect-square">
         <div 
           ref={boardRef}
-          className={`relative w-full h-full rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] ${
-            isWraparoundMode ? 'bg-gradient-to-br from-purple-400 to-indigo-400' : 'bg-gradient-to-br from-amber-500 to-orange-500'
-          }`}
+          className={`relative w-full h-full rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] bg-gradient-to-br from-secondary to-secondary-400`}
         >
           {/* Wraparound portals - off to the sides */}
           {isWraparoundMode && (
@@ -484,11 +482,11 @@ export function ChessBoard({
                 {/* Portal structure */}
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
-                  <div className="absolute inset-0 rounded-full border-3 border-purple-400 shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
-                  <div className="absolute inset-1 rounded-full border-2 border-indigo-400 animate-pulse [animation-delay:0.5s]"></div>
+                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
+                  <div className="absolute inset-1 rounded-full border-2 border-secondary-400 animate-pulse [animation-delay:0.5s]"></div>
                   
                   {/* Portal center */}
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 shadow-inner animate-pulse"></div>
+                  <div className="absolute inset-3 rounded-full bg-gradient-to-r from-secondary-800 to-secondary-400 shadow-inner animate-pulse"></div>
                   
                 </div>
                 
@@ -496,7 +494,7 @@ export function ChessBoard({
                 {[...Array(12)].map((_, i) => (
                   <div
                     key={`left-flow-${i}`}
-                    className="absolute w-1.5 h-1.5 bg-purple-400 rounded-full"
+                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full"
                     style={{
                       top: `${5 + i * 8}%`,
                       left: '100%',
@@ -513,7 +511,7 @@ export function ChessBoard({
                 {[...Array(8)].map((_, i) => (
                   <div
                     key={`left-flow-sec-${i}`}
-                    className="absolute w-1 h-1 bg-indigo-300 rounded-full"
+                    className="absolute w-1 h-1 bg-secondary-400 rounded-full"
                     style={{
                       top: `${8 + i * 10}%`,
                       left: '100%',
@@ -532,19 +530,19 @@ export function ChessBoard({
                 {/* Portal structure */}
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
-                  <div className="absolute inset-0 rounded-full border-3 border-purple-400 shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
-                  <div className="absolute inset-1 rounded-full border-2 border-indigo-400 animate-pulse [animation-delay:0.5s]"></div>
+                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
+                  <div className="absolute inset-1 rounded-full border-2 border-secondary-400 animate-pulse [animation-delay:0.5s]"></div>
                   
                   {/* Portal center */}
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-l from-purple-600 to-indigo-600 shadow-inner animate-pulse"></div>
-                  
+                  <div className="absolute inset-3 rounded-full bg-gradient-to-l from-secondary-600 to-secondary-400 shadow-inner animate-pulse"></div>
+
                 </div>
                 
                 {/* Horizontal particles flowing toward board - distributed across full height */}
                 {[...Array(12)].map((_, i) => (
                   <div
                     key={`right-flow-${i}`}
-                    className="absolute w-1.5 h-1.5 bg-purple-400 rounded-full"
+                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full"
                     style={{
                       top: `${5 + i * 8}%`,
                       right: '100%',
@@ -561,7 +559,7 @@ export function ChessBoard({
                 {[...Array(8)].map((_, i) => (
                   <div
                     key={`right-flow-sec-${i}`}
-                    className="absolute w-1 h-1 bg-indigo-300 rounded-full"
+                    className="absolute w-1 h-1 bg-secondary-400 rounded-full"
                     style={{
                       top: `${8 + i * 10}%`,
                       right: '100%',
