@@ -96,7 +96,7 @@ export default function HomePage() {
                     currentPlayer="white"
                     isPlayerTurn={false} // Disable interaction for demo
                     showCoordinates={false}
-                    boardTheme="cyberpunk"
+                    boardTheme="classic"
                     showActionButtons={false}
                     showTurnIndicator={false}
                   />

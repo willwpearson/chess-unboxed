@@ -402,8 +402,8 @@ export function ChessBoard({
           relative aspect-square cursor-pointer transition-all duration-200
           ${getSquareColor(file, rank)}
           ${isSelected ? 'ring-2 ring-yellow-500 ring-inset shadow-inner' : ''}
-          ${isPossibleMove && !isWraparoundTarget ? 'ring-1 ring-blue-400 ring-inset' : ''}
-          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-purple-500 ring-inset' : ''}
+          ${isPossibleMove && !isWraparoundTarget ? 'ring-1 ring-accent ring-inset' : ''}
+          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-secondary ring-inset' : ''}
           ${isLastMove ? 'ring-1 ring-green-500 ring-inset' : ''}
         `}
         onClick={() => handleSquareClick(square)}
@@ -416,12 +416,12 @@ export function ChessBoard({
             {piece ? (
               // Capture indicator - ring around edge
               <div className={`absolute inset-1 rounded-full border-2 ${
-                isWraparoundTarget ? 'border-purple-500' : 'border-blue-500'
+                isWraparoundTarget ? 'border-secondary' : 'border-accent'
               }`} />
             ) : (
               // Move indicator - small dot
               <div className={`w-3 md:w-6 h-3 md:h-6 rounded-full ${
-                isWraparoundTarget ? 'bg-purple-500' : 'bg-blue-500'
+                isWraparoundTarget ? 'bg-secondary' : 'bg-accent'
               } opacity-70`} />
             )}
           </div>
