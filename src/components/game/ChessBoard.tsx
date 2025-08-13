@@ -26,6 +26,8 @@ interface ChessBoardProps {
   isPlayerTurn: boolean;
   showCoordinates?: boolean;
   boardTheme?: 'classic' | 'modern' | 'wood' | 'neon' | 'cyberpunk';
+  showActionButtons?: boolean;
+  showTurnIndicator?: boolean;
 }
 
 
@@ -43,7 +45,9 @@ export function ChessBoard({
   currentPlayer,
   isPlayerTurn,
   showCoordinates = true,
-  boardTheme = 'classic'
+  boardTheme = 'classic',
+  showActionButtons = true,
+  showTurnIndicator = true
 }: ChessBoardProps) {
   const { ui, setSelectedSquare, setPossibleMoves, setDraggedPiece, showPromotionDialog, hidePromotionDialog, getLegalMoves: storeLegalMoves } = useGameStore();
   const [draggedElement, setDraggedElement] = useState<HTMLElement | null>(null);
@@ -606,61 +610,65 @@ export function ChessBoard({
         </div>
 
         {/* Modern Action Buttons - Floating */}
-        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
-          {onOfferDraw && (
-            <button
-              onClick={onOfferDraw}
-              disabled={!isPlayerTurn}
-              className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 disabled:opacity-50 text-sm"
-            >
-              <Users size={14} />
-              <span className="hidden sm:inline">Draw</span>
-            </button>
-          )}
-          
-          {onResign && (
-            <button
-              onClick={onResign}
-              className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 text-red-600 hover:bg-red-50 text-sm"
-            >
-              <Flag size={14} />
-              <span className="hidden sm:inline">Resign</span>
-            </button>
-          )}
+        {showActionButtons && (
+          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
+            {onOfferDraw && (
+              <button
+                onClick={onOfferDraw}
+                disabled={!isPlayerTurn}
+                className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 disabled:opacity-50 text-sm"
+              >
+                <Users size={14} />
+                <span className="hidden sm:inline">Draw</span>
+              </button>
+            )}
+            
+            {onResign && (
+              <button
+                onClick={onResign}
+                className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 text-red-600 hover:bg-red-50 text-sm"
+              >
+                <Flag size={14} />
+                <span className="hidden sm:inline">Resign</span>
+              </button>
+            )}
 
-          <button
-            onClick={() => {
-              setSelectedSquare(null);
-              setPossibleMoves([]);
-            }}
-            className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 text-sm"
-          >
-            <RotateCcw size={14} />
-            <span className="hidden sm:inline">Clear</span>
-          </button>
-        </div>
+            <button
+              onClick={() => {
+                setSelectedSquare(null);
+                setPossibleMoves([]);
+              }}
+              className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 text-sm"
+            >
+              <RotateCcw size={14} />
+              <span className="hidden sm:inline">Clear</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Modern Turn Indicator */}
-      <div className="mt-20 mb-4">
-        <div className={`inline-flex items-center space-x-3 px-4 py-2 rounded-full shadow-sm border transition-all duration-200 ${
-          isPlayerTurn 
-            ? 'bg-green-50 text-green-800 border-green-200' 
-            : 'bg-slate-50 text-slate-700 border-slate-200'
-        }`}>
-          <div className={`w-2 h-2 rounded-full ${
-            isPlayerTurn ? 'bg-green-500 animate-pulse' : 'bg-slate-400'
-          }`} />
-          <span className="font-medium text-sm">
-            {isPlayerTurn ? 'Your move' : `${currentPlayer === 'white' ? 'White' : 'Black'} to move`}
-          </span>
-          {isWraparoundMode && (
-            <div className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">
-              Unboxed
-            </div>
-          )}
+      {showTurnIndicator && (
+        <div className="mt-20 mb-4">
+          <div className={`inline-flex items-center space-x-3 px-4 py-2 rounded-full shadow-sm border transition-all duration-200 ${
+            isPlayerTurn 
+              ? 'bg-green-50 text-green-800 border-green-200' 
+              : 'bg-slate-50 text-slate-700 border-slate-200'
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${
+              isPlayerTurn ? 'bg-green-500 animate-pulse' : 'bg-slate-400'
+            }`} />
+            <span className="font-medium text-sm">
+              {isPlayerTurn ? 'Your move' : `${currentPlayer === 'white' ? 'White' : 'Black'} to move`}
+            </span>
+            {isWraparoundMode && (
+              <div className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+                Unboxed
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Promotion Dialog */}
       <PromotionDialog

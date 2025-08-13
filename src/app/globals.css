@@ -88,30 +88,6 @@
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
-/* Light theme variant (can be used with [data-theme="light"] or similar) */
-.light {
-  --color-background: #ffffff;
-  --color-foreground: #1f2937;
-  --color-card: #f9fafb;
-  --color-card-foreground: #1f2937;
-  --color-game-surface: #f3f4f6;
-  --color-game-surface-elevated: #ffffff;
-  --color-game-surface-highlight: #e5e7eb;
-  --color-game-border: #d1d5db;
-  --color-game-border-accent: #9ca3af;
-}
-
-* {
-  border-color: var(--color-border);
-}
-
-body {
-  color: var(--color-foreground);
-  background: var(--color-background);
-  font-family: var(--font-family-sans);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
 /* 3D Blocky Gaming UI Components - Chess.com Mobile Inspired */
 
 /* Gaming Card with 3D Bevel Effect */
@@ -299,7 +275,7 @@ body {
 .gaming-title {
   font-family: var(--font-family-gaming);
   font-weight: 800;
-  background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-500));
+  background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-400));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
