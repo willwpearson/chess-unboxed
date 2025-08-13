@@ -92,13 +92,13 @@ export default function HomePage() {
               Experience chess like never before with revolutionary wraparound gameplay that breaks all boundaries
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto mb-12">
-              <Link href="/register" className="gaming-button inline-flex items-center w-full sm:w-auto">
+              <Link href="/register" className="gaming-button-secondary inline-flex items-center w-full sm:w-auto">
                 <UserPlus size={20} className="mr-2" />
                 Start Playing Free
               </Link>
-              <Link href="/login" className="gaming-button-secondary inline-flex items-center w-full sm:w-auto">
+              <Link href="/login" className="gaming-button inline-flex items-center w-full sm:w-auto">
                 <LogIn size={20} className="mr-2" />
-                Sign In
+                Login
               </Link>
             </div>
             <button

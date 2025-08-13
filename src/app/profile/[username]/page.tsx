@@ -74,7 +74,7 @@ export default function UserProfilePage({ params }: ProfilePageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--gaming-bg-primary)]">
+    <div className="min-h-screen bg-primary">
       <div className="container mx-auto px-4 py-8">
         <UserProfile user={user} isOwnProfile={false} />
       </div>
