@@ -101,7 +101,7 @@ export function Header() {
                 </button>
                 <button
                   onClick={() => handleAuthClick('register')}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-lg transition-all duration-300 bg-secondary hover:bg-secondary-900 text-primary-50 hover:text-accent cursor-pointer shadow-lg"
+                  className="flex items-center space-x-1 px-3 py-2 rounded-lg transition-all duration-300 bg-secondary hover:bg-secondary-900 text-primary-50 cursor-pointer shadow-lg"
                 >
                   <User size={18} />
                   <span className="text-sm">Sign Up</span>
