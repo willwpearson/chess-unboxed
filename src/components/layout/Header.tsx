@@ -71,12 +71,12 @@ export function Header() {
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-3">
                 <Link href="/profile">
-                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg hover:bg-accent transition-colors duration-300 cursor-pointer bg-accent">
+                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-secondary cursor-pointer bg-accent">
                     <div className="flex flex-col">
-                      <div className="text-sm font-medium text-secondary">
+                      <div className="text-sm font-medium text-primary">
                         {user.display_name || user.username}
                       </div>
-                      <div className="text-xs text-accent">
+                      <div className="text-xs text-primary">
                         Rating: {user.current_rating}
                       </div>
                     </div>
@@ -84,7 +84,7 @@ export function Header() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center space-x-1 p-2 rounded-lg hover:bg-accent transition-colors duration-300 text-accent"
+                  className="flex items-center space-x-1 p-2 rounded-lg transition-colors duration-300 hover:bg-accent text-accent hover:text-primary cursor-pointer"
                 >
                   <LogOut size={18} />
                   <span className="hidden md:inline text-sm">Logout</span>
