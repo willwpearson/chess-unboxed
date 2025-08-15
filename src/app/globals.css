@@ -38,19 +38,19 @@
   --color-secondary-900: #1e3a8a;
   --color-secondary-foreground: #ffffff;
   
-  /* Accent - Bright Yellow (more vibrant, less golden) */
-  --color-accent: #eab308;
-  --color-accent-50: #fefce8;
-  --color-accent-100: #fef9c3;
-  --color-accent-200: #fef08a;
-  --color-accent-300: #fde047;
-  --color-accent-400: #facc15;
-  --color-accent-500: #eab308;
-  --color-accent-600: #ca8a04;
-  --color-accent-700: #a16207;
-  --color-accent-800: #854d0e;
-  --color-accent-900: #713f12;
-  --color-accent-foreground: #1f2937;
+  /* Accent - Vibrant Teal */
+  --color-accent: #06b6d4;
+  --color-accent-50: #ecfeff;
+  --color-accent-100: #cffafe;
+  --color-accent-200: #a5f3fc;
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-accent-600: #0891b2;
+  --color-accent-700: #0e7490;
+  --color-accent-800: #155e75;
+  --color-accent-900: #164e63;
+  --color-accent-foreground: #ffffff;
   
   /* Gaming Theme Colors */
   --color-game-surface: #1a1a2e;

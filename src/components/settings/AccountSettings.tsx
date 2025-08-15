@@ -127,37 +127,37 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
       {/* User Information */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <User size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Account Information</h2>
+          <User size={36} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Account Information</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-gaming font-medium text-gaming-text-primary mb-2">
+            <label className="block text-sm font-gaming font-medium text-primary-300 mb-2">
               Email Address
             </label>
             <input
               type="email"
               value={user?.email || ''}
-              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary-400 text-primary"
               readOnly
             />
-            <p className="text-xs text-gaming-text-secondary mt-1">
+            <p className="text-xs text-primary-400 mt-1">
               Email changes require verification
             </p>
           </div>
           
           <div>
-            <label className="block text-sm font-gaming font-medium text-gaming-text-primary mb-2">
+            <label className="block text-sm font-gaming font-medium text-primary-300 mb-2">
               Username
             </label>
             <input
               type="text"
               value={user?.username || ''}
-              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary-400 text-primary"
               readOnly
             />
-            <p className="text-xs text-gaming-text-secondary mt-1">
+            <p className="text-xs text-primary-400 mt-1">
               Username changes coming soon
             </p>
           </div>
@@ -166,8 +166,8 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
         <div className="mt-6 pt-6 border-t border-gaming-border">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="font-gaming font-medium text-gaming-text-primary">Password</h3>
-              <p className="text-sm text-gaming-text-secondary">Change your account password</p>
+              <h3 className="font-gaming font-medium text-primary-300">Password</h3>
+              <p className="text-sm text-primary-400">Change your account password</p>
             </div>
             <button
               onClick={() => setShowPasswordDialog(true)}
@@ -181,22 +181,22 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
       </div>
 
       {/* Danger Zone */}
-      <div className="gaming-card p-6 border-gaming-accent-danger">
+      <div className="gaming-card p-6 border-destructive">
         <div className="flex items-center space-x-3 mb-6">
-          <AlertTriangle size={24} className="text-[var(--gaming-accent-danger)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-accent-danger">Danger Zone</h2>
+          <AlertTriangle size={24} className="text-destructive" />
+          <h2 className="text-2xl font-gaming font-bold text-destructive">Danger Zone</h2>
         </div>
         
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="font-gaming font-medium text-gaming-text-primary">Delete Account</h3>
-            <p className="text-sm text-gaming-text-secondary">
+            <h3 className="font-gaming font-medium text-primary-300">Delete Account</h3>
+            <p className="text-sm text-primary-400">
               Permanently delete your account and all data. This action cannot be undone.
             </p>
           </div>
           <button
             onClick={() => setShowDeleteDialog(true)}
-            className="bg-gaming-accent-danger hover:bg-red-700 text-white px-6 py-3 rounded-lg font-gaming font-medium transition-colors flex items-center"
+            className="bg-destructive hover:bg-red-700 text-white px-6 py-3 rounded-lg font-gaming font-medium transition-colors duration-300 flex items-center cursor-pointer"
           >
             <Trash2 size={16} className="mr-2" />
             Delete Account

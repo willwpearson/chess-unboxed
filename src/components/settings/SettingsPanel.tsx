@@ -267,14 +267,14 @@ export function SettingsPanel() {
 
   // Main render
   return (
-    <div className="min-h-screen bg-[var(--gaming-bg-primary)]">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-4xl font-gaming font-bold gaming-title mb-2">Settings</h1>
-              <p className="text-gaming-text-secondary">
+              <p className="text-primary-300">
                 Customize your chess experience and personalize your preferences
               </p>
             </div>
@@ -324,7 +324,7 @@ export function SettingsPanel() {
                 <span className="text-gaming-text-primary">{notification.message}</span>
                 <button
                   onClick={() => setNotification(null)}
-                  className="ml-auto text-gaming-text-secondary hover:text-gaming-text-primary"
+                  className="ml-auto text-primary-300 hover:text-gaming-text-primary"
                 >
                   <X size={16} />
                 </button>
@@ -341,10 +341,10 @@ export function SettingsPanel() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-color duration-300 cursor-pointer ${
                         activeTab === tab.id
-                          ? 'bg-gaming-accent-primary text-white'
-                          : 'text-gaming-text-primary hover:bg-gaming-bg-tertiary'
+                          ? 'bg-accent text-primary'
+                          : 'text-primary-300 hover:bg-accent-900'
                       }`}
                     >
                       {tab.icon}
