@@ -283,7 +283,7 @@ export function SettingsPanel() {
               <button
                 onClick={handleReset}
                 disabled={isLoading}
-                className="gaming-button-secondary"
+                className="gaming-button"
               >
                 Reset to Default
               </button>
@@ -292,7 +292,7 @@ export function SettingsPanel() {
                 <button
                   onClick={handleSave}
                   disabled={isLoading}
-                  className={`gaming-button ${isLoading ? 'opacity-50' : ''}`}
+                  className={`gaming-button-secondary ${isLoading ? 'opacity-50' : ''}`}
                 >
                   {isLoading ? (
                     <div className="flex items-center">

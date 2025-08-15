@@ -26,7 +26,7 @@ const ToggleSwitch = ({
   <div className="gaming-card flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div className="text-accent">
+        <div className="text-secondary">
           {icon}
         </div>
       )}
@@ -93,7 +93,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       {/* Board Theme */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Palette size={24} className="text-accent" />
+          <Palette size={24} className="text-secondary" />
           <h2 className="text-2xl font-gaming font-bold text-primary-300">Board Theme</h2>
         </div>
         
@@ -103,8 +103,8 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
               key={themeOption}
               className={`gaming-card cursor-pointer p-4 text-center transition-all ${
                 preferences.boardTheme === themeOption
-                  ? 'border-gaming-accent-primary bg-gaming-accent-primary/10'
-                  : 'hover:border-gaming-accent-primary/50'
+                  ? 'border-accent bg-accent/10'
+                  : 'hover:border-accent/50'
               }`}
               onClick={() => onUpdatePreference('boardTheme', themeOption)}
             >
@@ -123,7 +123,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       {/* Piece Set */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Gamepad2 size={24} className="text-accent" />
+          <Gamepad2 size={24} className="text-secondary" />
           <h2 className="text-2xl font-gaming font-bold text-primary-300">Piece Set</h2>
         </div>
         
@@ -133,8 +133,8 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
               key={set}
               className={`gaming-card cursor-pointer p-4 text-center transition-all ${
                 preferences.pieceSet === set
-                  ? 'border-gaming-accent-primary bg-gaming-accent-primary/10'
-                  : 'hover:border-gaming-accent-primary/50'
+                  ? 'border-accent bg-accent/10'
+                  : 'hover:border-accent/50'
               }`}
               onClick={() => onUpdatePreference('pieceSet', set)}
             >
@@ -150,7 +150,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       {/* Game Options */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Settings size={24} className="text-accent" />
+          <Settings size={24} className="text-secondary" />
           <h2 className="text-2xl font-gaming font-bold text-primary-300">Game Options</h2>
         </div>
         

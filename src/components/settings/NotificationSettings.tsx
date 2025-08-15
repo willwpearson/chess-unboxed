@@ -30,20 +30,20 @@ const ToggleSwitch = ({
   <div className="gaming-card flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div className="text-[var(--gaming-accent-primary)]">
+        <div className="text-secondary">
           {icon}
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-gaming-text-primary">{label}</h4>
-        <p className="text-sm text-gaming-text-secondary">{description}</p>
+        <h4 className="font-gaming font-medium text-primary-300">{label}</h4>
+        <p className="text-sm text-primary-400">{description}</p>
       </div>
     </div>
     <button
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
         checked
-          ? 'bg-gaming-accent-primary'
-          : 'bg-gaming-border'
+          ? 'bg-accent'
+          : 'bg-border'
       }`}
       onClick={() => onChange(!checked)}
     >
@@ -62,8 +62,8 @@ export function NotificationSettings({ preferences, onToggleNestedPreference }: 
       {/* Email Notifications */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Mail size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Email Notifications</h2>
+          <Mail size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Email Notifications</h2>
         </div>
         
         <div className="space-y-4">
@@ -112,8 +112,8 @@ export function NotificationSettings({ preferences, onToggleNestedPreference }: 
       {/* Push Notifications */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Smartphone size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Push Notifications</h2>
+          <Smartphone size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Push Notifications</h2>
         </div>
         
         <div className="space-y-4">
