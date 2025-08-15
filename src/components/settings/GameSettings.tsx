@@ -26,20 +26,20 @@ const ToggleSwitch = ({
   <div className="gaming-card flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div className="text-[var(--gaming-accent-primary)]">
+        <div className="text-accent">
           {icon}
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-gaming-text-primary">{label}</h4>
-        <p className="text-sm text-gaming-text-secondary">{description}</p>
+        <h4 className="font-gaming font-medium text-primary-300">{label}</h4>
+        <p className="text-sm text-primary-400">{description}</p>
       </div>
     </div>
     <button
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
         checked
-          ? 'bg-gaming-accent-primary'
-          : 'bg-gaming-border'
+          ? 'bg-accent'
+          : 'bg-border'
       }`}
       onClick={() => onChange(!checked)}
     >
@@ -67,13 +67,13 @@ const SelectDropdown = ({
   description: string;
 }) => (
   <div className="gaming-card p-4">
-    <label className="block text-sm font-gaming font-medium text-gaming-text-primary mb-2">
+    <label className="block text-sm font-gaming font-medium text-primary-300 mb-2">
       {label}
     </label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
+      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary text-primary-300"
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -81,7 +81,7 @@ const SelectDropdown = ({
         </option>
       ))}
     </select>
-    <p className="text-xs text-gaming-text-secondary mt-1">
+    <p className="text-xs text-primary-400 mt-1">
       {description}
     </p>
   </div>
@@ -93,8 +93,8 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       {/* Board Theme */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Palette size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Board Theme</h2>
+          <Palette size={24} className="text-accent" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Board Theme</h2>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -114,7 +114,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
                 <div className={`${themeOption === 'classic' ? 'bg-amber-100' : themeOption === 'modern' ? 'bg-slate-100' : themeOption === 'wood' ? 'bg-yellow-200' : themeOption === 'neon' ? 'bg-cyan-400' : 'bg-purple-500'} rounded`}></div>
                 <div className={`${themeOption === 'classic' ? 'bg-amber-800' : themeOption === 'modern' ? 'bg-slate-600' : themeOption === 'wood' ? 'bg-yellow-800' : themeOption === 'neon' ? 'bg-pink-400' : 'bg-teal-400'} rounded`}></div>
               </div>
-              <h4 className="font-gaming font-medium text-gaming-text-primary mb-1 capitalize">{themeOption}</h4>
+              <h4 className="font-gaming font-medium text-primary-300 mb-1 capitalize">{themeOption}</h4>
             </div>
           ))}
         </div>
@@ -123,8 +123,8 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       {/* Piece Set */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Gamepad2 size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Piece Set</h2>
+          <Gamepad2 size={24} className="text-accent" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Piece Set</h2>
         </div>
         
         <div className="grid grid-cols-3 gap-4">
@@ -141,7 +141,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
               <div className="text-3xl mb-2">
                 {set === 'classic' ? '♚' : set === 'modern' ? '🤴' : '●'}
               </div>
-              <span className="font-gaming font-medium text-gaming-text-primary text-sm capitalize">{set}</span>
+              <span className="font-gaming font-medium text-primary-300 text-sm capitalize">{set}</span>
             </div>
           ))}
         </div>
@@ -150,8 +150,8 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       {/* Game Options */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Settings size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Game Options</h2>
+          <Settings size={24} className="text-accent" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Game Options</h2>
         </div>
         
         <div className="space-y-4">
