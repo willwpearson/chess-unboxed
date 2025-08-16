@@ -139,7 +139,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
             <input
               type="email"
               value={user?.email || ''}
-              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary text-foreground"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-background text-foreground"
               readOnly
             />
             <p className="text-xs text-primary-400 mt-1">
@@ -154,7 +154,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
             <input
               type="text"
               value={user?.username || ''}
-              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary text-foreground"
+              className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-background text-foreground"
               readOnly
             />
             <p className="text-xs text-primary-400 mt-1">

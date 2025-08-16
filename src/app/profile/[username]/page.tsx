@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { UserProfile } from '@/components/user/UserProfile';
 import { LoadingSpinner } from '@/components/ui/Loading';
 import { User } from '@/hooks/useAuth';
+import { ChevronLeft } from 'lucide-react';
 
 interface ProfilePageProps {
   params: Promise<{ username: string }>;
@@ -20,6 +21,7 @@ export default function UserProfilePage({ params }: ProfilePageProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -62,10 +64,10 @@ export default function UserProfilePage({ params }: ProfilePageProps) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="gaming-card p-8 text-center">
-          <h1 className="text-2xl font-gaming font-bold text-gaming-text-primary mb-4">
+          <h1 className="text-2xl font-gaming font-bold text-primary mb-4">
             Profile Not Found
           </h1>
-          <p className="text-gaming-text-secondary">
+          <p className="text-destructive">
             {error || 'The user you are looking for does not exist.'}
           </p>
         </div>
@@ -76,6 +78,15 @@ export default function UserProfilePage({ params }: ProfilePageProps) {
   return (
     <div className="min-h-screen bg-primary">
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="gaming-button flex items-center gap-2 mb-6 hover:bg-gaming-accent-primary/10 transition-colors"
+        >
+          <ChevronLeft size={16} />
+          Back
+        </button>
+
         <UserProfile user={user} isOwnProfile={false} />
       </div>
     </div>

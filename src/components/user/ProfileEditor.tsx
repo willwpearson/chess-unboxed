@@ -258,7 +258,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
   if (!user) {
     return (
       <div className="gaming-card p-6 text-center">
-        <p className="text-gaming-text-secondary">No user data available</p>
+        <p className="text-destructive">No user data available</p>
       </div>
     );
   }
@@ -268,16 +268,16 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
       {/* Header */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <User size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">
+          <User size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">
             Edit Profile
           </h2>
         </div>
 
         {/* Success Message */}
         {saveSuccess && (
-          <div className="mb-6 p-4 bg-gaming-accent-secondary bg-opacity-10 border-2 border-gaming-accent-secondary rounded-lg">
-            <div className="flex items-center space-x-2 text-gaming-accent-secondary">
+          <div className="mb-6 p-4 bg-background bg-opacity-10 border-2 border-secondary rounded-lg">
+            <div className="flex items-center space-x-2 text-secondary">
               <Check size={20} />
               <span className="font-medium">Profile updated successfully!</span>
             </div>
@@ -286,8 +286,8 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
 
         {/* General Error */}
         {errors.general && (
-          <div className="mb-6 p-4 bg-gaming-accent-danger bg-opacity-10 border-2 border-gaming-accent-danger rounded-lg">
-            <div className="flex items-center space-x-2 text-gaming-accent-danger">
+          <div className="mb-6 p-4 bg-background bg-opacity-10 border-2 border-destructive rounded-lg">
+            <div className="flex items-center space-x-2 text-destructive">
               <AlertCircle size={20} />
               <span>{errors.general}</span>
             </div>
@@ -296,7 +296,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
 
         {/* Avatar Section */}
         <div className="mb-6">
-          <label className="block text-sm font-gaming font-semibold text-gaming-text-primary mb-3">
+          <label className="block text-sm font-gaming font-semibold text-primary-300 mb-3">
             Profile Avatar
           </label>
           <div className="flex items-center space-x-4">
@@ -304,7 +304,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
               className="relative cursor-pointer group"
               onClick={handleAvatarClick}
             >
-              <div className="w-24 h-24 rounded-full border-4 border-gaming-accent-primary overflow-hidden bg-gaming-bg-tertiary flex items-center justify-center transition-all duration-300 group-hover:border-gaming-accent-secondary">
+              <div className="w-24 h-24 rounded-full border-4 border-accent overflow-hidden bg-background flex items-center justify-center transition-all duration-300 group-hover:border-accent">
                 {avatarPreview ? (
                   <img
                     src={avatarPreview}
@@ -312,11 +312,11 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User size={32} className="text-gaming-text-secondary" />
+                  <User size={32} className="text-primary-400" />
                 )}
                 
                 {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Camera size={20} className="text-white" />
                 </div>
               </div>
@@ -332,11 +332,11 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
                 <Upload size={16} />
                 <span>Upload Avatar</span>
               </button>
-              <p className="text-xs text-gaming-text-secondary mt-2">
+              <p className="text-xs text-primary-400 mt-2">
                 Max 5MB • JPEG, PNG, WebP, or GIF
               </p>
               {errors.avatar && (
-                <p className="text-xs text-gaming-accent-danger mt-1">
+                <p className="text-xs text-destructive mt-1">
                   {errors.avatar}
                 </p>
               )}
@@ -356,7 +356,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Username */}
           <div>
-            <label htmlFor="username" className="block text-sm font-gaming font-semibold text-gaming-text-primary mb-2">
+            <label htmlFor="username" className="block text-sm font-gaming font-semibold text-primary-300 mb-2">
               Username *
             </label>
             <input
@@ -364,14 +364,14 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
               type="text"
               value={formData.username}
               onChange={(e) => handleInputChange('username', e.target.value)}
-              className={`w-full px-4 py-3 bg-gaming-bg-tertiary border-2 rounded-lg text-gaming-text-primary placeholder-gaming-text-secondary focus:outline-none focus:border-gaming-accent-primary transition-colors ${
-                errors.username ? 'border-gaming-accent-danger' : 'border-gaming-border'
+              className={`w-full px-4 py-3 bg-background border-2 rounded-lg text-primary-300 placeholder-primary-400 focus:outline-none focus:border-accent transition-colors ${
+                errors.username ? 'border-destructive' : 'border-border'
               }`}
               placeholder="Enter your username"
               disabled={isLoading}
             />
             {errors.username && (
-              <p className="text-xs text-gaming-accent-danger mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.username}
               </p>
             )}
@@ -379,7 +379,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
 
           {/* Display Name */}
           <div>
-            <label htmlFor="display_name" className="block text-sm font-gaming font-semibold text-gaming-text-primary mb-2">
+            <label htmlFor="display_name" className="block text-sm font-gaming font-semibold text-primary-300 mb-2">
               Display Name *
             </label>
             <input
@@ -387,14 +387,14 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
               type="text"
               value={formData.display_name}
               onChange={(e) => handleInputChange('display_name', e.target.value)}
-              className={`w-full px-4 py-3 bg-gaming-bg-tertiary border-2 rounded-lg text-gaming-text-primary placeholder-gaming-text-secondary focus:outline-none focus:border-gaming-accent-primary transition-colors ${
-                errors.display_name ? 'border-gaming-accent-danger' : 'border-gaming-border'
+              className={`w-full px-4 py-3 bg-background border-2 rounded-lg text-primary-300 placeholder-primary-400 focus:outline-none focus:border-accent transition-colors ${
+                errors.display_name ? 'border-destructive' : 'border-border'
               }`}
               placeholder="Enter your display name"
               disabled={isLoading}
             />
             {errors.display_name && (
-              <p className="text-xs text-gaming-accent-danger mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.display_name}
               </p>
             )}
@@ -402,7 +402,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
 
           {/* Country */}
           <div>
-            <label htmlFor="country" className="block text-sm font-gaming font-semibold text-gaming-text-primary mb-2">
+            <label htmlFor="country" className="block text-sm font-gaming font-semibold text-primary-300 mb-2">
               <MapPin size={16} className="inline mr-1" />
               Country
             </label>
@@ -411,14 +411,14 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
               type="text"
               value={formData.country}
               onChange={(e) => handleInputChange('country', e.target.value)}
-              className={`w-full px-4 py-3 bg-gaming-bg-tertiary border-2 rounded-lg text-gaming-text-primary placeholder-gaming-text-secondary focus:outline-none focus:border-gaming-accent-primary transition-colors ${
-                errors.country ? 'border-gaming-accent-danger' : 'border-gaming-border'
+              className={`w-full px-4 py-3 bg-background border-2 rounded-lg text-primary-300 placeholder-primary-400 focus:outline-none focus:border-accent transition-colors ${
+                errors.country ? 'border-destructive' : 'border-border'
               }`}
               placeholder="Enter your country"
               disabled={isLoading}
             />
             {errors.country && (
-              <p className="text-xs text-gaming-accent-danger mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.country}
               </p>
             )}
@@ -426,7 +426,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
 
           {/* Website */}
           <div>
-            <label htmlFor="website" className="block text-sm font-gaming font-semibold text-gaming-text-primary mb-2">
+            <label htmlFor="website" className="block text-sm font-gaming font-semibold text-primary-300 mb-2">
               <Globe size={16} className="inline mr-1" />
               Website
             </label>
@@ -435,14 +435,14 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
               type="url"
               value={formData.website}
               onChange={(e) => handleInputChange('website', e.target.value)}
-              className={`w-full px-4 py-3 bg-gaming-bg-tertiary border-2 rounded-lg text-gaming-text-primary placeholder-gaming-text-secondary focus:outline-none focus:border-gaming-accent-primary transition-colors ${
-                errors.website ? 'border-gaming-accent-danger' : 'border-gaming-border'
+              className={`w-full px-4 py-3 bg-background border-2 rounded-lg text-primary-300 placeholder-primary-400 focus:outline-none focus:border-accent transition-colors ${
+                errors.website ? 'border-destructive' : 'border-border'
               }`}
               placeholder="https://your-website.com"
               disabled={isLoading}
             />
             {errors.website && (
-              <p className="text-xs text-gaming-accent-danger mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.website}
               </p>
             )}
@@ -451,7 +451,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
 
         {/* Bio */}
         <div className="mt-6">
-          <label htmlFor="bio" className="block text-sm font-gaming font-semibold text-gaming-text-primary mb-2">
+          <label htmlFor="bio" className="block text-sm font-gaming font-semibold text-primary-300 mb-2">
             Bio
           </label>
           <textarea
@@ -459,32 +459,32 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
             value={formData.bio}
             onChange={(e) => handleInputChange('bio', e.target.value)}
             rows={4}
-            className={`w-full px-4 py-3 bg-gaming-bg-tertiary border-2 rounded-lg text-gaming-text-primary placeholder-gaming-text-secondary focus:outline-none focus:border-gaming-accent-primary transition-colors resize-none ${
-              errors.bio ? 'border-gaming-accent-danger' : 'border-gaming-border'
+            className={`w-full px-4 py-3 bg-background border-2 rounded-lg text-primary-300 placeholder-primary-400 focus:outline-none focus:border-accent transition-colors resize-none ${
+              errors.bio ? 'border-destructive' : 'border-border'
             }`}
             placeholder="Tell us about yourself... (optional)"
             disabled={isLoading}
           />
           <div className="flex justify-between items-center mt-1">
             {errors.bio ? (
-              <p className="text-xs text-gaming-accent-danger">
+              <p className="text-xs text-destructive">
                 {errors.bio}
               </p>
             ) : (
               <div />
             )}
-            <p className="text-xs text-gaming-text-secondary">
+            <p className="text-xs text-primary-400">
               {formData.bio.length}/500
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gaming-border">
+        <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-border">
           <button
             type="button"
             onClick={handleCancel}
-            className="gaming-button-secondary flex items-center space-x-2"
+            className="gaming-button flex items-center space-x-2"
             disabled={isLoading}
           >
             <X size={16} />
@@ -494,7 +494,7 @@ export function ProfileEditor({ user, onSave, onCancel, className = '' }: Profil
           <button
             type="button"
             onClick={handleSave}
-            className="gaming-button flex items-center space-x-2"
+            className="gaming-button-secondary flex items-center space-x-2"
             disabled={isLoading}
           >
             <Save size={16} />

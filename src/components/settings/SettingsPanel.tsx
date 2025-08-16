@@ -322,7 +322,7 @@ export function SettingsPanel() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-color duration-300 cursor-pointer ${
                         activeTab === tab.id
-                          ? 'bg-accent text-primary'
+                          ? 'bg-accent text-black'
                           : 'text-primary-300 hover:bg-accent-900'
                       }`}
                     >

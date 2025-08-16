@@ -45,11 +45,11 @@ function UserStatsCard({ title, value, icon, color, subtitle }: UserStatsCardPro
       <div className="text-2xl font-gaming font-bold mb-1" style={{ color: color }}>
         {value}
       </div>
-      <div className="text-sm font-medium text-gaming-text-primary mb-1">
+      <div className="text-sm font-medium text-primary-300 mb-1">
         {title}
       </div>
       {subtitle && (
-        <div className="text-xs text-gaming-text-secondary">
+        <div className="text-xs text-primary-400">
           {subtitle}
         </div>
       )}
@@ -95,7 +95,7 @@ function UserAvatar({ user, size = 'large' }: { user: User; size?: 'small' | 'me
   // Fallback to initials
   return (
     <div 
-      className={`${sizeClasses[size]} ${borderClasses[size]} border-gaming-accent-primary rounded-full bg-gaming-accent-primary text-white font-gaming font-bold flex items-center justify-center`}
+      className={`${sizeClasses[size]} ${borderClasses[size]} border-accent rounded-full bg-secondary text-white font-gaming font-bold flex items-center justify-center`}
     >
       {user.display_name.charAt(0).toUpperCase()}
     </div>
@@ -160,17 +160,17 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
             
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-gaming font-bold text-gaming-text-primary">
+                <h1 className="text-3xl font-gaming font-bold text-primary-300">
                   {user.display_name}
                 </h1>
                 {user.is_verified && (
                   <div className="flex items-center" title="Verified User">
-                    <Shield size={24} className="text-[var(--gaming-accent-secondary)]" />
+                    <Shield size={24} className="text-gaming-accent-secondary" />
                   </div>
                 )}
               </div>
               
-              <div className="flex flex-wrap items-center gap-4 text-gaming-text-secondary">
+              <div className="flex flex-wrap items-center gap-4 text-primary-400">
                 <span className="flex items-center gap-1">
                   <UserIcon size={16} />
                   @{user.username}
@@ -198,12 +198,12 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           
           {/* Rating Badge */}
           <div className="gaming-card p-4 text-center min-w-[120px]">
-            <div className="text-3xl font-gaming font-bold mb-1 text-[var(--gaming-accent-primary)]">
+            <div className="text-3xl font-gaming font-bold mb-1 text-gaming-accent-primary">
               {user.current_rating}
             </div>
-            <div className="text-sm text-gaming-text-secondary mb-1">Current Rating</div>
+            <div className="text-sm text-primary-400 mb-1">Current Rating</div>
             {user.peak_rating > user.current_rating && (
-              <div className="text-xs text-gaming-text-secondary">
+              <div className="text-xs text-primary-400">
                 Peak: {user.peak_rating}
               </div>
             )}
@@ -213,7 +213,7 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
         {/* Bio Section */}
         {user.bio && (
           <div className="mt-6 pt-6 border-t border-gaming-border">
-            <p className="text-gaming-text-primary leading-relaxed">
+            <p className="text-primary-300 leading-relaxed">
               {user.bio}
             </p>
           </div>
@@ -226,7 +226,7 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           title="Total Games"
           value={user.total_games}
           icon={<Activity size={24} />}
-          color="var(--gaming-accent-primary)"
+          color="gaming-accent-primary"
           subtitle={user.total_games === 1 ? "game played" : "games played"}
         />
         
@@ -234,7 +234,7 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           title="Wins"
           value={user.wins}
           icon={<Trophy size={24} />}
-          color="var(--gaming-accent-secondary)"
+          color="gaming-accent-secondary"
           subtitle={`${winRate}% win rate`}
         />
         
@@ -242,7 +242,7 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           title="Losses"
           value={user.losses}
           icon={<TrendingUp size={24} />}
-          color="var(--gaming-accent-danger)"
+          color="gaming-accent-danger"
           subtitle={user.total_games > 0 ? `${Math.round((user.losses / user.total_games) * 100)}% of games` : ""}
         />
         
@@ -250,7 +250,7 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           title="Draws"
           value={user.draws}
           icon={<Target size={24} />}
-          color="#fbbf24"
+          color="warning"
           subtitle={user.total_games > 0 ? `${Math.round((user.draws / user.total_games) * 100)}% of games` : ""}
         />
       </div>
@@ -258,29 +258,29 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
       {/* Detailed Stats */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Award size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Performance Overview</h2>
+          <Award size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Performance Overview</h2>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Rating Progress */}
           <div className="gaming-card p-4">
-            <h3 className="font-gaming font-semibold text-gaming-text-primary mb-3">Rating Progress</h3>
+            <h3 className="font-gaming font-semibold text-primary-300 mb-3">Rating Progress</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gaming-text-secondary">Current</span>
-                <span className="font-gaming font-bold text-[var(--gaming-accent-primary)]">
+                <span className="text-primary-400">Current</span>
+                <span className="font-gaming font-bold text-gaming-accent-primary">
                   {user.current_rating}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gaming-text-secondary">Peak</span>
-                <span className="font-gaming font-bold text-[var(--gaming-accent-secondary)]">
+                <span className="text-primary-400">Peak</span>
+                <span className="font-gaming font-bold text-gaming-accent-secondary">
                   {user.peak_rating}
                 </span>
               </div>
               {user.peak_rating > user.current_rating && (
-                <div className="text-xs text-gaming-text-secondary text-center pt-2">
+                <div className="text-xs text-primary-400 text-center pt-2">
                   {user.peak_rating - user.current_rating} points from peak
                 </div>
               )}
@@ -289,34 +289,34 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           
           {/* Win Distribution */}
           <div className="gaming-card p-4">
-            <h3 className="font-gaming font-semibold text-gaming-text-primary mb-3">Game Results</h3>
+            <h3 className="font-gaming font-semibold text-primary-300 mb-3">Game Results</h3>
             <div className="space-y-2">
               {user.total_games > 0 ? (
                 <>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-[var(--gaming-accent-secondary)]"></div>
-                      <span className="text-sm text-gaming-text-secondary">Wins</span>
+                      <div className="w-3 h-3 rounded-full bg-gaming-accent-secondary"></div>
+                      <span className="text-sm text-primary-400">Wins</span>
                     </div>
                     <span className="text-sm font-gaming">{user.wins} ({winRate}%)</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-[var(--gaming-accent-danger)]"></div>
-                      <span className="text-sm text-gaming-text-secondary">Losses</span>
+                      <div className="w-3 h-3 rounded-full bg-gaming-accent-danger"></div>
+                      <span className="text-sm text-primary-400">Losses</span>
                     </div>
                     <span className="text-sm font-gaming">{user.losses} ({Math.round((user.losses / user.total_games) * 100)}%)</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <span className="text-sm text-gaming-text-secondary">Draws</span>
+                      <div className="w-3 h-3 rounded-full bg-warning"></div>
+                      <span className="text-sm text-primary-400">Draws</span>
                     </div>
                     <span className="text-sm font-gaming">{user.draws} ({Math.round((user.draws / user.total_games) * 100)}%)</span>
                   </div>
                 </>
               ) : (
-                <div className="text-center text-gaming-text-secondary py-4">
+                <div className="text-center text-primary-400 py-4">
                   No games played yet
                 </div>
               )}
@@ -325,18 +325,18 @@ export function UserProfile({ user, isOwnProfile = false, className = '' }: User
           
           {/* Activity Status */}
           <div className="gaming-card p-4">
-            <h3 className="font-gaming font-semibold text-gaming-text-primary mb-3">Activity</h3>
+            <h3 className="font-gaming font-semibold text-primary-300 mb-3">Activity</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-gaming-accent-secondary animate-pulse' : 'bg-gaming-text-secondary'}`}></div>
-                <span className="text-sm text-gaming-text-secondary">
+                <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-gaming-accent-secondary animate-pulse' : 'bg-primary-400'}`}></div>
+                <span className="text-sm text-primary-400">
                   {isOnline ? 'Online now' : 'Offline'}
                 </span>
               </div>
-              <div className="text-xs text-gaming-text-secondary">
+              <div className="text-xs text-primary-400">
                 Last seen: {formatLastSeen(user.last_seen)}
               </div>
-              <div className="text-xs text-gaming-text-secondary">
+              <div className="text-xs text-primary-400">
                 Member since: {formatDate(user.created_at)}
               </div>
             </div>
