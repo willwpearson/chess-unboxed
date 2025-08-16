@@ -57,12 +57,12 @@ export function Header() {
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-3">
                 <Link href="/profile">
-                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-secondary cursor-pointer bg-accent">
+                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-accent cursor-pointer bg-secondary">
                     <div className="flex flex-col">
-                      <div className="text-sm font-medium text-primary">
+                      <div className="text-sm font-medium text-white">
                         {user.display_name || user.username}
                       </div>
-                      <div className="text-xs text-primary">
+                      <div className="text-xs text-white">
                         Rating: {user.current_rating}
                       </div>
                     </div>

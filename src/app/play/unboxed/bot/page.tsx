@@ -79,13 +79,13 @@ export default function UnboxedBotGamePage() {
     return (
       <>
         <Header />
-        <main className="flex-1 min-h-screen bg-[var(--gaming-bg-primary)]">
+        <main className="flex-1 min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-4xl mx-auto">
               <div className="mb-8">
                 <button
                   onClick={() => router.push('/')}
-                  className="gaming-button-secondary flex items-center space-x-2"
+                  className="gaming-button flex items-center space-x-2"
                 >
                   <ArrowLeft size={16} />
                   <span>Back to Home</span>
