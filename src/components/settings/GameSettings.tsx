@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Palette, Gamepad2, Settings, Eye, Volume2, VolumeX } from 'lucide-react';
+import { Palette, Gamepad2, Settings, Eye, Volume2, VolumeX, Languages } from 'lucide-react';
 import { UserPreferences } from '@/types/game';
 
 interface GameSettingsProps {
@@ -87,9 +87,37 @@ const SelectDropdown = ({
   </div>
 );
 
+// Language options
+const languageOptions = [
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español' },
+  { value: 'fr', label: 'Français' },
+  { value: 'de', label: 'Deutsch' },
+  { value: 'ru', label: 'Русский' },
+  { value: 'zh', label: '中文' },
+  { value: 'ja', label: '日本語' },
+  { value: 'ko', label: '한국어' },
+];
+
 export function GameSettings({ preferences, onUpdatePreference }: GameSettingsProps) {
   return (
     <div className="space-y-6">
+      {/* Language Settings */}
+      <div className="gaming-card p-6">
+        <div className="flex items-center space-x-3 mb-6">
+          <Languages size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Language</h2>
+        </div>
+        
+        <SelectDropdown
+          value={preferences.language}
+          onChange={(value) => onUpdatePreference('language', value as any)}
+          options={languageOptions}
+          label="Language"
+          description="Choose your preferred language"
+        />
+      </div>
+
       {/* Board Theme */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">

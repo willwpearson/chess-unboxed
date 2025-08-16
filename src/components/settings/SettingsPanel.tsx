@@ -15,7 +15,6 @@ import { AccountSettings } from './AccountSettings';
 import { GameSettings } from './GameSettings';
 import { NotificationSettings } from './NotificationSettings';
 import { PrivacySettings } from './PrivacySettings';
-import { DisplaySettings } from './DisplaySettings';
 import { 
   User, Save, Bell, Shield, Monitor, Gamepad2,
   AlertTriangle, CheckCircle, X
@@ -55,7 +54,7 @@ const defaultPreferences: UserPreferences = {
 };
 
 // Tab types
-type SettingsTab = 'account' | 'game' | 'notifications' | 'privacy' | 'display';
+type SettingsTab = 'account' | 'game' | 'notifications' | 'privacy';
 
 interface TabConfig {
   id: SettingsTab;
@@ -75,7 +74,7 @@ const tabs: TabConfig[] = [
     id: 'game',
     label: 'Game',
     icon: <Gamepad2 size={20} />,
-    description: 'Chess board and gameplay preferences'
+    description: 'Chess board, gameplay, and language preferences'
   },
   {
     id: 'notifications',
@@ -88,12 +87,6 @@ const tabs: TabConfig[] = [
     label: 'Privacy',
     icon: <Shield size={20} />,
     description: 'Profile visibility and privacy controls'
-  },
-  {
-    id: 'display',
-    label: 'Display',
-    icon: <Monitor size={20} />,
-    description: 'Theme, language, and display preferences'
   },
 ];
 
@@ -258,12 +251,6 @@ export function SettingsPanel() {
     />
   );
 
-  const renderDisplayTab = () => (
-    <DisplaySettings
-      preferences={preferences}
-      onUpdatePreference={updatePreference}
-    />
-  );
 
   // Main render
   return (
@@ -364,7 +351,6 @@ export function SettingsPanel() {
               {activeTab === 'game' && renderGameTab()}
               {activeTab === 'notifications' && renderNotificationsTab()}
               {activeTab === 'privacy' && renderPrivacyTab()}
-              {activeTab === 'display' && renderDisplayTab()}
             </div>
           </div>
         </div>

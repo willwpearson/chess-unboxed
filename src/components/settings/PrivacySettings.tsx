@@ -26,20 +26,20 @@ const ToggleSwitch = ({
   <div className="gaming-card flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div className="text-[var(--gaming-accent-primary)]">
+        <div className="text-secondary">
           {icon}
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-gaming-text-primary">{label}</h4>
-        <p className="text-sm text-gaming-text-secondary">{description}</p>
+        <h4 className="font-gaming font-medium text-primary-300">{label}</h4>
+        <p className="text-sm text-primary-400">{description}</p>
       </div>
     </div>
     <button
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
         checked
-          ? 'bg-gaming-accent-primary'
-          : 'bg-gaming-border'
+          ? 'bg-accent'
+          : 'bg-border'
       }`}
       onClick={() => onChange(!checked)}
     >
@@ -66,14 +66,14 @@ const SelectDropdown = ({
   label: string;
   description: string;
 }) => (
-  <div className="gaming-card p-6">
-    <label className="block text-sm font-gaming font-medium text-gaming-text-primary mb-2">
+  <div className="gaming-card p-4">
+    <label className="block text-sm font-gaming font-medium text-primary-300 mb-2">
       {label}
     </label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-gaming-accent-primary transition-all bg-[var(--gaming-bg-tertiary)] border-2 border-[var(--gaming-border)] text-[var(--gaming-text-primary)]"
+      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary text-primary-300"
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -81,7 +81,7 @@ const SelectDropdown = ({
         </option>
       ))}
     </select>
-    <p className="text-xs text-gaming-text-secondary mt-1">
+    <p className="text-xs text-primary-400 mt-1">
       {description}
     </p>
   </div>
@@ -93,8 +93,8 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
       {/* Profile Visibility */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Shield size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Profile Visibility</h2>
+          <Shield size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Profile Visibility</h2>
         </div>
         
         <SelectDropdown
@@ -113,8 +113,8 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
       {/* Privacy Options */}
       <div className="gaming-card p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Lock size={24} className="text-[var(--gaming-accent-primary)]" />
-          <h2 className="text-2xl font-gaming font-bold text-gaming-text-primary">Privacy Options</h2>
+          <Lock size={24} className="text-secondary" />
+          <h2 className="text-2xl font-gaming font-bold text-primary-300">Privacy Options</h2>
         </div>
         
         <div className="space-y-4">
