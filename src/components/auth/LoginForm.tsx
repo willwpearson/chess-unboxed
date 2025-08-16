@@ -41,17 +41,17 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   return (
     <Card className="w-full max-w-md mx-auto p-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-2xl font-bold text-foreground">
           Sign In
         </h2>
-        <p className="text-sm text-gray-400 mt-2">
+        <p className="text-sm text-primary-300 mt-2">
           Welcome back! Please sign in to your account.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="identifier" className="block text-sm font-medium text-gray-300 mb-1">
+          <label htmlFor="identifier" className="block text-sm font-medium text-primary-300 mb-1">
             Email or Username
           </label>
           <input
@@ -60,7 +60,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
             placeholder="Enter your email or username"
             disabled={isLoading}
           />
@@ -76,7 +76,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-3 py-2 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-700 text-white"
+            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
             placeholder="Enter your password"
             disabled={isLoading}
           />
@@ -90,7 +90,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 
         <Button
           type="submit"
-          className="w-full"
+          className="w-full gaming-button-secondary"
           disabled={isLoading}
         >
           {isLoading ? 'Signing In...' : 'Sign In'}
@@ -98,12 +98,12 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-primary-300">
           Don't have an account?{' '}
           <button
             type="button"
             onClick={onSwitchToRegister}
-            className="text-blue-400 hover:text-blue-500 font-medium"
+            className="text-accent hover:text-accent-800 font-medium cursor-pointer"
           >
             Sign up
           </button>

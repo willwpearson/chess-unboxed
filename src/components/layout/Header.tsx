@@ -79,18 +79,11 @@ export function Header() {
             ) : (
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => handleAuthClick('login')}
-                  className="flex items-center space-x-1 px-3 py-2 rounded-lg text-primary-50 hover:text-accent cursor-pointer"
-                >
-                  <LogIn size={18} />
-                  <span className="text-sm">Login</span>
-                </button>
-                <button
                   onClick={() => handleAuthClick('register')}
                   className="flex items-center space-x-1 px-3 py-2 rounded-lg transition-all duration-300 bg-secondary hover:bg-secondary-900 text-primary-50 cursor-pointer shadow-lg"
                 >
                   <User size={18} />
-                  <span className="text-sm">Sign Up</span>
+                  <span className="text-sm">Log In</span>
                 </button>
               </div>
             )}

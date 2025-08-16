@@ -113,7 +113,7 @@ export default function HomePage() {
                 </p>
                 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
                   <Link href="/register" className="gaming-button-secondary inline-flex items-center justify-center px-8 py-4">
                     <UserPlus size={20} className="mr-2" />
                     Start Playing Free
@@ -223,14 +223,14 @@ export default function HomePage() {
               Join thousands of players already experiencing the future of chess
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto">
-              <Link href="/register" className="gaming-button inline-flex items-center w-full sm:w-auto">
+              <Link href="/register" className="gaming-button-secondary inline-flex items-center w-full sm:w-auto">
                 <Play size={20} className="mr-2" />
                 Start Your Journey
               </Link>
               <button
                 onClick={handleGuestAccess}
                 disabled={guestLoading}
-                className="gaming-button-secondary inline-flex items-center w-full sm:w-auto"
+                className="gaming-button inline-flex items-center w-full sm:w-auto"
               >
                 {guestLoading ? (
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2"></div>
