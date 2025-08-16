@@ -32,8 +32,8 @@ export default function RegisterPage() {
     return (
       <>
         <Header />
-        <main className="flex-1 min-h-screen flex items-center justify-center bg-[var(--gaming-bg-primary)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gaming-accent-primary"></div>
+        <main className="flex-1 min-h-screen flex items-center justify-center bg-background">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-border"></div>
         </main>
         <Footer />
       </>
@@ -47,14 +47,14 @@ export default function RegisterPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 min-h-screen bg-[var(--gaming-bg-primary)]">
+      <main className="flex-1 min-h-screen bg-background">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-md mx-auto">
             {/* Back button */}
             <div className="mb-6">
               <Link 
                 href="/"
-                className="inline-flex items-center text-gaming-text-secondary hover:text-gaming-accent-primary transition-colors duration-300"
+                className="flex items-center text-accent hover:text-primary transition-colors duration-300"
               >
                 <ChevronLeft size={20} className="mr-1" />
                 Back to Home
@@ -66,30 +66,17 @@ export default function RegisterPage() {
               <h1 className="text-3xl font-gaming font-bold mb-2 gaming-title">
                 Join Chess Unboxed
               </h1>
-              <p className="text-gaming-text-secondary">
+              <p className="text-primary-400">
                 Create your account and start playing
               </p>
             </div>
 
             {/* Register Form */}
-            <div className="gaming-card p-0">
+            <div>
               <RegisterForm
                 onSuccess={handleRegisterSuccess}
                 onSwitchToLogin={handleSwitchToLogin}
               />
-            </div>
-
-            {/* Additional Links */}
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gaming-text-secondary mb-4">
-                Already have an account?
-              </p>
-              <Link 
-                href="/login"
-                className="gaming-button-secondary inline-block"
-              >
-                Sign In
-              </Link>
             </div>
           </div>
         </div>

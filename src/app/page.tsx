@@ -69,7 +69,7 @@ export default function HomePage() {
   if (authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gaming-accent-primary"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
       </div>
     );
   }
@@ -161,51 +161,51 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Gameplay Features */}
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Zap size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Zap size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Toroidal Board Topology</h4>
                 <p className="text-sm text-gaming-text-secondary">Pieces wrap around board edges, creating mind-bending strategic possibilities</p>
               </div>
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Infinity size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Infinity size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Edge-Wrapping Movement</h4>
                 <p className="text-sm text-gaming-text-secondary">Revolutionary gameplay mechanics transcend traditional boundaries</p>
               </div>
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Sparkles size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Sparkles size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Unique Tactical Patterns</h4>
                 <p className="text-sm text-gaming-text-secondary">Discover new strategies impossible in traditional chess</p>
               </div>
               
               {/* AI & Multiplayer */}
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Bot size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Bot size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Smart AI Opponents</h4>
                 <p className="text-sm text-gaming-text-secondary">Challenge adaptive AI with multiple difficulty levels</p>
               </div>
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Users size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Users size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Global Multiplayer</h4>
                 <p className="text-sm text-gaming-text-secondary">Play against thousands of players worldwide</p>
               </div>
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Trophy size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Trophy size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Competitive Rankings</h4>
                 <p className="text-sm text-gaming-text-secondary">Climb leaderboards with accurate ELO-based skill matching</p>
               </div>
               
               {/* Platform Features */}
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Gamepad2 size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Gamepad2 size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Performance Analytics</h4>
                 <p className="text-sm text-gaming-text-secondary">Track your progress with detailed statistics</p>
               </div>
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Shield size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Shield size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Fair Play Protection</h4>
                 <p className="text-sm text-gaming-text-secondary">Anti-cheat protection and active moderation</p>
               </div>
               <div className="gaming-card gaming-glow p-6 text-center">
-                <Star size={40} className="mx-auto mb-4 text-gaming-accent-primary" />
+                <Star size={40} className="mx-auto mb-4 text-secondary" />
                 <h4 className="font-bold text-gaming-text-primary mb-2">Custom Themes</h4>
                 <p className="text-sm text-gaming-text-secondary">Personalize your gaming experience with multiple board themes</p>
               </div>
@@ -240,8 +240,8 @@ export default function HomePage() {
                 {guestLoading ? 'Setting up...' : 'Try as Guest'}
               </button>
             </div>
-            <p className="text-sm text-gaming-text-secondary mt-4">
-              Already have an account? <Link href="/login" className="text-gaming-accent-primary hover:underline">Sign in here</Link>
+            <p className="text-sm text-primary-400 mt-4">
+              Already have an account? <Link href="/login" className="text-accent hover:underline">Sign in here</Link>
             </p>
           </div>
         </section>
