@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     // Return preferences or defaults
     const defaultPreferences: UserPreferences = {
-      theme: 'light',
+      theme: 'dark',
       language: 'en',
       timezone: 'UTC',
       dateFormat: 'MM/DD/YYYY',

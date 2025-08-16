@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
 @theme {
-  /* Base UI Colors - Mobile Game Inspired Palette */
+  /* Base UI Colors - Dark Gaming Theme */
   --color-background: #0a0a0f;
   --color-foreground: #f8fafc;
   --color-card: #161622;
@@ -10,7 +10,7 @@
   --color-popover: #1e1e2e;
   --color-popover-foreground: #f1f5f9;
   
-  /* Primary - Steel Grey (swapped from secondary) */
+  /* Primary - Steel Grey */
   --color-primary: #374151;
   --color-primary-50: #f9fafb;
   --color-primary-100: #f3f4f6;
@@ -24,7 +24,7 @@
   --color-primary-900: #111827;
   --color-primary-foreground: #ffffff;
   
-  /* Secondary - Electric Blue (swapped from primary) */
+  /* Secondary - Electric Blue */
   --color-secondary: #2563eb;
   --color-secondary-50: #eff6ff;
   --color-secondary-100: #dbeafe;
@@ -78,6 +78,17 @@
   --color-border: #3f3f46;
   --color-input: #27272a;
   --color-ring: #2563eb;
+  
+  /* Gaming Theme Variables (Dark Mode Only) */
+  --gaming-bg-primary: #0f0f1a;
+  --gaming-bg-secondary: #1a1a2e;
+  --gaming-bg-tertiary: #16213e;
+  --gaming-accent-primary: #7c3aed;
+  --gaming-accent-secondary: #06d6a0;
+  --gaming-accent-danger: #ef4444;
+  --gaming-text-primary: #ffffff;
+  --gaming-text-secondary: #a1a1aa;
+  --gaming-border: #374151;
   
   /* Radius */
   --radius: 0.75rem;

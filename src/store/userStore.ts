@@ -19,7 +19,7 @@ interface UserState {
 }
 
 const defaultPreferences: UserPreferences = {
-  theme: 'light',
+  theme: 'dark',
   language: 'en',
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   dateFormat: 'MM/DD/YYYY',

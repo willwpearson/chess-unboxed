@@ -129,7 +129,7 @@ export interface PlayerStats {
 
 export interface UserPreferences {
   // Display settings
-  theme: 'light' | 'dark';
+  theme: 'dark';
   language: 'en' | 'es' | 'fr' | 'de' | 'ru' | 'zh' | 'ja' | 'ko';
   timezone: string;
   dateFormat: 'MM/DD/YYYY' | 'DD/MM/YYYY' | 'YYYY-MM-DD';

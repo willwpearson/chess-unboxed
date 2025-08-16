@@ -3,19 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
-import { Moon, Sun, Settings, Crown, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { Settings, Crown, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
 
   const handleAuthClick = (mode: 'login' | 'register') => {
     setAuthMode(mode);
@@ -59,14 +53,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center space-x-4">
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg transition-colors duration-300 text-secondary hover:text-accent cursor-pointer"
-            >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-            </button>
-
             {/* Authentication */}
             {isAuthenticated && user ? (
               <div className="flex items-center space-x-3">

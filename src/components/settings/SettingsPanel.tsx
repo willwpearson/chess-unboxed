@@ -9,20 +9,19 @@ import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import { UserPreferences } from '@/types/game';
 import { AccountSettings } from './AccountSettings';
 import { GameSettings } from './GameSettings';
 import { NotificationSettings } from './NotificationSettings';
 import { PrivacySettings } from './PrivacySettings';
 import { 
-  User, Save, Bell, Shield, Monitor, Gamepad2,
+  User, Save, Bell, Shield, Gamepad2,
   AlertTriangle, CheckCircle, X
 } from 'lucide-react';
 
 // Default preferences
 const defaultPreferences: UserPreferences = {
-  theme: 'light',
+  theme: 'dark',
   language: 'en',
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   dateFormat: 'MM/DD/YYYY',
@@ -93,7 +92,6 @@ const tabs: TabConfig[] = [
 
 export function SettingsPanel() {
   const { user, refreshUser } = useAuth();
-  const { theme, setTheme } = useTheme();
   
   // State management
   const [activeTab, setActiveTab] = useState<SettingsTab>('account');
@@ -152,12 +150,6 @@ export function SettingsPanel() {
     setHasUnsavedChanges(hasChanges);
   }, [preferences, originalPreferences]);
 
-  // Apply theme changes immediately when preferences change
-  useEffect(() => {
-    if (preferences.theme !== theme) {
-      setTheme(preferences.theme);
-    }
-  }, [preferences.theme, theme, setTheme]);
 
   // Save preferences
   const handleSave = useCallback(async () => {
