@@ -13,8 +13,9 @@ import {
   MoveAnnotation, 
   MoveEvaluation 
 } from '@/types/game';
-import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/Card';
-import { 
+import { Badge } from '@/components/ui/Badge';
+import { IconButton } from '@/components/ui/IconButton';
+import {
   ScrollText, 
   Download, 
   Search, 
@@ -144,24 +145,24 @@ export function MoveHistory({
   };
 
   const getMoveIcon = (move: typeof formattedMoves[0]) => {
-    if (move.isCheckmate) return <Star className="w-3 h-3 text-yellow-500" />;
-    if (move.isCheck) return <AlertCircle className="w-3 h-3 text-orange-500" />;
-    if (move.captured) return <Zap className="w-3 h-3 text-red-500" />;
-    if (move.isWraparound) return <RotateCcw className="w-3 h-3 text-purple-500" />;
-    return <CheckCircle className="w-3 h-3 text-green-500" />;
+    if (move.isCheckmate) return <Star className="w-3 h-3 text-status-warning" />;
+    if (move.isCheck) return <AlertCircle className="w-3 h-3 text-status-warning" />;
+    if (move.captured) return <Zap className="w-3 h-3 text-status-danger" />;
+    if (move.isWraparound) return <RotateCcw className="w-3 h-3 text-accent-secondary" />;
+    return <CheckCircle className="w-3 h-3 text-status-success" />;
   };
 
   if (moves.length === 0) {
     return (
-      <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-3 border-b border-gray-100">
-          <h3 className="text-sm font-semibold text-gray-900">Move History</h3>
+      <div className="w-full bg-surface-raised rounded-xl shadow-sm border border-border-subtle">
+        <div className="p-3 border-b border-border-subtle">
+          <h3 className="text-sm font-semibold text-fg">Move History</h3>
         </div>
         <div className="p-4">
-          <div className="text-center py-6 text-gray-500">
+          <div className="text-center py-6 text-fg-muted">
             <ScrollText size={32} className="mx-auto mb-3 opacity-30" />
             <p className="text-sm">No moves yet</p>
-            <p className="text-xs text-gray-400">Moves will appear here as the game progresses</p>
+            <p className="text-xs text-fg-muted">Moves will appear here as the game progresses</p>
           </div>
         </div>
       </div>
@@ -169,34 +170,30 @@ export function MoveHistory({
   }
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
+    <div className="w-full bg-surface-raised rounded-xl shadow-sm border border-border-subtle">
       {/* Header */}
-      <div className="p-3 border-b border-gray-100">
+      <div className="p-3 border-b border-border-subtle">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-sm font-semibold text-fg flex items-center gap-1">
               Moves
               {isWraparoundMode && (
-                <span className="ml-1 text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                <Badge variant="info" size="sm">
                   Unboxed
-                </span>
+                </Badge>
               )}
             </h3>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-fg-muted">
               {moves.length}
             </span>
           </div>
-          
+
           {/* Compact controls */}
           <div className="flex items-center space-x-1">
             {gameInfo && (
-              <button
-                onClick={handleExportPGN}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                title="Export PGN"
-              >
+              <IconButton variant="ghost" size="sm" aria-label="Export PGN" onClick={handleExportPGN} title="Export PGN">
                 <Download size={14} />
-              </button>
+              </IconButton>
             )}
           </div>
         </div>
@@ -206,7 +203,7 @@ export function MoveHistory({
       <div className="p-2">
         <div className="max-h-80 overflow-y-auto">
           {filteredMoves.length === 0 ? (
-            <div className="text-center py-4 text-gray-500">
+            <div className="text-center py-4 text-fg-muted">
               <p className="text-xs">No moves match your filters</p>
             </div>
           ) : (
@@ -215,55 +212,55 @@ export function MoveHistory({
               {Array.from({ length: Math.ceil(filteredMoves.length / 2) }, (_, pairIndex) => {
                 const whiteMove = filteredMoves.find(m => m.index === pairIndex * 2);
                 const blackMove = filteredMoves.find(m => m.index === pairIndex * 2 + 1);
-                
+
                 return (
                   <div key={pairIndex} className="flex items-center space-x-1 text-xs">
                     {/* Move number */}
-                    <span className="text-gray-400 font-mono w-6 text-right">
+                    <span className="text-fg-muted font-mono w-6 text-right">
                       {pairIndex + 1}.
                     </span>
-                    
+
                     {/* White move */}
-                    <div 
+                    <div
                       className={`flex-1 p-1.5 rounded cursor-pointer transition-colors ${
-                        whiteMove && currentMoveIndex === whiteMove.index 
-                          ? 'bg-blue-50 text-blue-900' 
-                          : 'hover:bg-gray-50'
+                        whiteMove && currentMoveIndex === whiteMove.index
+                          ? 'bg-accent-primary/10 text-accent-primary'
+                          : 'hover:bg-surface-hover'
                       }`}
                       onClick={() => whiteMove && onMoveClick?.(whiteMove.index)}
                     >
                       {whiteMove ? (
                         <div className="flex items-center space-x-1">
                           <span className="font-mono font-medium">{whiteMove.notation}</span>
-                          {whiteMove.captured && <span className="text-red-500">×</span>}
-                          {whiteMove.isCheck && <span className="text-orange-500">+</span>}
-                          {whiteMove.isCheckmate && <span className="text-red-500">#</span>}
-                          {whiteMove.isWraparound && <span className="text-purple-500">↺</span>}
+                          {whiteMove.captured && <span className="text-status-danger">×</span>}
+                          {whiteMove.isCheck && <span className="text-status-warning">+</span>}
+                          {whiteMove.isCheckmate && <span className="text-status-danger">#</span>}
+                          {whiteMove.isWraparound && <span className="text-accent-secondary">↺</span>}
                         </div>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-fg-muted/50">—</span>
                       )}
                     </div>
-                    
+
                     {/* Black move */}
-                    <div 
+                    <div
                       className={`flex-1 p-1.5 rounded cursor-pointer transition-colors ${
-                        blackMove && currentMoveIndex === blackMove.index 
-                          ? 'bg-blue-50 text-blue-900' 
-                          : 'hover:bg-gray-50'
+                        blackMove && currentMoveIndex === blackMove.index
+                          ? 'bg-accent-primary/10 text-accent-primary'
+                          : 'hover:bg-surface-hover'
                       }`}
                       onClick={() => blackMove && onMoveClick?.(blackMove.index)}
                     >
                       {blackMove ? (
                         <div className="flex items-center space-x-1">
                           <span className="font-mono font-medium">{blackMove.notation}</span>
-                          {blackMove.captured && <span className="text-red-500">×</span>}
-                          {blackMove.isCheck && <span className="text-orange-500">+</span>}
-                          {blackMove.isCheckmate && <span className="text-red-500">#</span>}
-                          {blackMove.isWraparound && <span className="text-purple-500">↺</span>}
+                          {blackMove.captured && <span className="text-status-danger">×</span>}
+                          {blackMove.isCheck && <span className="text-status-warning">+</span>}
+                          {blackMove.isCheckmate && <span className="text-status-danger">#</span>}
+                          {blackMove.isWraparound && <span className="text-accent-secondary">↺</span>}
                         </div>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-fg-muted/50">—</span>
                       )}
                     </div>
                   </div>

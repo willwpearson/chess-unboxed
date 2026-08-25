@@ -6,8 +6,8 @@
 
 import React from 'react';
 import { GameState, Player, TimeControl } from '@/types/game';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Clock, User, Trophy, Zap } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
+import { Clock, Trophy, Zap } from 'lucide-react';
 
 interface GameInfoProps {
   game: GameState;
@@ -19,44 +19,44 @@ interface GameInfoProps {
 export function GameInfo({ game, timeControl, whiteTimeRemaining, blackTimeRemaining }: GameInfoProps) {
   const formatTime = (seconds: number): string => {
     if (seconds < 0) return '0:00';
-    
+
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    
+
     if (minutes >= 60) {
       const hours = Math.floor(minutes / 60);
       const mins = minutes % 60;
       return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
-    
+
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getStatusDisplay = () => {
+  const getStatusDisplay = (): { text: string; variant: 'warning' | 'success' | 'info' | 'danger' | 'default' } => {
     switch (game.status) {
       case 'waiting':
-        return { text: 'Waiting for players', color: 'text-yellow-600 bg-yellow-50' };
+        return { text: 'Waiting for players', variant: 'warning' };
       case 'active':
-        return { text: 'In Progress', color: 'text-green-600 bg-green-50' };
+        return { text: 'In Progress', variant: 'success' };
       case 'paused':
-        return { text: 'Paused', color: 'text-orange-600 bg-orange-50' };
+        return { text: 'Paused', variant: 'warning' };
       case 'finished':
-        return { text: 'Finished', color: 'text-blue-600 bg-blue-50' };
+        return { text: 'Finished', variant: 'info' };
       case 'abandoned':
-        return { text: 'Abandoned', color: 'text-red-600 bg-red-50' };
+        return { text: 'Abandoned', variant: 'danger' };
       default:
-        return { text: 'Unknown', color: 'text-gray-600 bg-gray-50' };
+        return { text: 'Unknown', variant: 'default' };
     }
   };
 
-  const getResultDisplay = () => {
+  const getResultDisplay = (): { text: string; icon: typeof Trophy; variant: 'warning' | 'default' | 'info' } | null => {
     switch (game.result) {
       case 'white-wins':
-        return { text: 'White Wins', icon: Trophy, color: 'text-yellow-600' };
+        return { text: 'White Wins', icon: Trophy, variant: 'warning' };
       case 'black-wins':
-        return { text: 'Black Wins', icon: Trophy, color: 'text-gray-800' };
+        return { text: 'Black Wins', icon: Trophy, variant: 'default' };
       case 'draw':
-        return { text: 'Draw', icon: Zap, color: 'text-blue-600' };
+        return { text: 'Draw', icon: Zap, variant: 'info' };
       case 'ongoing':
         return null;
       default:
@@ -66,45 +66,51 @@ export function GameInfo({ game, timeControl, whiteTimeRemaining, blackTimeRemai
 
   const renderPlayer = (player: Player, color: 'white' | 'black', timeRemaining?: number) => {
     const isCurrentTurn = game.position.turn === color;
-    
+
     return (
-      <div className={`relative p-3 rounded-lg transition-all duration-200 ${
-        isCurrentTurn 
-          ? 'bg-green-50 border border-green-200 shadow-sm' 
-          : 'bg-white border border-gray-200'
-      }`}>
+      <div
+        className={`relative p-3 rounded-lg transition-all duration-200 border ${
+          isCurrentTurn
+            ? 'bg-status-success/10 border-status-success/30 shadow-sm'
+            : 'bg-surface-raised border-border-subtle'
+        }`}
+      >
         {/* Current turn indicator */}
         {isCurrentTurn && game.status === 'active' && (
-          <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-sm" />
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-status-success rounded-full animate-pulse shadow-sm" />
         )}
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3 flex-1">
-            <div className={`w-3 h-3 rounded-full ${
-              color === 'white' ? 'bg-white border border-gray-400 shadow-sm' : 'bg-gray-800'
-            }`} />
+            <div
+              className={`w-3 h-3 rounded-full ${
+                color === 'white' ? 'bg-surface-raised border border-border-strong shadow-sm' : 'bg-fg'
+              }`}
+            />
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2">
-                <span className="font-medium text-gray-900 truncate">{player.name}</span>
+                <span className="font-medium text-fg truncate">{player.name}</span>
                 {player.isBot && (
-                  <span className="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium">
+                  <Badge variant="info" size="sm">
                     BOT
-                  </span>
+                  </Badge>
                 )}
               </div>
-              {player.rating && (
-                <div className="text-xs text-gray-500">
-                  {player.rating}
-                </div>
-              )}
+              {player.rating && <div className="text-xs text-fg-muted">{player.rating}</div>}
             </div>
           </div>
-          
+
           {/* Timer */}
           {timeControl && timeRemaining !== undefined && (
-            <div className={`flex items-center space-x-1 font-mono text-sm ${
-              timeRemaining < 60 ? 'text-red-600' : timeRemaining < 300 ? 'text-orange-600' : 'text-gray-800'
-            }`}>
+            <div
+              className={`flex items-center space-x-1 font-mono text-sm ${
+                timeRemaining < 60
+                  ? 'text-status-danger'
+                  : timeRemaining < 300
+                    ? 'text-status-warning'
+                    : 'text-fg'
+              }`}
+            >
               <Clock size={14} />
               <span>{formatTime(timeRemaining)}</span>
             </div>
@@ -118,27 +124,31 @@ export function GameInfo({ game, timeControl, whiteTimeRemaining, blackTimeRemai
   const result = getResultDisplay();
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
+    <div className="w-full bg-surface-raised rounded-xl shadow-sm border border-border-subtle">
       {/* Header */}
-      <div className="p-3 border-b border-gray-100">
+      <div className="p-3 border-b border-border-subtle">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-900">Game Info</h3>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
+          <h3 className="text-sm font-semibold text-fg">Game Info</h3>
+          <Badge variant={status.variant} size="sm">
             {status.text}
-          </span>
+          </Badge>
         </div>
       </div>
 
       <div className="p-3 space-y-3">
         {/* Game Result */}
         {result && (
-          <div className={`flex items-center justify-center space-x-2 p-2.5 rounded-lg ${
-            result.color.includes('yellow') ? 'bg-yellow-50 border border-yellow-200' :
-            result.color.includes('gray') ? 'bg-gray-50 border border-gray-200' :
-            'bg-blue-50 border border-blue-200'
-          }`}>
-            <result.icon size={16} className={result.color} />
-            <span className={`text-sm font-semibold ${result.color}`}>{result.text}</span>
+          <div
+            className={`flex items-center justify-center space-x-2 p-2.5 rounded-lg border ${
+              result.variant === 'warning'
+                ? 'bg-status-warning/10 border-status-warning/30 text-status-warning'
+                : result.variant === 'info'
+                  ? 'bg-status-info/10 border-status-info/30 text-status-info'
+                  : 'bg-surface-sunken border-border-subtle text-fg-secondary'
+            }`}
+          >
+            <result.icon size={16} />
+            <span className="text-sm font-semibold">{result.text}</span>
           </div>
         )}
 
@@ -149,22 +159,22 @@ export function GameInfo({ game, timeControl, whiteTimeRemaining, blackTimeRemai
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100">
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border-subtle">
           <div className="text-center">
-            <div className="text-xs text-gray-500">Moves</div>
-            <div className="text-sm font-semibold text-gray-900">{game.moves.length}</div>
+            <div className="text-xs text-fg-muted">Moves</div>
+            <div className="text-sm font-semibold text-fg">{game.moves.length}</div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-500">Mode</div>
-            <div className="text-sm font-semibold text-gray-900 capitalize">{game.mode}</div>
+            <div className="text-xs text-fg-muted">Mode</div>
+            <div className="text-sm font-semibold text-fg capitalize">{game.mode}</div>
           </div>
         </div>
 
         {/* Time Control */}
         {timeControl && (
-          <div className="text-center pt-2 border-t border-gray-100">
-            <div className="text-xs text-gray-500">Time Control</div>
-            <div className="text-sm font-semibold text-gray-900">
+          <div className="text-center pt-2 border-t border-border-subtle">
+            <div className="text-xs text-fg-muted">Time Control</div>
+            <div className="text-sm font-semibold text-fg">
               {formatTime(timeControl.initialTime)}
               {timeControl.increment > 0 && ` +${timeControl.increment}s`}
             </div>

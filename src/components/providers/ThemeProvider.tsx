@@ -1,36 +1,74 @@
 'use client';
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+
+type Theme = 'light' | 'dark' | 'system';
+type ResolvedTheme = 'light' | 'dark';
 
 interface ThemeContextType {
-  theme: 'dark';
+  theme: Theme;
+  resolvedTheme: ResolvedTheme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
 }
+
+const STORAGE_KEY = 'chess-unboxed-theme';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+function getSystemPrefersDark(): boolean {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyResolvedTheme(resolved: ResolvedTheme) {
+  document.documentElement.classList.toggle('dark', resolved === 'dark');
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const theme = 'dark' as const;
+  const [theme, setThemeState] = useState<Theme>('system');
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>('dark');
 
   useEffect(() => {
-    // Apply dark theme to document root
-    const root = document.documentElement;
-    root.classList.remove('light', 'dark');
-    root.classList.add('dark');
-    
-    // Set CSS custom properties for gaming theme (dark mode only)
-    root.style.setProperty('--gaming-bg-primary', '#0f0f1a');
-    root.style.setProperty('--gaming-bg-secondary', '#1a1a2e');
-    root.style.setProperty('--gaming-bg-tertiary', '#16213e');
-    root.style.setProperty('--gaming-accent-primary', '#7c3aed');
-    root.style.setProperty('--gaming-accent-secondary', '#06d6a0');
-    root.style.setProperty('--gaming-accent-danger', '#ef4444');
-    root.style.setProperty('--gaming-text-primary', '#ffffff');
-    root.style.setProperty('--gaming-text-secondary', '#a1a1aa');
-    root.style.setProperty('--gaming-border', '#374151');
+    const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    const initialTheme: Theme = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+    const initialResolved: ResolvedTheme = initialTheme === 'system'
+      ? (getSystemPrefersDark() ? 'dark' : 'light')
+      : initialTheme;
+
+    setThemeState(initialTheme);
+    setResolvedTheme(initialResolved);
+    applyResolvedTheme(initialResolved);
   }, []);
 
+  useEffect(() => {
+    if (theme !== 'system') return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      const resolved: ResolvedTheme = e.matches ? 'dark' : 'light';
+      setResolvedTheme(resolved);
+      applyResolvedTheme(resolved);
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
+
+  const setTheme = useCallback((next: Theme) => {
+    const resolved: ResolvedTheme = next === 'system' ? (getSystemPrefersDark() ? 'dark' : 'light') : next;
+
+    setThemeState(next);
+    setResolvedTheme(resolved);
+    applyResolvedTheme(resolved);
+    localStorage.setItem(STORAGE_KEY, next);
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  }, [resolvedTheme, setTheme]);
+
   return (
-    <ThemeContext.Provider value={{ theme }}>
+    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

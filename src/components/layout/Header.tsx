@@ -3,11 +3,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/components/providers/ThemeProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
-import { Settings, Crown, LogIn, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
+import { Settings, Crown, LogOut, User, LayoutDashboard, Sun, Moon } from 'lucide-react';
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
@@ -21,12 +25,12 @@ export function Header() {
   };
 
   return (
-    <header className="bg-card border-b-2 border-b-border">
+    <header className="bg-surface-base border-b border-border-subtle">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center justify-center space-x-3">
-            <Crown size={32} className="text-secondary" />
-            <span className="text-xl font-gaming font-bold gaming-title">
+            <Crown size={32} className="text-accent-primary" />
+            <span className="text-xl font-gaming font-bold text-fg">
               Chess Unboxed
             </span>
           </Link>
@@ -34,16 +38,16 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
             {isAuthenticated && (
               <>
-                <Link 
-                  href="/dashboard" 
-                  className="flex items-center space-x-1 lg:space-x-2 text-secondary hover:text-accent transition-colors duration-300"
+                <Link
+                  href="/dashboard"
+                  className="flex items-center space-x-1 lg:space-x-2 text-fg-secondary hover:text-fg transition-colors duration-300"
                 >
                   <LayoutDashboard size={18} />
                   <span className="font-medium text-sm lg:text-base">Dashboard</span>
                 </Link>
-                <Link 
-                  href="/settings" 
-                  className="flex items-center space-x-1 lg:space-x-2 text-secondary hover:text-accent transition-colors duration-300"
+                <Link
+                  href="/settings"
+                  className="flex items-center space-x-1 lg:space-x-2 text-fg-secondary hover:text-fg transition-colors duration-300"
                 >
                   <Settings size={18} />
                   <span className="font-medium text-sm lg:text-base">Settings</span>
@@ -52,40 +56,47 @@ export function Header() {
             )}
           </nav>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <IconButton
+              variant="ghost"
+              size="md"
+              onClick={toggleTheme}
+              aria-label={resolvedTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {resolvedTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </IconButton>
+
             {/* Authentication */}
             {isAuthenticated && user ? (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <Link href="/profile">
-                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-accent cursor-pointer bg-secondary">
+                  <div className="hidden sm:flex items-center space-x-3 px-3 lg:px-4 py-2 rounded-lg transition-colors duration-300 hover:bg-surface-raised cursor-pointer bg-surface-hover">
                     <div className="flex flex-col">
-                      <div className="text-sm font-medium text-white">
+                      <div className="text-sm font-medium text-fg">
                         {user.display_name || user.username}
                       </div>
-                      <div className="text-xs text-white">
+                      <div className="text-xs text-fg-secondary">
                         Rating: {user.current_rating}
                       </div>
                     </div>
                   </div>
                 </Link>
-                <button
+                <IconButton
+                  variant="ghost"
+                  size="md"
                   onClick={handleLogout}
-                  className="flex items-center space-x-1 p-2 rounded-lg transition-colors duration-300 hover:bg-accent text-accent hover:text-primary cursor-pointer"
+                  aria-label="Logout"
                 >
                   <LogOut size={18} />
-                  <span className="hidden md:inline text-sm">Logout</span>
-                </button>
+                </IconButton>
               </div>
             ) : (
-              <div className="flex items-center space-x-2 py-3">
-                <Link
-                  href="/login"
-                  className="gaming-button-secondary flex items-center gap-2"
-                >
+              <Link href="/login">
+                <Button variant="secondary" className="flex items-center gap-2">
                   <User size={18} />
                   <span className="text-sm">Log In</span>
-                </Link>
-              </div>
+                </Button>
+              </Link>
             )}
           </div>
         </div>

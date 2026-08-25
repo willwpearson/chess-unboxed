@@ -9,9 +9,11 @@ import { Chess, Square as ChessJSSquare } from 'chess.js';
 import { ChessPiece, Square, ChessMove, PieceType, PieceColor, GameVariant } from '@/types/game';
 import { WraparoundChessEngine } from '@/lib/chessEngine';
 import { useGameStore } from '@/store/gameStore';
-import { getPieceSymbol, normalizeColor, normalizePieceType } from '@/lib/utils';
+import { normalizeColor, normalizePieceType } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { PromotionDialog } from './PromotionDialog';
+import { ChessPieceIcon } from './ChessPiece';
 import { Crown, RotateCcw, Flag, Users, RefreshCw } from 'lucide-react';
 
 interface ChessBoardProps {
@@ -358,15 +360,12 @@ export function ChessBoard({
   const renderPiece = (piece: ChessPiece | null, square: Square) => {
     if (!piece) return null;
 
-    console.log('Rendering piece:', piece, 'on square:', square);
-    const symbol = getPieceSymbol(piece.type, piece.color);
-    console.log('Symbol:', symbol);
     const isDragged = ui.draggedPiece?.from === square;
     const isMyPiece = isPlayerTurn && normalizeColor(piece.color) === currentPlayer;
 
     return (
       <div
-        className={`absolute inset-0 flex items-center justify-center cursor-pointer select-none transition-all duration-200 ${
+        className={`absolute inset-0 flex items-center justify-center cursor-pointer select-none transition-all duration-200 p-[12%] ${
           isDragged ? 'opacity-50 scale-110' : ''
         } ${isMyPiece ? 'hover:scale-105' : ''}`}
         draggable={isMyPiece}
@@ -374,9 +373,7 @@ export function ChessBoard({
         onDragEnd={handleDragEnd}
         onClick={() => handleSquareClick(square)}
       >
-        <span className="text-3xl sm:text-4xl md:text-5xl drop-shadow-sm">
-          {symbol}
-        </span>
+        <ChessPieceIcon type={piece.type} color={piece.color} className="drop-shadow-sm" />
       </div>
     );
   };
@@ -401,10 +398,10 @@ export function ChessBoard({
         className={`
           relative aspect-square cursor-pointer transition-all duration-200
           ${getSquareColor(file, rank)}
-          ${isSelected ? 'ring-2 ring-yellow-500 ring-inset shadow-inner' : ''}
-          ${isPossibleMove && !isWraparoundTarget ? 'ring-1 ring-accent ring-inset' : ''}
-          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-secondary ring-inset' : ''}
-          ${isLastMove ? 'ring-1 ring-green-500 ring-inset' : ''}
+          ${isSelected ? 'ring-2 ring-board-highlight-selected ring-inset shadow-inner' : ''}
+          ${isPossibleMove && !isWraparoundTarget ? 'ring-1 ring-board-highlight-legal ring-inset' : ''}
+          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-accent-secondary ring-inset' : ''}
+          ${isLastMove ? 'ring-1 ring-board-highlight-lastmove ring-inset' : ''}
         `}
         onClick={() => handleSquareClick(square)}
         onDragOver={handleDragOver}
@@ -416,12 +413,12 @@ export function ChessBoard({
             {piece ? (
               // Capture indicator - ring around edge
               <div className={`absolute inset-1 rounded-full border-2 ${
-                isWraparoundTarget ? 'border-secondary' : 'border-accent'
+                isWraparoundTarget ? 'border-accent-secondary' : 'border-board-highlight-legal'
               }`} />
             ) : (
               // Move indicator - small dot
               <div className={`w-3 md:w-6 h-3 md:h-6 rounded-full ${
-                isWraparoundTarget ? 'bg-secondary' : 'bg-accent'
+                isWraparoundTarget ? 'bg-accent-secondary' : 'bg-board-highlight-legal'
               } opacity-70`} />
             )}
           </div>
@@ -591,7 +588,7 @@ export function ChessBoard({
               <div className="absolute bottom-0 left-3 right-3 md:left-4 md:right-4 flex justify-between pointer-events-none">
                 {FILES.map(file => (
                   <div key={file} className="w-[12.5%] text-center">
-                    <span className="text-xs font-medium text-gray-600">{file}</span>
+                    <span className="text-xs font-medium text-board-coord-label">{file}</span>
                   </div>
                 ))}
               </div>
@@ -599,7 +596,7 @@ export function ChessBoard({
               <div className="absolute top-3 bottom-3 md:top-4 md:bottom-4 left-1 flex flex-col justify-between pointer-events-none">
                 {RANKS.map(rank => (
                   <div key={rank} className="h-[12.5%] flex items-center">
-                    <span className="text-xs font-medium text-gray-600">{rank}</span>
+                    <span className="text-xs font-medium text-board-coord-label">{rank}</span>
                   </div>
                 ))}
               </div>
@@ -614,17 +611,17 @@ export function ChessBoard({
               <button
                 onClick={onOfferDraw}
                 disabled={!isPlayerTurn}
-                className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 disabled:opacity-50 text-sm"
+                className="flex items-center space-x-1 px-3 py-2 bg-surface-raised border border-border-subtle rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:translate-y-0 text-sm text-fg"
               >
                 <Users size={14} />
                 <span className="hidden sm:inline">Draw</span>
               </button>
             )}
-            
+
             {onResign && (
               <button
                 onClick={onResign}
-                className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 text-red-600 hover:bg-red-50 text-sm"
+                className="flex items-center space-x-1 px-3 py-2 bg-surface-raised border border-border-subtle rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-accent-danger hover:bg-accent-danger/10 text-sm"
               >
                 <Flag size={14} />
                 <span className="hidden sm:inline">Resign</span>
@@ -636,7 +633,7 @@ export function ChessBoard({
                 setSelectedSquare(null);
                 setPossibleMoves([]);
               }}
-              className="flex items-center space-x-1 px-3 py-2 bg-white rounded-full shadow-md border hover:shadow-lg transition-all duration-200 text-sm"
+              className="flex items-center space-x-1 px-3 py-2 bg-surface-raised border border-border-subtle rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm text-fg"
             >
               <RotateCcw size={14} />
               <span className="hidden sm:inline">Clear</span>
@@ -648,23 +645,19 @@ export function ChessBoard({
       {/* Modern Turn Indicator */}
       {showTurnIndicator && (
         <div className="mt-20 mb-4">
-          <div className={`inline-flex items-center space-x-3 px-4 py-2 rounded-full shadow-sm border transition-all duration-200 ${
-            isPlayerTurn 
-              ? 'bg-green-50 text-green-800 border-green-200' 
-              : 'bg-slate-50 text-slate-700 border-slate-200'
-          }`}>
+          <Badge variant={isPlayerTurn ? 'success' : 'default'} size="md" className="shadow-sm">
             <div className={`w-2 h-2 rounded-full ${
-              isPlayerTurn ? 'bg-green-500 animate-pulse' : 'bg-slate-400'
+              isPlayerTurn ? 'bg-status-success animate-pulse' : 'bg-fg-muted'
             }`} />
-            <span className="font-medium text-sm">
+            <span className="font-medium">
               {isPlayerTurn ? 'Your move' : `${currentPlayer === 'white' ? 'White' : 'Black'} to move`}
             </span>
             {isWraparoundMode && (
-              <div className="ml-2 px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+              <Badge variant="info" size="sm" className="ml-2">
                 Unboxed
-              </div>
+              </Badge>
             )}
-          </div>
+          </Badge>
         </div>
       )}
 

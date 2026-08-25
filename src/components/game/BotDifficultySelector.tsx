@@ -6,9 +6,9 @@
 
 import React, { useState } from 'react';
 import { BotDifficulty, BotConfig } from '@/types/game';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Bot, Brain, Zap, Target, Crown, Settings } from 'lucide-react';
+import { Bot, Brain, Zap, Target, Crown, Settings, Swords, Scale, Shield } from 'lucide-react';
 
 interface BotDifficultySelectorProps {
   onStartGame: (config: BotConfig) => void;
@@ -62,6 +62,36 @@ const BOT_CONFIGS: Record<BotDifficulty, {
   }
 };
 
+const PERSONALITIES: {
+  type: 'Aggressive' | 'Balanced' | 'Defensive';
+  name: string;
+  description: string;
+  icon: typeof Swords;
+  gradient: string;
+}[] = [
+  {
+    type: 'Aggressive',
+    name: 'Aggressive',
+    description: 'Attacks quickly, takes risks',
+    icon: Swords,
+    gradient: 'from-red-500 to-orange-600'
+  },
+  {
+    type: 'Balanced',
+    name: 'Balanced',
+    description: 'Mix of attack and defense',
+    icon: Scale,
+    gradient: 'from-blue-500 to-indigo-600'
+  },
+  {
+    type: 'Defensive',
+    name: 'Defensive',
+    description: 'Solid play, fewer risks',
+    icon: Shield,
+    gradient: 'from-green-500 to-emerald-600'
+  }
+];
+
 export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultySelectorProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<BotDifficulty | null>(null);
   const [selectedPersonality, setSelectedPersonality] = useState<'Aggressive' | 'Defensive' | 'Balanced'>('Balanced');
@@ -80,10 +110,10 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
   };
 
   return (
-    <div className="gaming-card p-8">
+    <Card className="p-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-gaming font-bold gaming-title mb-4">Choose Your Opponent</h2>
-        <p className="text-lg text-gaming-text-secondary">Select the difficulty level that matches your skill</p>
+        <h2 className="text-3xl font-gaming font-bold mb-4 bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">Choose Your Opponent</h2>
+        <p className="text-lg text-fg-secondary">Select the difficulty level that matches your skill</p>
       </div>
 
       {/* Difficulty Selection */}
@@ -94,37 +124,38 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
           const isSelected = selectedDifficulty === difficulty;
 
           return (
-            <div
-              key={difficulty}
-              className={`gaming-card gaming-glow cursor-pointer p-6 text-center transition-all duration-300 relative overflow-hidden ${
-                isSelected ? 'border-gaming-accent-primary transform scale-105' : 'hover:border-gaming-accent-primary/50'
-              }`}
-              onClick={() => setSelectedDifficulty(difficulty)}
-            >
-              {/* Gradient overlay for selected state */}
-              {isSelected && (
-                <div className={`absolute inset-0 bg-gradient-to-br ${config.color} opacity-20 pointer-events-none`} />
-              )}
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${config.color} text-white mx-auto mb-4 relative z-10`}>
-                <IconComponent size={32} />
-              </div>
-              <h3 className="text-xl font-gaming font-bold text-gaming-text-primary mb-2 relative z-10">{config.name}</h3>
-              <p className="text-sm text-gaming-text-secondary mb-4 relative z-10">{config.description}</p>
-              
-              <div className="space-y-2 mb-4 relative z-10">
-                {config.features.map((feature, index) => (
-                  <div key={index} className="flex items-center text-sm text-gaming-text-secondary justify-center">
-                    <Zap size={14} className="mr-2 text-[var(--gaming-accent-secondary)]" />
-                    {feature}
-                  </div>
-                ))}
-              </div>
-              
-              <div className="pt-3 border-t relative z-10 border-t-[var(--gaming-border)]">
-                <span className="text-xs text-gaming-text-secondary">
-                  Thinking time: {config.thinkingTime / 1000}s
-                </span>
-              </div>
+            <div key={difficulty} onClick={() => setSelectedDifficulty(difficulty)}>
+              <Card
+                interactive
+                className={`cursor-pointer p-6 text-center relative overflow-hidden ${
+                  isSelected ? 'ring-2 ring-accent-primary' : ''
+                }`}
+              >
+                {/* Gradient overlay for selected state */}
+                {isSelected && (
+                  <div className={`absolute inset-0 bg-gradient-to-br ${config.color} opacity-20 pointer-events-none`} />
+                )}
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${config.color} text-white mx-auto mb-4 relative z-10`}>
+                  <IconComponent size={32} />
+                </div>
+                <h3 className="text-xl font-gaming font-bold text-fg mb-2 relative z-10">{config.name}</h3>
+                <p className="text-sm text-fg-secondary mb-4 relative z-10">{config.description}</p>
+
+                <div className="space-y-2 mb-4 relative z-10">
+                  {config.features.map((feature, index) => (
+                    <div key={index} className="flex items-center text-sm text-fg-secondary justify-center">
+                      <Zap size={14} className="mr-2 text-accent-secondary" />
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-3 border-t border-border-subtle relative z-10">
+                  <span className="text-xs text-fg-muted">
+                    Thinking time: {config.thinkingTime / 1000}s
+                  </span>
+                </div>
+              </Card>
             </div>
           );
         })}
@@ -132,78 +163,56 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
 
       {/* Personality Selection */}
       {selectedDifficulty && (
-        <div className="mt-8 gaming-card p-6">
+        <Card className="mt-8 p-6" variant="flat">
           <div className="flex items-center space-x-3 mb-6">
-            <Settings size={24} className="text-[var(--gaming-accent-primary)]" />
-            <h3 className="text-2xl font-gaming font-bold text-gaming-text-primary">Bot Personality</h3>
+            <Settings size={24} className="text-accent-primary" />
+            <h3 className="text-2xl font-gaming font-bold text-fg">Bot Personality</h3>
           </div>
-          <p className="text-gaming-text-secondary mb-6">
+          <p className="text-fg-secondary mb-6">
             Customize how the bot plays against you
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                type: 'Aggressive' as const,
-                name: 'Aggressive',
-                description: 'Attacks quickly, takes risks',
-                icon: '⚔️',
-                gradient: 'from-red-500 to-orange-600'
-              },
-              {
-                type: 'Balanced' as const,
-                name: 'Balanced',
-                description: 'Mix of attack and defense',
-                icon: '⚖️',
-                gradient: 'from-blue-500 to-indigo-600'
-              },
-              {
-                type: 'Defensive' as const,
-                name: 'Defensive',
-                description: 'Solid play, fewer risks',
-                icon: '🛡️',
-                gradient: 'from-green-500 to-emerald-600'
-              }
-            ].map((personality) => {
+            {PERSONALITIES.map((personality) => {
               const isPersonalitySelected = selectedPersonality === personality.type;
+              const PersonalityIcon = personality.icon;
               return (
-                <div
-                  key={personality.type}
-                  className={`gaming-card cursor-pointer p-4 text-center transition-all duration-300 relative overflow-hidden ${
-                    isPersonalitySelected
-                      ? 'border-gaming-accent-primary transform scale-105'
-                      : 'hover:border-gaming-accent-primary/50'
-                  }`}
-                  onClick={() => setSelectedPersonality(personality.type)}
-                >
-                  {/* Gradient overlay for selected state */}
-                  {isPersonalitySelected && (
-                    <div className={`absolute inset-0 bg-gradient-to-br ${personality.gradient} opacity-20 pointer-events-none`} />
-                  )}
-                  <div className="text-3xl mb-3 relative z-10">{personality.icon}</div>
-                  <h4 className="font-gaming font-medium text-gaming-text-primary mb-2 relative z-10">{personality.name}</h4>
-                  <p className="text-sm text-gaming-text-secondary relative z-10">{personality.description}</p>
+                <div key={personality.type} onClick={() => setSelectedPersonality(personality.type)}>
+                  <Card
+                    interactive
+                    className={`cursor-pointer p-4 text-center relative overflow-hidden ${
+                      isPersonalitySelected ? 'ring-2 ring-accent-primary' : ''
+                    }`}
+                  >
+                    {/* Gradient overlay for selected state */}
+                    {isPersonalitySelected && (
+                      <div className={`absolute inset-0 bg-gradient-to-br ${personality.gradient} opacity-20 pointer-events-none`} />
+                    )}
+                    <div className="flex items-center justify-center mb-3 relative z-10 text-fg">
+                      <PersonalityIcon size={32} />
+                    </div>
+                    <h4 className="font-gaming font-medium text-fg mb-2 relative z-10">{personality.name}</h4>
+                    <p className="text-sm text-fg-secondary relative z-10">{personality.description}</p>
+                  </Card>
                 </div>
               );
             })}
-            </div>
-        </div>
+          </div>
+        </Card>
       )}
 
       {/* Start Game Button */}
       <div className="text-center my-8">
-        <button
+        <Button
           onClick={handleStartGame}
           disabled={!selectedDifficulty || isLoading}
-          className={`px-8 py-4 text-lg font-gaming font-bold transition-all duration-300 ${
-            selectedDifficulty && !isLoading
-              ? 'gaming-button'
-              : 'gaming-button-secondary opacity-50 cursor-not-allowed'
-          }`}
+          variant={selectedDifficulty && !isLoading ? 'primary' : 'secondary'}
+          size="lg"
+          className="font-gaming"
         >
           {isLoading ? (
             <div className="flex items-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-accent-primary-foreground mr-2"></div>
               Starting Game...
             </div>
           ) : (
@@ -214,30 +223,30 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
                 : 'Select Difficulty'}
             </div>
           )}
-        </button>
+        </Button>
       </div>
 
       {/* Selected Configuration Summary */}
       {selectedDifficulty && (
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-accent-primary/10 border-accent-primary/20">
           <CardContent className="p-4">
             <div className="text-center">
-              <h4 className="font-semibold text-blue-900 mb-2">Game Configuration</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-800">
+              <h4 className="font-semibold text-fg mb-2">Game Configuration</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-fg-secondary">
                 <div>
-                  <span className="font-medium">Difficulty:</span> {BOT_CONFIGS[selectedDifficulty].name}
+                  <span className="font-medium text-fg">Difficulty:</span> {BOT_CONFIGS[selectedDifficulty].name}
                 </div>
                 <div>
-                  <span className="font-medium">Personality:</span> {selectedPersonality}
+                  <span className="font-medium text-fg">Personality:</span> {selectedPersonality}
                 </div>
                 <div>
-                  <span className="font-medium">Thinking Time:</span> {BOT_CONFIGS[selectedDifficulty].thinkingTime / 1000}s
+                  <span className="font-medium text-fg">Thinking Time:</span> {BOT_CONFIGS[selectedDifficulty].thinkingTime / 1000}s
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
-    </div>
+    </Card>
   );
 }

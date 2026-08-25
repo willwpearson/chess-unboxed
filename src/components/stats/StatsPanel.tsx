@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { api, EndlessSession } from '@/lib/api';
 import { usePlayer } from '@/hooks';
 import { Trophy, Zap, TrendingUp, Users, RefreshCw } from 'lucide-react';
@@ -106,10 +107,10 @@ export function StatsPanel({ onRefresh, isLoading }: StatsProps) {
     <div className="w-full max-w-4xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Endless Mode</h1>
-          <p className="text-gray-600 mt-1">Challenge yourself - one loss and you&apos;re out!</p>
+          <h1 className="text-3xl font-bold text-fg">Endless Mode</h1>
+          <p className="text-fg-secondary mt-1">Challenge yourself - one loss and you&apos;re out!</p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           <Button
             variant="outline"
@@ -120,12 +121,12 @@ export function StatsPanel({ onRefresh, isLoading }: StatsProps) {
             <RefreshCw size={16} className={isLoading || isLoadingStats ? 'animate-spin' : ''} />
             <span>Refresh</span>
           </Button>
-          
+
           {player && !activeSession && (
             <Button
               onClick={startEndlessSession}
               disabled={isLoadingStats}
-              className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700"
+              className="flex items-center space-x-2"
             >
               <Zap size={16} />
               <span>Start Session</span>
@@ -139,28 +140,28 @@ export function StatsPanel({ onRefresh, isLoading }: StatsProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-600 mb-1">
+              <div className="text-2xl font-bold text-accent-primary mb-1">
                 {playerBestScore}
               </div>
-              <div className="text-sm text-gray-600">Your Best Score</div>
+              <div className="text-sm text-fg-secondary">Your Best Score</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600 mb-1">
+              <div className="text-2xl font-bold text-accent-secondary mb-1">
                 {endlessStats.filter(s => s.playerName === player.nickname).length}
               </div>
-              <div className="text-sm text-gray-600">Sessions Played</div>
+              <div className="text-sm text-fg-secondary">Sessions Played</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-600 mb-1">
+              <div className="text-2xl font-bold text-status-success mb-1">
                 {activeSession ? 'Active' : 'None'}
               </div>
-              <div className="text-sm text-gray-600">Current Session</div>
+              <div className="text-sm text-fg-secondary">Current Session</div>
             </CardContent>
           </Card>
         </div>
@@ -168,13 +169,13 @@ export function StatsPanel({ onRefresh, isLoading }: StatsProps) {
 
       {/* Active Session Alert */}
       {activeSession && (
-        <Card className="border-purple-200 bg-purple-50">
+        <Card className="border-accent-primary bg-accent-primary/5">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              <Zap className="text-purple-600" size={24} />
+              <Zap className="text-accent-primary" size={24} />
               <div>
-                <h3 className="font-semibold text-purple-900">Active Endless Session</h3>
-                <p className="text-purple-700">
+                <h3 className="font-semibold text-fg">Active Endless Session</h3>
+                <p className="text-fg-secondary">
                   Current Score: <span className="font-bold">{activeSession.score}</span>
                 </p>
               </div>
@@ -185,10 +186,10 @@ export function StatsPanel({ onRefresh, isLoading }: StatsProps) {
 
       {/* Error Display */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-status-danger bg-status-danger/5">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
-              <div className="text-red-600">{error}</div>
+              <div className="text-status-danger">{error}</div>
             </div>
           </CardContent>
         </Card>
@@ -198,64 +199,64 @@ export function StatsPanel({ onRefresh, isLoading }: StatsProps) {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold">Endless Mode Leaderboard</h2>
-            <span className="text-sm text-gray-500">
+            <h2 className="text-xl font-semibold text-fg">Endless Mode Leaderboard</h2>
+            <span className="text-sm text-fg-muted">
               {endlessStats.length} sessions
             </span>
           </div>
         </CardHeader>
-        
+
         <CardContent className="space-y-3">
           {endlessStats.slice(0, 10).map((stat) => (
             <div
               key={stat.id}
               className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
-                stat.rank <= 3 
-                  ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200' 
-                  : 'bg-white border-gray-200'
+                stat.rank <= 3
+                  ? 'bg-status-warning/10 border-status-warning/30'
+                  : 'bg-surface-raised border-border-subtle'
               }`}
             >
               <div className="flex items-center space-x-3">
                 <div className="flex items-center justify-center w-8 h-8">
-                  {stat.rank === 1 && <Trophy className="text-yellow-500" size={20} />}
-                  {stat.rank === 2 && <Trophy className="text-gray-400" size={20} />}
-                  {stat.rank === 3 && <Trophy className="text-amber-600" size={20} />}
+                  {stat.rank === 1 && <Trophy className="text-status-warning" size={20} />}
+                  {stat.rank === 2 && <Trophy className="text-fg-muted" size={20} />}
+                  {stat.rank === 3 && <Trophy className="text-accent-secondary" size={20} />}
                   {stat.rank > 3 && (
-                    <span className="text-sm font-bold text-gray-600">#{stat.rank}</span>
+                    <span className="text-sm font-bold text-fg-secondary">#{stat.rank}</span>
                   )}
                 </div>
-                
+
                 <div>
-                  <div className="font-medium">{stat.playerName}</div>
+                  <div className="font-medium text-fg">{stat.playerName}</div>
                   {stat.active && (
-                    <div className="text-xs text-green-600 font-medium">● Active</div>
+                    <Badge variant="success" size="sm" className="mt-0.5">Active</Badge>
                   )}
                 </div>
               </div>
-              
+
               <div className="text-right">
-                <div className="text-lg font-bold text-purple-600">
+                <div className="text-lg font-bold text-accent-primary">
                   {stat.score}
                 </div>
-                <div className="text-xs text-gray-500">Score</div>
+                <div className="text-xs text-fg-muted">Score</div>
               </div>
             </div>
           ))}
-          
+
           {endlessStats.length === 0 && !isLoadingStats && (
             <div className="text-center py-8">
-              <Zap size={48} className="mx-auto mb-4 text-gray-400" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Sessions Yet</h3>
-              <p className="text-gray-600">
+              <Zap size={48} className="mx-auto mb-4 text-fg-muted" />
+              <h3 className="text-lg font-semibold text-fg mb-2">No Sessions Yet</h3>
+              <p className="text-fg-secondary">
                 Be the first to start an endless mode session!
               </p>
             </div>
           )}
-          
+
           {isLoadingStats && (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading sessions...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary mx-auto mb-4"></div>
+              <p className="text-fg-secondary">Loading sessions...</p>
             </div>
           )}
         </CardContent>

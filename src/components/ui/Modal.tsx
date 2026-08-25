@@ -7,6 +7,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from './Button';
+import { IconButton } from './IconButton';
 
 interface ModalProps {
   isOpen: boolean;
@@ -17,13 +18,13 @@ interface ModalProps {
   showCloseButton?: boolean;
 }
 
-export function Modal({ 
-  isOpen, 
-  onClose, 
-  title, 
-  children, 
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
   maxWidth = 'md',
-  showCloseButton = true 
+  showCloseButton = true
 }: ModalProps) {
   const maxWidthClasses = {
     sm: 'max-w-sm',
@@ -42,26 +43,23 @@ export function Modal({
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    <div
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={handleBackdropClick}
     >
-      <div className={`bg-white rounded-lg w-full ${maxWidthClasses[maxWidth]} max-h-[90vh] overflow-y-auto`}>
+      <div className={`bg-surface-overlay border border-border-subtle shadow-lg rounded-xl w-full ${maxWidthClasses[maxWidth]} max-h-[90vh] overflow-y-auto`}>
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-6 border-b">
-            {title && <h2 className="text-xl font-semibold">{title}</h2>}
+          <div className="flex items-center justify-between p-6 border-b border-border-subtle">
+            {title && <h2 className="text-xl font-semibold text-fg">{title}</h2>}
             {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
+              <IconButton variant="ghost" size="sm" aria-label="Close" onClick={onClose}>
                 <X size={20} />
-              </button>
+              </IconButton>
             )}
           </div>
         )}
-        
+
         {/* Content */}
         <div className={title || showCloseButton ? "p-6" : "p-0"}>
           {children}
@@ -102,16 +100,15 @@ export function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="sm">
       <div className="space-y-4">
-        <p className="text-gray-600">{message}</p>
-        
+        <p className="text-fg-secondary">{message}</p>
+
         <div className="flex items-center justify-end space-x-3">
           <Button variant="outline" onClick={onClose}>
             {cancelText}
           </Button>
-          <Button 
-            variant={confirmVariant}
+          <Button
+            variant={isDestructive ? 'danger' : confirmVariant}
             onClick={handleConfirm}
-            className={isDestructive ? 'bg-red-600 hover:bg-red-700 text-white' : ''}
           >
             {confirmText}
           </Button>

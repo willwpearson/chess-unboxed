@@ -91,17 +91,17 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   return (
     <Card className="w-full max-w-md mx-auto p-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-foreground">
+        <h2 className="text-2xl font-bold text-fg">
           Create Account
         </h2>
-        <p className="text-sm text-primary-300 mt-2">
+        <p className="text-sm text-fg-secondary mt-2">
           Join our chess community today!
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-primary-300 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-fg-secondary mb-1">
             Email Address
           </label>
           <input
@@ -111,14 +111,14 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
+            className="w-full px-3 py-2 border border-border-subtle rounded-md bg-surface-sunken text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent-primary"
             placeholder="Enter your email"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-primary-300 mb-1">
+          <label htmlFor="username" className="block text-sm font-medium text-fg-secondary mb-1">
             Username
           </label>
           <input
@@ -130,14 +130,14 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
             required
             minLength={3}
             maxLength={20}
-            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
+            className="w-full px-3 py-2 border border-border-subtle rounded-md bg-surface-sunken text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent-primary"
             placeholder="Choose a username"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label htmlFor="displayName" className="block text-sm font-medium text-primary-300 mb-1">
+          <label htmlFor="displayName" className="block text-sm font-medium text-fg-secondary mb-1">
             Display Name (Optional)
           </label>
           <input
@@ -146,14 +146,14 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
             type="text"
             value={formData.displayName}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
+            className="w-full px-3 py-2 border border-border-subtle rounded-md bg-surface-sunken text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent-primary"
             placeholder="Your display name"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-primary-300 mb-1">
+          <label htmlFor="password" className="block text-sm font-medium text-fg-secondary mb-1">
             Password
           </label>
           <input
@@ -164,14 +164,14 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
             onChange={handleChange}
             required
             minLength={6}
-            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
+            className="w-full px-3 py-2 border border-border-subtle rounded-md bg-surface-sunken text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent-primary"
             placeholder="Create a password"
             disabled={isLoading}
           />
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-primary-300 mb-1">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-fg-secondary mb-1">
             Confirm Password
           </label>
           <input
@@ -181,21 +181,22 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
             value={formData.confirmPassword}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 border border-secondary rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent bg-background text-foreground"
+            className="w-full px-3 py-2 border border-border-subtle rounded-md bg-surface-sunken text-fg placeholder:text-fg-muted focus:outline-none focus:ring-2 focus:ring-accent-primary"
             placeholder="Confirm your password"
             disabled={isLoading}
           />
         </div>
 
         {error && (
-          <div className="text-red-400 text-sm bg-red-900/20 p-3 rounded-md">
+          <div className="text-status-danger text-sm bg-status-danger/10 p-3 rounded-md">
             {error}
           </div>
         )}
 
         <Button
           type="submit"
-          className="w-full gaming-button-secondary"
+          variant="primary"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -203,12 +204,12 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-primary-300">
+        <p className="text-sm text-fg-secondary">
           Already have an account?{' '}
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-accent hover:text-accent-800 font-medium cursor-pointer"
+            className="text-accent-primary hover:text-fg font-medium cursor-pointer"
           >
             Sign in
           </button>

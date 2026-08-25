@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { UserProfile } from '@/components/user/UserProfile';
 import { LoadingSpinner } from '@/components/ui/Loading';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { User } from '@/hooks/useAuth';
 import { ChevronLeft } from 'lucide-react';
 
@@ -63,29 +65,26 @@ export default function UserProfilePage({ params }: ProfilePageProps) {
   if (error || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="gaming-card p-8 text-center">
-          <h1 className="text-2xl font-gaming font-bold text-primary mb-4">
+        <Card className="p-8 text-center">
+          <h1 className="text-2xl font-bold text-fg mb-4">
             Profile Not Found
           </h1>
-          <p className="text-destructive">
+          <p className="text-status-danger">
             {error || 'The user you are looking for does not exist.'}
           </p>
-        </div>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-surface-base">
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="gaming-button flex items-center gap-2 mb-6 hover:bg-gaming-accent-primary/10 transition-colors"
-        >
+        <Button variant="ghost" onClick={() => router.back()} className="mb-6 gap-2">
           <ChevronLeft size={16} />
           Back
-        </button>
+        </Button>
 
         <UserProfile user={user} isOwnProfile={false} />
       </div>
