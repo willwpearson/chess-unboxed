@@ -70,8 +70,8 @@ export interface GamePosition {
 }
 
 // Game state types
-export type GameMode = 'bot' | 'multiplayer' | 'endless';
-export type GameVariant = 'classic' | 'unboxed' | 'programming' | 'programming_unboxed';
+export type GameMode = 'bot';
+export type GameVariant = 'unboxed';
 export type GameStatus = 'waiting' | 'active' | 'paused' | 'finished' | 'abandoned';
 export type GameResult = 'white-wins' | 'black-wins' | 'draw' | 'ongoing';
 export type GameEndReason = 'checkmate' | 'stalemate' | 'resignation' | 'timeout' | 'draw-agreement' | 'insufficient-material' | 'fifty-move-rule' | 'threefold-repetition' | 'abandoned';
@@ -124,7 +124,6 @@ export interface PlayerStats {
   losses: number;
   draws: number;
   rating: number;
-  endlessHighScore: number;
 }
 
 export interface UserPreferences {
@@ -166,49 +165,9 @@ export interface UserPreferences {
   showRatingHistory: boolean;
 }
 
-// Lobby types
-export interface Lobby {
-  id: string;
-  name: string;
-  host: Player;
-  guest?: Player;
-  isPrivate: boolean;
-  status: 'waiting' | 'full' | 'in-game';
-  gameMode: GameMode;
-  gameVariant: GameVariant;
-  timeControl?: TimeControl;
-  createdAt: number;
-}
-
 export interface TimeControl {
   initialTime: number; // seconds
   increment: number; // seconds per move
-}
-
-// Real-time communication types
-export interface SocketEvents {
-  // Client to server
-  'join-lobby': { lobbyId: string; player: Player };
-  'create-lobby': { lobby: Omit<Lobby, 'id' | 'createdAt'> };
-  'leave-lobby': { lobbyId: string };
-  'make-move': { gameId: string; move: ChessMove };
-  'offer-draw': { gameId: string };
-  'resign': { gameId: string };
-  'start-endless': { player: Player };
-
-  // Server to client
-  'lobby-created': { lobby: Lobby };
-  'lobby-joined': { lobby: Lobby };
-  'lobby-left': { lobbyId: string };
-  'game-started': { game: GameState };
-  'move-made': { gameId: string; move: ChessMove; position: GamePosition };
-  'game-ended': { gameId: string; result: GameResult; reason: string };
-  'draw-offered': { gameId: string; offeredBy: PieceColor };
-  'draw-accepted': { gameId: string };
-  'draw-declined': { gameId: string };
-  'player-resigned': { gameId: string; resignedBy: PieceColor };
-  'time-update': { gameId: string; whiteTime: number; blackTime: number };
-  'error': { message: string; code?: string };
 }
 
 // API types
@@ -217,17 +176,6 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
   timestamp: number;
-}
-
-export interface CreateLobbyRequest {
-  name: string;
-  isPrivate: boolean;
-  timeControl?: TimeControl;
-}
-
-export interface JoinLobbyRequest {
-  lobbyId: string;
-  playerId: string;
 }
 
 export interface MakeMoveRequest {
@@ -260,77 +208,3 @@ export interface BotConfig {
   personality: 'Aggressive' | 'Defensive' | 'Balanced';
 }
 
-// Programming Chess types
-export interface ProgrammingChessContext {
-  board: Record<Square, ChessPiece | null>;
-  pieces: {
-    white: Square[];
-    black: Square[];
-  };
-  gameState: {
-    turn: PieceColor;
-    moveNumber: number;
-    isCheck: boolean;
-    isCheckmate: boolean;
-    lastMove?: ChessMove;
-    castlingRights: {
-      whiteKingside: boolean;
-      whiteQueenside: boolean;
-      blackKingside: boolean;
-      blackQueenside: boolean;
-    };
-    enPassantTarget?: Square;
-  };
-  history: ChessMove[];
-}
-
-export interface ProgrammingChessMove {
-  from: Square;
-  to: Square;
-  piece: PieceType;
-  promotion?: PieceType;
-}
-
-export interface ProgrammingChessFunction {
-  name: string;
-  description: string;
-  parameters: string[];
-  returnType: string;
-  example: string;
-}
-
-export interface CodeExecutionResult {
-  success: boolean;
-  move?: ProgrammingChessMove;
-  error?: string;
-  executionTime: number;
-  logs: string[];
-}
-
-export interface ProgrammingChessPlayer extends Player {
-  code: string;
-  codeExecutionHistory: CodeExecutionResult[];
-  debugMode: boolean;
-  selectedTemplate?: string;
-}
-
-export interface CodeTemplate {
-  id: string;
-  name: string;
-  description: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
-  category: 'basic' | 'opening' | 'middlegame' | 'endgame' | 'tactical' | 'positional';
-  code: string;
-  explanation: string;
-}
-
-export type ProgrammingChessExecutionMode = 'manual' | 'automatic' | 'step-by-step';
-
-export interface ProgrammingChessSettings {
-  executionMode: ProgrammingChessExecutionMode;
-  timeLimit: number; // milliseconds
-  memoryLimit: number; // bytes
-  allowedAPIs: string[];
-  enableDebugging: boolean;
-  showExecutionLogs: boolean;
-}

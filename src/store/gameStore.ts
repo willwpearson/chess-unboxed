@@ -13,11 +13,6 @@ interface GameStore {
   // UI state
   ui: UIState;
   
-  // Connection state
-  isConnected: boolean;
-  isConnecting: boolean;
-  connectionError: string | null;
-  
   // Game management actions
   initializeGame: (mode: GameMode, variant: GameVariant, botConfig?: BotConfig) => Promise<boolean>;
   makeMove: (from: Square, to: Square, promotion?: string) => Promise<boolean>;
@@ -40,10 +35,6 @@ interface GameStore {
   hidePromotionDialog: () => void;
   clearUI: () => void;
   
-  // Connection actions
-  setConnected: (connected: boolean) => void;
-  setConnecting: (connecting: boolean) => void;
-  setConnectionError: (error: string | null) => void;
 }
 
 const initialUIState: UIState = {
@@ -62,9 +53,6 @@ export const useGameStore = create<GameStore>()(
       botManager: null,
       gameHistory: [],
       ui: initialUIState,
-      isConnected: false,
-      isConnecting: false,
-      connectionError: null,
 
       // Enhanced game management actions
       initializeGame: async (mode: GameMode, variant: GameVariant, botConfig?: BotConfig): Promise<boolean> => {
@@ -296,12 +284,6 @@ export const useGameStore = create<GameStore>()(
       },
 
       clearUI: () => set({ ui: initialUIState }),
-
-      setConnected: (connected: boolean) => set({ isConnected: connected }),
-
-      setConnecting: (connecting: boolean) => set({ isConnecting: connecting }),
-
-      setConnectionError: (error: string | null) => set({ connectionError: error }),
     }),
     { name: 'game-store' }
   )

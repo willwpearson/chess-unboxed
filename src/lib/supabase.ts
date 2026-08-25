@@ -152,7 +152,7 @@ export interface Database {
           id: string;
           created_at: string;
           ended_at: string | null;
-          mode: 'bot' | 'pvp' | 'endless';
+          mode: 'bot';
           white_player_id: string | null;
           black_player_id: string | null;
           winner_id: string | null;
@@ -163,7 +163,7 @@ export interface Database {
           id?: string;
           created_at?: string;
           ended_at?: string | null;
-          mode: 'bot' | 'pvp' | 'endless';
+          mode: 'bot';
           white_player_id?: string | null;
           black_player_id?: string | null;
           winner_id?: string | null;
@@ -174,61 +174,12 @@ export interface Database {
           id?: string;
           created_at?: string;
           ended_at?: string | null;
-          mode?: 'bot' | 'pvp' | 'endless';
+          mode?: 'bot';
           white_player_id?: string | null;
           black_player_id?: string | null;
           winner_id?: string | null;
           status?: 'in_progress' | 'completed' | 'abandoned';
           moves?: any;
-        };
-      };
-      lobbies: {
-        Row: {
-          id: string;
-          created_at: string;
-          host_id: string | null;
-          guest_id: string | null;
-          status: 'waiting' | 'full' | 'in_game';
-        };
-        Insert: {
-          id?: string;
-          created_at?: string;
-          host_id?: string | null;
-          guest_id?: string | null;
-          status?: 'waiting' | 'full' | 'in_game';
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          host_id?: string | null;
-          guest_id?: string | null;
-          status?: 'waiting' | 'full' | 'in_game';
-        };
-      };
-      endless_sessions: {
-        Row: {
-          id: string;
-          user_id: string | null;
-          score: number;
-          active: boolean;
-          started_at: string;
-          ended_at: string | null;
-        };
-        Insert: {
-          id?: string;
-          user_id?: string | null;
-          score?: number;
-          active?: boolean;
-          started_at?: string;
-          ended_at?: string | null;
-        };
-        Update: {
-          id?: string;
-          user_id?: string | null;
-          score?: number;
-          active?: boolean;
-          started_at?: string;
-          ended_at?: string | null;
         };
       };
     };
@@ -243,5 +194,3 @@ export type UpdateTables<T extends keyof Database['public']['Tables']> = Databas
 export type User = Tables<'users'>;
 export type UserSession = Tables<'user_sessions'>;
 export type Game = Tables<'games'>;
-export type Lobby = Tables<'lobbies'>;
-export type EndlessSession = Tables<'endless_sessions'>;

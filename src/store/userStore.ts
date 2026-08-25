@@ -56,7 +56,6 @@ const defaultStats: PlayerStats = {
   losses: 0,
   draws: 0,
   rating: 1200,
-  endlessHighScore: 0,
 };
 
 export const useUserStore = create<UserState>()(
