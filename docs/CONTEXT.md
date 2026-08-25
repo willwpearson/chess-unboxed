@@ -36,6 +36,10 @@ The board uses toroidal topology — pieces that move off one edge of the board 
 - **Guest**: "Play as Guest" on home page → `/api/auth/guest` creates a `Guest_XXXXXXXX` user → JWT cookie → redirect to `/play/unboxed/bot`. Guest accounts persist for 7 days; users can register to make them permanent.
 - All auth checked via `/api/auth/me` on page load through `useAuth` hook.
 
+### Offline dev mode
+
+Set `NEXT_PUBLIC_DEV_MODE=true` in `.env.local` to run all of the above with zero Supabase calls. `src/lib/supabase.ts` swaps `supabase`/`supabaseAdmin` for `src/lib/devDb.ts`, an in-memory mock of the query builder shapes the auth routes use. It seeds a fixed login (`devuser` / `devpassword`) on server start, and guest accounts work the same way but stay in memory only (reset on restart). No Supabase project or env vars are required in this mode.
+
 ## Bot AI
 
 Located in `src/lib/gameManager.ts` (`BotManager` class). Four difficulty levels:

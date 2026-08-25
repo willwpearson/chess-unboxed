@@ -1,23 +1,38 @@
 import { createClient } from '@supabase/supabase-js';
+import { devDb } from './devDb';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+let supabase: any;
+let supabaseAdmin: any;
+
+if (isDevMode) {
+  // Offline dev mode: no network calls, no Supabase project required.
+  // See docs/CONTEXT.md for how to use the seeded devuser/devpassword account.
+  supabase = devDb;
+  supabaseAdmin = devDb;
+} else {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  // Client for public operations (client-side)
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  // Admin client for server-side operations (with service role key)
+  supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
 }
 
-// Client for public operations (client-side)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// Admin client for server-side operations (with service role key)
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+export { supabase, supabaseAdmin };
 
 // Database types based on your schema
 export interface Database {
