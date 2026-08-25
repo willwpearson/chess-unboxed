@@ -1,0 +1,353 @@
+/**
+ * Enhanced Settings Component
+ * Comprehensive user preferences and settings management
+ */
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
+import { useAuth } from '@/hooks/useAuth';
+import { UserPreferences } from '@/types/game';
+import { AccountSettings } from './AccountSettings';
+import { GameSettings } from './GameSettings';
+import { NotificationSettings } from './NotificationSettings';
+import { PrivacySettings } from './PrivacySettings';
+import { 
+  User, Save, Bell, Shield, Gamepad2,
+  AlertTriangle, CheckCircle, X
+} from 'lucide-react';
+
+// Default preferences
+const defaultPreferences: UserPreferences = {
+  theme: 'dark',
+  language: 'en',
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  dateFormat: 'MM/DD/YYYY',
+  boardTheme: 'classic',
+  pieceSet: 'classic',
+  showCoordinates: true,
+  showPossibleMoves: true,
+  moveAnimationSpeed: 'normal',
+  soundEnabled: true,
+  autoQueen: true,
+  emailNotifications: {
+    gameInvites: true,
+    friendRequests: true,
+    tournaments: true,
+    dailyPuzzles: false,
+    weeklyDigest: true,
+  },
+  pushNotifications: {
+    moves: true,
+    gameStart: true,
+    gameEnd: true,
+    friendActivity: false,
+  },
+  profileVisibility: 'public',
+  showOnlineStatus: true,
+  allowFriendRequests: true,
+  showGameHistory: true,
+  showRatingHistory: true,
+};
+
+// Tab types
+type SettingsTab = 'account' | 'game' | 'notifications' | 'privacy';
+
+interface TabConfig {
+  id: SettingsTab;
+  label: string;
+  icon: React.ReactNode;
+  description: string;
+}
+
+const tabs: TabConfig[] = [
+  {
+    id: 'account',
+    label: 'Account',
+    icon: <User size={20} />,
+    description: 'Account settings and security'
+  },
+  {
+    id: 'game',
+    label: 'Game',
+    icon: <Gamepad2 size={20} />,
+    description: 'Chess board, gameplay, and language preferences'
+  },
+  {
+    id: 'notifications',
+    label: 'Notifications',
+    icon: <Bell size={20} />,
+    description: 'Email and push notification settings'
+  },
+  {
+    id: 'privacy',
+    label: 'Privacy',
+    icon: <Shield size={20} />,
+    description: 'Profile visibility and privacy controls'
+  },
+];
+
+
+export function SettingsPanel() {
+  const { user, refreshUser } = useAuth();
+  
+  // State management
+  const [activeTab, setActiveTab] = useState<SettingsTab>('account');
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [originalPreferences, setOriginalPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [isLoading, setSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [notification, setNotification] = useState<{type: 'success' | 'error', message: string} | null>(null);
+
+  // Initialize preferences from user data
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (user) {
+        try {
+          setSaving(true);
+          const response = await fetch('/api/users/preferences', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data?.preferences) {
+              setPreferences(data.data.preferences);
+              setOriginalPreferences(data.data.preferences);
+            } else {
+              setPreferences(defaultPreferences);
+              setOriginalPreferences(defaultPreferences);
+            }
+          } else {
+            // Use defaults if API fails
+            setPreferences(defaultPreferences);
+            setOriginalPreferences(defaultPreferences);
+          }
+        } catch (error) {
+          console.error('Error loading preferences:', error);
+          setPreferences(defaultPreferences);
+          setOriginalPreferences(defaultPreferences);
+          setNotification({ type: 'error', message: 'Failed to load preferences. Using defaults.' });
+        } finally {
+          setSaving(false);
+        }
+      }
+    };
+
+    loadPreferences();
+  }, [user]);
+
+  // Check for unsaved changes
+  useEffect(() => {
+    const hasChanges = JSON.stringify(preferences) !== JSON.stringify(originalPreferences);
+    setHasUnsavedChanges(hasChanges);
+  }, [preferences, originalPreferences]);
+
+
+  // Save preferences
+  const handleSave = useCallback(async () => {
+    setSaving(true);
+    
+    try {
+      const response = await fetch('/api/users/preferences', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(preferences),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save preferences');
+      }
+
+      setOriginalPreferences({ ...preferences });
+      setNotification({ type: 'success', message: 'Settings saved successfully!' });
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      setNotification({ type: 'error', message: 'Failed to save settings. Please try again.' });
+    } finally {
+      setSaving(false);
+    }
+  }, [preferences]);
+
+  // Reset to defaults
+  const handleReset = useCallback(() => {
+    setPreferences({ ...defaultPreferences });
+  }, []);
+
+  // Update preferences helper
+  const updatePreference = useCallback(<K extends keyof UserPreferences>(
+    key: K,
+    value: UserPreferences[K]
+  ) => {
+    setPreferences(prev => ({ ...prev, [key]: value }));
+  }, []);
+
+
+  // Toggle helper for nested objects
+  const toggleNestedPreference = useCallback(<T extends keyof UserPreferences>(
+    category: T,
+    key: keyof UserPreferences[T],
+    value: boolean
+  ) => {
+    setPreferences(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category] as object,
+        [key]: value,
+      },
+    }));
+  }, []);
+
+  // Notification handler
+  const handleNotification = (notif: { type: 'success' | 'error', message: string }) => {
+    setNotification(notif);
+  };
+
+
+  const renderAccountTab = () => (
+    <AccountSettings
+      isLoading={isLoading}
+      onNotification={handleNotification}
+    />
+  );
+
+  const renderGameTab = () => (
+    <GameSettings
+      preferences={preferences}
+      onUpdatePreference={updatePreference}
+    />
+  );
+
+  const renderNotificationsTab = () => (
+    <NotificationSettings
+      preferences={preferences}
+      onToggleNestedPreference={toggleNestedPreference}
+    />
+  );
+
+  const renderPrivacyTab = () => (
+    <PrivacySettings
+      preferences={preferences}
+      onUpdatePreference={updatePreference}
+    />
+  );
+
+
+  // Main render
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="w-full max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-4xl font-gaming font-bold gaming-title mb-2">Settings</h1>
+              <p className="text-primary-300">
+                Customize your chess experience and personalize your preferences
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleReset}
+                disabled={isLoading}
+                className="gaming-button"
+              >
+                Reset to Default
+              </button>
+              
+              {hasUnsavedChanges && (
+                <button
+                  onClick={handleSave}
+                  disabled={isLoading}
+                  className={`gaming-button-secondary ${isLoading ? 'opacity-50' : ''}`}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Saving...
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <Save size={16} className="mr-2" />
+                      Save Changes
+                    </div>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Notification */}
+          {notification && (
+            <div className={`gaming-card p-4 mb-6 border ${
+              notification.type === 'success' ? 'border-gaming-accent-secondary' : 'border-gaming-accent-danger'
+            }`}>
+              <div className="flex items-center">
+                {notification.type === 'success' ? (
+                  <CheckCircle size={20} className="text-gaming-accent-secondary mr-3" />
+                ) : (
+                  <AlertTriangle size={20} className="text-gaming-accent-danger mr-3" />
+                )}
+                <span className="text-gaming-text-primary">{notification.message}</span>
+                <button
+                  onClick={() => setNotification(null)}
+                  className="ml-auto text-primary-300 hover:text-gaming-text-primary"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Tab Navigation */}
+            <div className="lg:w-64 lg:flex-shrink-0">
+              <div className="gaming-card p-4">
+                <nav className="space-y-2">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-color duration-300 cursor-pointer ${
+                        activeTab === tab.id
+                          ? 'bg-accent text-black'
+                          : 'text-primary-300 hover:bg-accent-900'
+                      }`}
+                    >
+                      {tab.icon}
+                      <div className="flex-1">
+                        <div className="font-gaming font-medium">{tab.label}</div>
+                        <div className="text-xs opacity-75">{tab.description}</div>
+                      </div>
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1">
+              {activeTab === 'account' && renderAccountTab()}
+              {activeTab === 'game' && renderGameTab()}
+              {activeTab === 'notifications' && renderNotificationsTab()}
+              {activeTab === 'privacy' && renderPrivacyTab()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
+}
