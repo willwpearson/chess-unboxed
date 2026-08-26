@@ -24,7 +24,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
   personality: 'aggressive' | 'defensive' | 'balanced';
   features: string[];
 }> = {
-  easy: {
+  Beginner: {
     name: 'Beginner',
     description: 'Perfect for learning the basics',
     icon: Bot,
@@ -33,7 +33,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     personality: 'balanced',
     features: ['Random moves', 'No deep strategy', 'Great for beginners']
   },
-  medium: {
+  Intermediate: {
     name: 'Intermediate',
     description: 'Good challenge for casual players',
     icon: Brain,
@@ -42,7 +42,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     personality: 'balanced',
     features: ['Basic tactics', 'Simple strategy', 'Balanced gameplay']
   },
-  hard: {
+  Advanced: {
     name: 'Advanced',
     description: 'Strong opponent for experienced players',
     icon: Target,
@@ -51,7 +51,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     personality: 'aggressive',
     features: ['Advanced tactics', 'Strong endgame', 'Aggressive play']
   },
-  expert: {
+  Grandmaster: {
     name: 'Grandmaster',
     description: 'Ultimate challenge for chess masters',
     icon: Crown,

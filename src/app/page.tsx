@@ -26,20 +26,6 @@ interface GameModeConfig {
   difficulty: string;
 }
 
-const gameModes: GameModeConfig[] = [
-  {
-    id: 'unboxed',
-    title: 'Chess Unboxed',
-    shortDescription: 'Side-wrapping chess - pieces wrap around board edges',
-    fullDescription: 'In Chess Unboxed, the board wraps around itself - pieces can move off one edge and appear on the opposite side, opening up strategic possibilities not found in traditional chess.',
-    icon: Zap,
-    color: 'from-purple-500 to-pink-600',
-    gradient: 'bg-gradient-to-br from-purple-500/20 to-pink-600/20',
-    features: ['Side-wrapping board', 'Edge-wrapping movement', 'Unique tactical patterns'],
-    difficulty: 'Intermediate to Expert'
-  }
-];
-
 export default function HomePage() {
   const [guestLoading, setGuestLoading] = useState(false);
   const router = useRouter();
@@ -165,12 +151,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="p-6 text-center">
-                <Zap size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Side-Wrapping Board</h4>
-                <p className="text-sm text-fg-secondary">Pieces wrap around the board edges, opening up new strategic possibilities</p>
-              </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="p-6 text-center">
                 <Infinity size={40} className="mx-auto mb-4 text-accent-primary" />
                 <h4 className="font-bold text-fg mb-2">Edge-Wrapping Movement</h4>

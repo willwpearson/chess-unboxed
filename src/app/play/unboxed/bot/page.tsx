@@ -14,7 +14,7 @@ import { useUserStore } from '@/store/userStore';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { ArrowLeft, Bot } from 'lucide-react';
 
 export default function UnboxedBotGamePage() {
   const router = useRouter();
@@ -98,14 +98,11 @@ export default function UnboxedBotGamePage() {
 
               <div className="space-y-8">
                 {/* Game Mode Header */}
-                <Card className="p-8 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
+                <Card className="p-4 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6">
-                    <Zap size={40} />
+                    <Bot size={40} />
                   </div>
-                  <h2 className="text-3xl font-bold text-fg mb-4">Chess Unboxed vs Bot</h2>
-                  <p className="text-fg-secondary text-lg">
-                    Side-wrapping chess - pieces that move off one edge appear on the opposite side.
-                  </p>
+                  <h2 className="text-3xl font-bold text-fg">Play vs. Bot</h2>
                 </Card>
 
                 <BotDifficultySelector
@@ -137,7 +134,7 @@ export default function UnboxedBotGamePage() {
 
             <div className="text-center">
               <h1 className="text-lg font-semibold text-fg flex items-center justify-center space-x-2">
-                <span>Chess Unboxed vs {botConfig?.difficulty} Bot</span>
+                <span>{botConfig?.difficulty} Bot</span>
                 <Badge variant="info" size="sm">Unboxed</Badge>
               </h1>
               {currentGame.status === 'finished' && (
