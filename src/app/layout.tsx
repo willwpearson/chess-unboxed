@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata: Metadata = {
   title: 'Chess Unboxed',
   description: 'Play chess where pieces wrap around board edges. Play against bots or create an account.',
-  keywords: ['chess', 'unboxed', 'toroidal', 'online', 'game', 'strategy'],
+  keywords: ['chess', 'unboxed', 'wraparound', 'online', 'game', 'strategy'],
   authors: [{ name: 'Optim II' }],
 };
 
@@ -25,7 +25,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="font-sans antialiased bg-background text-foreground">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('chess-unboxed-theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className="font-sans antialiased bg-surface-base text-fg">
         <Providers>
           <div className="min-h-screen flex flex-col">
             {children}

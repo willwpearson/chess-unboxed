@@ -5,9 +5,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Modal } from '@/components/ui/Modal';
+import { IconButton } from '@/components/ui/IconButton';
 import { useAuth } from '@/hooks/useAuth';
 import { UserPreferences } from '@/types/game';
 import { AccountSettings } from './AccountSettings';
@@ -246,36 +246,28 @@ export function SettingsPanel() {
 
   // Main render
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-surface-base">
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-gaming font-bold gaming-title mb-2">Settings</h1>
-              <p className="text-primary-300">
+              <h1 className="text-4xl font-gaming font-bold mb-2 bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">Settings</h1>
+              <p className="text-fg-secondary">
                 Customize your chess experience and personalize your preferences
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-3">
-              <button
-                onClick={handleReset}
-                disabled={isLoading}
-                className="gaming-button"
-              >
+              <Button variant="secondary" onClick={handleReset} disabled={isLoading}>
                 Reset to Default
-              </button>
-              
+              </Button>
+
               {hasUnsavedChanges && (
-                <button
-                  onClick={handleSave}
-                  disabled={isLoading}
-                  className={`gaming-button-secondary ${isLoading ? 'opacity-50' : ''}`}
-                >
+                <Button onClick={handleSave} disabled={isLoading}>
                   {isLoading ? (
                     <div className="flex items-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
                       Saving...
                     </div>
                   ) : (
@@ -284,46 +276,52 @@ export function SettingsPanel() {
                       Save Changes
                     </div>
                   )}
-                </button>
+                </Button>
               )}
             </div>
           </div>
 
           {/* Notification */}
           {notification && (
-            <div className={`gaming-card p-4 mb-6 border ${
-              notification.type === 'success' ? 'border-gaming-accent-secondary' : 'border-gaming-accent-danger'
-            }`}>
+            <Card
+              variant="flat"
+              className={`p-4 mb-6 ${
+                notification.type === 'success' ? 'border-accent-secondary' : 'border-accent-danger'
+              }`}
+            >
               <div className="flex items-center">
                 {notification.type === 'success' ? (
-                  <CheckCircle size={20} className="text-gaming-accent-secondary mr-3" />
+                  <CheckCircle size={20} className="text-accent-secondary mr-3" />
                 ) : (
-                  <AlertTriangle size={20} className="text-gaming-accent-danger mr-3" />
+                  <AlertTriangle size={20} className="text-accent-danger mr-3" />
                 )}
-                <span className="text-gaming-text-primary">{notification.message}</span>
-                <button
+                <span className="text-fg">{notification.message}</span>
+                <IconButton
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Dismiss notification"
+                  className="ml-auto"
                   onClick={() => setNotification(null)}
-                  className="ml-auto text-primary-300 hover:text-gaming-text-primary"
                 >
                   <X size={16} />
-                </button>
+                </IconButton>
               </div>
-            </div>
+            </Card>
           )}
 
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Tab Navigation */}
             <div className="lg:w-64 lg:flex-shrink-0">
-              <div className="gaming-card p-4">
+              <Card className="p-4">
                 <nav className="space-y-2">
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-color duration-300 cursor-pointer ${
+                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors duration-200 cursor-pointer ${
                         activeTab === tab.id
-                          ? 'bg-accent text-black'
-                          : 'text-primary-300 hover:bg-accent-900'
+                          ? 'bg-accent-primary text-accent-primary-foreground'
+                          : 'text-fg-secondary hover:bg-surface-hover'
                       }`}
                     >
                       {tab.icon}
@@ -334,7 +332,7 @@ export function SettingsPanel() {
                     </button>
                   ))}
                 </nav>
-              </div>
+              </Card>
             </div>
 
             {/* Tab Content */}

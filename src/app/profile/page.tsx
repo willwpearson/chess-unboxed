@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { UserProfile, ProfileEditor } from '@/components/user';
 import { LoadingSpinner } from '@/components/ui/Loading';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { Edit, User, ChevronLeft } from 'lucide-react';
 
 export default function ProfilePage() {
@@ -23,14 +25,14 @@ export default function ProfilePage() {
   if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="gaming-card p-8 text-center">
-          <h1 className="text-2xl font-gaming font-bold text-gaming-text-primary mb-4">
+        <Card className="p-8 text-center">
+          <h1 className="text-2xl font-bold text-fg mb-4">
             Profile Not Found
           </h1>
-          <p className="text-gaming-text-secondary">
+          <p className="text-fg-secondary">
             You need to be logged in to view your profile.
           </p>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -40,33 +42,29 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-surface-base">
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
-        <button
-          onClick={() => router.back()}
-          className="gaming-button flex items-center gap-2 mb-6 hover:bg-gaming-accent-primary/10 transition-colors"
-        >
+        <Button variant="ghost" onClick={() => router.back()} className="mb-6 gap-2">
           <ChevronLeft size={16} />
           Back
-        </button>
+        </Button>
 
         {/* Header with Edit Toggle */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-gaming font-bold text-primary-300 flex items-center gap-3">
-            <User size={32} className="text-secondary" />
+          <h1 className="text-3xl font-bold text-fg flex items-center gap-3">
+            <User size={32} className="text-accent-primary" />
             {isEditing ? 'Edit Profile' : 'My Profile'}
           </h1>
-          
-          <button
+
+          <Button
+            variant={isEditing ? 'primary' : 'secondary'}
             onClick={() => setIsEditing(!isEditing)}
-            className={`${
-              isEditing ? 'gaming-button' : 'gaming-button-secondary'
-            } flex items-center space-x-2`}
+            className="gap-2"
           >
             <Edit size={16} />
             <span>{isEditing ? 'Cancel' : 'Edit Profile'}</span>
-          </button>
+          </Button>
         </div>
 
         {/* Content */}

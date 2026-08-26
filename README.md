@@ -1,105 +1,40 @@
 # Chess Unboxed
 
-A real-time multiplayer chess game built with Next.js 15, TypeScript, and Tailwind CSS. This is a full-stack application with Next.js API routes and Supabase database integration.
+A web app for playing **Chess Unboxed** — a toroidal/wraparound variant of chess where pieces that move off one edge of the board reappear on the opposite side — against AI bots. Play as a guest or create an account.
 
-## 🎮 Features
+## Features
 
-- **Multiple Game Modes**:
-  - **Bot Mode**: Play against AI with different difficulty levels
-  - **Multiplayer**: Create or join lobbies to play against other players
-  - **Endless Mode**: Challenge yourself - one loss and you're out!
+- **Unboxed chess engine**: a custom wraparound move generator (`src/lib/chessEngine.ts`) layered on top of `chess.js` for standard move validation.
+- **Bot opponents**: four difficulty levels, from random move selection up to strategic evaluation (`src/lib/gameManager.ts`).
+- **Guest play**: jump straight into a game with a temporary account that can later be upgraded to a permanent one.
+- **Accounts**: email/username + password registration and login, backed by Supabase.
 
-- **Real-time Gameplay**: WebSocket-based communication for instant moves and updates
-- **Modern UI**: Built with Tailwind CSS and responsive design
-- **Database Integration**: Full Supabase PostgreSQL integration with real data
-- **Player Management**: Automatic player creation and management
-- **Statistics Tracking**: Live leaderboards and endless mode statistics
-- **TypeScript**: Full type safety throughout the application
+## Tech Stack
 
-## 🏗️ Architecture
+| Layer      | Technology                          |
+| ---------- | ------------------------------------ |
+| Framework  | Next.js 15 (App Router)              |
+| Language   | TypeScript                           |
+| Styling    | Tailwind CSS 4                       |
+| State      | Zustand + React Query                |
+| Database   | Supabase (PostgreSQL)                |
+| Auth       | JWT via HTTP-only cookies + bcryptjs |
+| ORM        | Drizzle Kit (migrations)             |
 
-This is a full-stack chess game built with Next.js and Supabase:
-
-- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS
-- **Backend**: Next.js API routes for backend logic
-- **Database**: Supabase PostgreSQL with real-time capabilities
-- **Real-time**: WebSocket support for live gameplay
-- **Deployment**: Single Vercel deployment with Supabase integration
-
-## ✅ Currently Working Features
-
-### 🔗 Database Integration
-
-- **✅ Players API**: Create, read, update players
-- **✅ Lobbies API**: Create, join, and manage multiplayer lobbies
-- **✅ Games API**: Track game states, moves, and results
-- **✅ Endless Mode API**: Session management and scoring
-- **✅ Real-time Leaderboards**: Live player rankings and statistics
-
-### 🎯 UI Components Connected to Database
-
-- **✅ Leaderboard**: Shows real player stats and endless mode rankings
-- **✅ Lobby System**: Real lobby creation and joining with live data
-- **✅ Player Management**: Automatic guest player creation
-- **✅ Stats Panel**: Endless mode session tracking
-- **✅ Real-time Updates**: Components refresh with live data
-
-### 🛠️ API Client
-
-- **✅ Type-safe API client** with error handling
-- **✅ Player management hooks** for automatic initialization
-- **✅ Comprehensive error handling** and loading states
-
-## 🚧 Next Steps
-
-### 🔮 Chess Game Implementation
-
-- **Chess Board Component**: Interactive chess board with drag-and-drop
-- **Game Logic Integration**: Connect chess.js for move validation
-- **Real-time Moves**: WebSocket integration for live gameplay
-- **Bot AI**: Implement chess bot with different difficulty levels
-
-### 🎮 Game Features
-
-- **Move History**: Visual move tracking and navigation
-- **Timer System**: Configurable time controls for games
-- **Game Analysis**: Post-game analysis and review
-- **Tournament Mode**: Multi-player tournament brackets
-
-### 🔐 Authentication & Social
-
-- **User Authentication**: Proper login system with Supabase Auth
-- **Player Profiles**: Detailed player statistics and history
-- **Social Features**: Friend system and private matches
-- **Chat System**: In-game messaging
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn/pnpm
-- A Supabase project with the chess schema (see setup instructions below)
+- Node.js 18+
+- Either a Supabase project, or just use offline dev mode (see below) to run with no external services.
 
 ### Installation
 
-1. Clone this repository:
-
-```bash
-git clone <your-repo-url>
-cd chess.optim.boo
-```
-
-1. Install dependencies:
-
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
 ```
 
-1. Set up environment variables:
+### Environment variables
 
 Create a `.env.local` file in the project root:
 
@@ -110,220 +45,43 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 JWT_SECRET=your_jwt_secret_key_here
 ```
 
-1. Set up your Supabase database:
+#### Offline dev mode
 
-Run this SQL in your Supabase SQL editor:
+Set `NEXT_PUBLIC_DEV_MODE=true` in `.env.local` to run the app with zero Supabase calls. `src/lib/supabase.ts` swaps in an in-memory mock (`src/lib/devDb.ts`) of the query builder shapes the auth routes use. It seeds a fixed login (`devuser` / `devpassword`) on server start; guest accounts also work but stay in memory only and reset on restart. No Supabase project or other env vars are required in this mode.
 
-```sql
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
-
--- Players table
-create table players (
-  id uuid primary key default uuid_generate_v4(),
-  created_at timestamp default now(),
-  nickname text,
-  score integer default 0,
-  is_active boolean default true
-);
-
--- Games table
-create table games (
-  id uuid primary key default uuid_generate_v4(),
-  created_at timestamp default now(),
-  ended_at timestamp,
-  mode text check (mode in ('bot', 'pvp', 'endless')),
-  player1_id uuid references players(id),
-  player2_id uuid references players(id),
-  winner_id uuid references players(id),
-  status text check (status in ('in_progress', 'completed', 'abandoned')) default 'in_progress',
-  moves jsonb default '[]'::jsonb
-);
-
--- Lobbies table
-create table lobbies (
-  id uuid primary key default uuid_generate_v4(),
-  created_at timestamp default now(),
-  host_id uuid references players(id),
-  guest_id uuid references players(id),
-  status text check (status in ('waiting', 'full', 'in_game')) default 'waiting'
-);
-
--- Endless sessions table
-create table endless_sessions (
-  id uuid primary key default uuid_generate_v4(),
-  player_id uuid references players(id),
-  score integer default 0,
-  active boolean default true,
-  started_at timestamp default now(),
-  ended_at timestamp
-);
-
--- Create indexes for performance
-create index idx_games_player1 on games(player1_id);
-create index idx_games_player2 on games(player2_id);
-create index idx_lobbies_status on lobbies(status);
-create index idx_endless_sessions_player on endless_sessions(player_id);
-```
-
-1. Run the development server:
+### Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
-1. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Testing the Setup
+### Other scripts
 
-You can test your API endpoints:
+- `npm run build` — production build
+- `npm run start` — start production server
+- `npm run lint` — run ESLint
+- `npm run type-check` — run TypeScript checks
+- `npm run format` — format code with Prettier
+- `npm run db:generate` / `npm run db:migrate` / `npm run db:studio` — Drizzle Kit migrations
 
-```bash
-# Test health check
-curl http://localhost:3000/api/health
+## Project Structure
 
-# Create a test player
-curl -X POST http://localhost:3000/api/players \
-  -H "Content-Type: application/json" \
-  -d '{"nickname":"TestPlayer"}'
-
-# Get all lobbies
-curl http://localhost:3000/api/lobbies
 ```
-
-## 📁 Project Structure
-
-```bash
 src/
-├── app/                    # Next.js 15 App Router
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Homepage
-├── components/            # React components
-│   ├── game/              # Game-specific components
-│   ├── layout/            # Layout components (Header, Footer)
-│   └── providers.tsx      # App providers
-├── lib/                   # Utilities and services
-│   ├── api.ts            # API client
-│   ├── utils.ts          # Utility functions
-│   └── websocket.ts      # WebSocket service
-├── store/                 # Zustand stores
-│   ├── gameStore.ts      # Game state management
-│   └── userStore.ts      # User state management
-└── types/                 # TypeScript type definitions
-    ├── api.ts            # API-related types
-    ├── config.ts         # Configuration types
-    └── game.ts           # Game-related types
+├── app/                    # Next.js App Router pages (dashboard, login, play, profile, register, settings, api)
+├── components/             # React components (game, layout, settings, ui, user, auth)
+├── lib/                    # chessEngine.ts, gameManager.ts, supabase.ts, devDb.ts, utils.ts
+├── store/                  # Zustand game state
+├── hooks/                  # useAuth and other hooks
+└── types/                  # Core TypeScript types
 ```
 
-## 🎯 Game Modes
+## More Context
 
-### Bot Mode
+See [`docs/CONTEXT.md`](docs/CONTEXT.md) for the database schema, auth flow, bot AI details, and a record of what was intentionally scoped out of this build. See [`docs/PROGRESS.md`](docs/PROGRESS.md) for the history of that scope-trimming work.
 
-- Play against AI opponents
-- Multiple difficulty levels
-- Perfect for practice and learning
+## License
 
-### Multiplayer Mode
-
-- Create or join public/private lobbies
-- Real-time gameplay with other players
-- Matchmaking system
-
-### Endless Mode
-
-- Continuous games against progressively harder opponents
-- One loss ends your run
-- Compete for high scores on the leaderboard
-
-## 🔧 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript checks
-- `npm run format` - Format code with Prettier
-
-## 🌐 Database Integration
-
-This application connects to a Supabase database that handles:
-
-- Player management and profiles
-- Game state and move history
-- Real-time lobby system
-- Endless mode session tracking
-- Leaderboard and statistics
-
-The database schema includes tables for players, games, lobbies, and endless sessions with proper relationships and constraints.
-
-## 🎨 Styling
-
-- **Tailwind CSS**: Utility-first CSS framework
-- **Custom Chess Theme**: Specialized colors and animations for chess
-- **Responsive Design**: Mobile-first approach
-- **Dark Mode Support**: Built-in theme switching
-
-## 📱 Responsive Design
-
-The application is fully responsive and works on:
-
-- Desktop computers
-- Tablets
-- Mobile phones
-- Touch devices with drag-and-drop support
-
-## 🔒 Security
-
-- No sensitive data stored in frontend
-- All game validation handled by backend
-- WebSocket authentication
-- Move validation on server-side
-
-## 🚀 Deployment
-
-### Vercel (Recommended)
-
-```bash
-npm install -g vercel
-vercel
-```
-
-### Docker
-
-```bash
-docker build -t chess-frontend .
-docker run -p 3000:3000 chess-frontend
-```
-
-### Manual Deployment
-
-```bash
-npm run build
-npm run start
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🔗 Related Repositories
-
-- Backend API: [Link to .NET backend repository]
-- Database Schema: [Link to database repository if separate]
-
-## 📞 Support
-
-For questions or support, please [open an issue](../../issues) or contact the development team.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

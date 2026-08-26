@@ -1,9 +1,9 @@
 export function Footer() {
   return (
-    <footer className="bg-card` border-t-2 border-t-border">
+    <footer className="bg-surface-base border-t border-border-subtle">
       <div className="container mx-auto px-4 py-6">
-        <div className="text-center text-sm text-primary-400">
-          <p>&copy; 2025 Chess Unboxed. Experience chess beyond boundaries.</p>
+        <div className="text-center text-sm text-fg-muted">
+          <p>&copy; 2025 Chess Unboxed.</p>
         </div>
       </div>
     </footer>

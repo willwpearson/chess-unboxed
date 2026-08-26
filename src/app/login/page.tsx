@@ -32,8 +32,8 @@ export default function LoginPage() {
     return (
       <>
         <Header />
-        <main className="flex-1 min-h-screen flex items-center justify-center bg-background">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-border"></div>
+        <main className="flex-1 min-h-screen flex items-center justify-center bg-surface-base">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-border-subtle border-t-accent-primary"></div>
         </main>
         <Footer />
       </>
@@ -47,14 +47,14 @@ export default function LoginPage() {
   return (
     <>
       <Header />
-      <main className="flex-1 min-h-screen bg-background">
+      <main className="flex-1 min-h-screen bg-surface-base">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-md mx-auto">
             {/* Back button */}
             <div className="mb-6">
-              <Link 
+              <Link
                 href="/"
-                className="flex items-center text-accent hover:text-primary transition-colors duration-300"
+                className="flex items-center text-accent-primary hover:text-fg transition-colors duration-300"
               >
                 <ChevronLeft size={20} className="mr-1" />
                 Back to Home
@@ -63,11 +63,11 @@ export default function LoginPage() {
 
             {/* Hero Section */}
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-gaming font-bold mb-2 gaming-title">
+              <h1 className="text-3xl font-gaming font-bold mb-2 bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
                 Welcome Back
               </h1>
-              <p className="text-primary-400">
-                Sign in to continue your chess journey
+              <p className="text-fg-secondary">
+                Sign in to your account
               </p>
             </div>
 

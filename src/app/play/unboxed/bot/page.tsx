@@ -11,7 +11,10 @@ import { GameInfo } from '@/components/game/GameInfo';
 import { BotConfig, GameState, ChessMove, Player } from '@/types/game';
 import { useGameStore } from '@/store/gameStore';
 import { useUserStore } from '@/store/userStore';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { ArrowLeft, Bot } from 'lucide-react';
 
 export default function UnboxedBotGamePage() {
   const router = useRouter();
@@ -79,30 +82,28 @@ export default function UnboxedBotGamePage() {
     return (
       <>
         <Header />
-        <main className="flex-1 min-h-screen bg-background">
+        <main className="flex-1 min-h-screen bg-surface-base">
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-4xl mx-auto">
               <div className="mb-8">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={() => router.push('/')}
-                  className="gaming-button flex items-center space-x-2"
+                  className="flex items-center space-x-2"
                 >
                   <ArrowLeft size={16} />
                   <span>Back to Home</span>
-                </button>
+                </Button>
               </div>
-              
+
               <div className="space-y-8">
                 {/* Game Mode Header */}
-                <div className="gaming-card p-8 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
+                <Card className="p-4 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
                   <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6">
-                    <Zap size={40} />
+                    <Bot size={40} />
                   </div>
-                  <h2 className="text-3xl font-gaming font-bold gaming-title mb-4">Chess Unboxed vs Bot</h2>
-                  <p className="text-gaming-text-secondary text-lg">
-                    Revolutionary toroidal chess - pieces wrap around board edges for infinite possibilities.
-                  </p>
-                </div>
+                  <h2 className="text-3xl font-bold text-fg">Play vs. Bot</h2>
+                </Card>
 
                 <BotDifficultySelector
                   onStartGame={handleStartGame}
@@ -118,35 +119,33 @@ export default function UnboxedBotGamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-base">
       {/* Modern Header - Purple theme for Unboxed */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-surface-raised border-b border-border-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <button
               onClick={handleNewGame}
-              className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center space-x-2 px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
             >
               <ArrowLeft size={16} />
               <span>New Game</span>
             </button>
 
             <div className="text-center">
-              <h1 className="text-lg font-semibold text-gray-900 flex items-center justify-center space-x-2">
-                <span>Chess Unboxed vs {botConfig?.difficulty} Bot</span>
-                <div className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
-                  Unboxed
-                </div>
+              <h1 className="text-lg font-semibold text-fg flex items-center justify-center space-x-2">
+                <span>{botConfig?.difficulty} Bot</span>
+                <Badge variant="info" size="sm">Unboxed</Badge>
               </h1>
               {currentGame.status === 'finished' && (
                 <div className={`text-sm font-medium ${
-                  currentGame.result === 'white-wins' ? 'text-green-600' :
-                  currentGame.result === 'black-wins' ? 'text-red-600' : 'text-yellow-600'
+                  currentGame.result === 'white-wins' ? 'text-status-success' :
+                  currentGame.result === 'black-wins' ? 'text-status-danger' : 'text-status-warning'
                 }`}>
                   {currentGame.result === 'white-wins' ? '1-0 You won!' :
                    currentGame.result === 'black-wins' ? '0-1 You lost' : '½-½ Draw'}
                   {currentGame.endReason && (
-                    <span className="text-gray-500 ml-1">
+                    <span className="text-fg-muted ml-1">
                       ({currentGame.endReason.replace('-', ' ')})
                     </span>
                   )}

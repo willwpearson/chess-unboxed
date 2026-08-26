@@ -200,11 +200,10 @@ export interface UIState {
 }
 
 // Bot difficulty levels
-export type BotDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+export type BotDifficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Grandmaster';
 
 export interface BotConfig {
   difficulty: BotDifficulty;
-  thinkingTime: number; // ms
   personality: 'Aggressive' | 'Defensive' | 'Balanced';
 }
 

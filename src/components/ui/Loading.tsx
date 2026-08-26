@@ -16,7 +16,7 @@ export function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerPr
 
   return (
     <div className={`inline-flex items-center justify-center ${className}`}>
-      <div className={`animate-spin rounded-full border-2 border-gray-300 border-t-primary-600 ${sizeClasses[size]}`} />
+      <div className={`animate-spin rounded-full border-2 border-border-subtle border-t-accent-primary ${sizeClasses[size]}`} />
     </div>
   );
 }
@@ -30,7 +30,7 @@ export function LoadingState({ children, className = '' }: LoadingStateProps) {
   return (
     <div className={`flex flex-col items-center justify-center py-12 ${className}`}>
       <LoadingSpinner size="lg" className="mb-4" />
-      <p className="text-gray-600 text-center">{children}</p>
+      <p className="text-fg-secondary text-center">{children}</p>
     </div>
   );
 }

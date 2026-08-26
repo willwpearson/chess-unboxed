@@ -3,6 +3,7 @@
 import React from 'react';
 import { Shield, Lock, Eye, Users, History, Trophy } from 'lucide-react';
 import { UserPreferences } from '@/types/game';
+import { Card } from '@/components/ui/Card';
 
 interface PrivacySettingsProps {
   preferences: UserPreferences;
@@ -10,70 +11,70 @@ interface PrivacySettingsProps {
 }
 
 // Toggle switch component
-const ToggleSwitch = ({ 
-  checked, 
-  onChange, 
-  label, 
-  description, 
-  icon 
-}: { 
+const ToggleSwitch = ({
+  checked,
+  onChange,
+  label,
+  description,
+  icon
+}: {
   checked: boolean;
   onChange: (value: boolean) => void;
   label: string;
   description: string;
   icon?: React.ReactNode;
 }) => (
-  <div className="gaming-card flex items-center justify-between p-4">
+  <Card className="flex items-center justify-between p-4">
     <div className="flex items-center space-x-3">
       {icon && (
-        <div className="text-secondary">
+        <div className="text-accent-primary">
           {icon}
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-primary-300">{label}</h4>
-        <p className="text-sm text-primary-400">{description}</p>
+        <h4 className="font-gaming font-medium text-fg">{label}</h4>
+        <p className="text-sm text-fg-muted">{description}</p>
       </div>
     </div>
     <button
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
         checked
-          ? 'bg-accent'
-          : 'bg-border'
+          ? 'bg-accent-primary'
+          : 'bg-surface-sunken border border-border-subtle'
       }`}
       onClick={() => onChange(!checked)}
     >
       <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+        className={`inline-block h-4 w-4 transform rounded-full bg-surface-overlay transition-transform ${
           checked ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
     </button>
-  </div>
+  </Card>
 );
 
 // Select dropdown component
-const SelectDropdown = ({ 
-  value, 
-  onChange, 
-  options, 
-  label, 
-  description 
-}: { 
+const SelectDropdown = ({
+  value,
+  onChange,
+  options,
+  label,
+  description
+}: {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
   label: string;
   description: string;
 }) => (
-  <div className="gaming-card p-4">
-    <label className="block text-sm font-gaming font-medium text-primary-300 mb-2">
+  <Card className="p-4">
+    <label className="block text-sm font-gaming font-medium text-fg mb-2">
       {label}
     </label>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent transition-all bg-primary text-primary-300"
+      className="w-full px-4 py-3 rounded-md border border-border-subtle focus:outline-none focus:ring-2 focus:ring-accent-primary transition-all bg-surface-sunken text-fg"
     >
       {options.map((option) => (
         <option key={option.value} value={option.value}>
@@ -81,22 +82,22 @@ const SelectDropdown = ({
         </option>
       ))}
     </select>
-    <p className="text-xs text-primary-400 mt-1">
+    <p className="text-xs text-fg-muted mt-1">
       {description}
     </p>
-  </div>
+  </Card>
 );
 
 export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySettingsProps) {
   return (
     <div className="space-y-6">
       {/* Profile Visibility */}
-      <div className="gaming-card p-6">
+      <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Shield size={24} className="text-secondary" />
-          <h2 className="text-2xl font-gaming font-bold text-primary-300">Profile Visibility</h2>
+          <Shield size={24} className="text-accent-primary" />
+          <h2 className="text-2xl font-gaming font-bold text-fg">Profile Visibility</h2>
         </div>
-        
+
         <SelectDropdown
           value={preferences.profileVisibility}
           onChange={(value) => onUpdatePreference('profileVisibility', value as any)}
@@ -108,15 +109,15 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
           label="Who can view your profile?"
           description="Control who can see your profile information"
         />
-      </div>
+      </Card>
 
       {/* Privacy Options */}
-      <div className="gaming-card p-6">
+      <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
-          <Lock size={24} className="text-secondary" />
-          <h2 className="text-2xl font-gaming font-bold text-primary-300">Privacy Options</h2>
+          <Lock size={24} className="text-accent-primary" />
+          <h2 className="text-2xl font-gaming font-bold text-fg">Privacy Options</h2>
         </div>
-        
+
         <div className="space-y-4">
           <ToggleSwitch
             checked={preferences.showOnlineStatus}
@@ -125,7 +126,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
             description="Let others see when you're online"
             icon={<Eye size={20} />}
           />
-          
+
           <ToggleSwitch
             checked={preferences.allowFriendRequests}
             onChange={(value) => onUpdatePreference('allowFriendRequests', value)}
@@ -133,7 +134,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
             description="Let others send you friend requests"
             icon={<Users size={20} />}
           />
-          
+
           <ToggleSwitch
             checked={preferences.showGameHistory}
             onChange={(value) => onUpdatePreference('showGameHistory', value)}
@@ -141,7 +142,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
             description="Let others view your game history"
             icon={<History size={20} />}
           />
-          
+
           <ToggleSwitch
             checked={preferences.showRatingHistory}
             onChange={(value) => onUpdatePreference('showRatingHistory', value)}
@@ -150,7 +151,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
             icon={<Trophy size={20} />}
           />
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
