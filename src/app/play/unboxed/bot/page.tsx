@@ -104,7 +104,7 @@ export default function UnboxedBotGamePage() {
                   </div>
                   <h2 className="text-3xl font-bold text-fg mb-4">Chess Unboxed vs Bot</h2>
                   <p className="text-fg-secondary text-lg">
-                    Revolutionary toroidal chess - pieces wrap around board edges for infinite possibilities.
+                    Side-wrapping chess - pieces that move off one edge appear on the opposite side.
                   </p>
                 </Card>
 

@@ -10,7 +10,7 @@ import { ChessBoard } from '@/components/game/ChessBoard';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { LoadingSpinner } from '@/components/ui/Loading';
-import { Zap, Users, Bot, Infinity, UserPlus, Trophy, Gamepad2, UserCheck, Play, Star, Shield, Sparkles } from 'lucide-react';
+import { Zap, Bot, Infinity, UserPlus, Gamepad2, UserCheck, Play, Sparkles } from 'lucide-react';
 
 type GameMode = 'unboxed';
 
@@ -30,12 +30,12 @@ const gameModes: GameModeConfig[] = [
   {
     id: 'unboxed',
     title: 'Chess Unboxed',
-    shortDescription: 'Revolutionary toroidal chess - pieces wrap around board edges',
-    fullDescription: 'Break free from traditional boundaries! In Chess Unboxed, the board wraps around itself - pieces can move off one edge and appear on the opposite side, creating mind-bending strategic possibilities.',
+    shortDescription: 'Side-wrapping chess - pieces wrap around board edges',
+    fullDescription: 'In Chess Unboxed, the board wraps around itself - pieces can move off one edge and appear on the opposite side, opening up strategic possibilities not found in traditional chess.',
     icon: Zap,
     color: 'from-purple-500 to-pink-600',
     gradient: 'bg-gradient-to-br from-purple-500/20 to-pink-600/20',
-    features: ['Toroidal board topology', 'Edge-wrapping movement', 'Unique tactical patterns', 'Revolutionary gameplay'],
+    features: ['Side-wrapping board', 'Edge-wrapping movement', 'Unique tactical patterns'],
     difficulty: 'Intermediate to Expert'
   }
 ];
@@ -112,7 +112,7 @@ export default function HomePage() {
                   Chess Unboxed
                 </h1>
                 <p className="text-xl md:text-2xl text-fg-secondary mb-8 leading-relaxed">
-                  Experience chess like never before with toroidal board topology, edge-wrapping movement, and revolutionary gameplay that breaks all boundaries
+                  Chess with a twist: the board wraps around itself, so pieces that move off one edge reappear on the opposite side.
                 </p>
 
                 {/* Action Buttons */}
@@ -146,7 +146,7 @@ export default function HomePage() {
 
                 {/* Smaller description */}
                 <p className="text-fg-secondary max-w-lg">
-                  Join thousands of players experiencing the future of chess with wraparound gameplay, advanced AI opponents, and competitive ranking systems.
+                  Play against an AI opponent on a wraparound board, or jump in as a guest to try it out.
                 </p>
               </div>
             </div>
@@ -158,63 +158,38 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-gaming font-bold text-fg mb-6">
-                Revolutionary Chess Platform
+                How It Works
               </h2>
               <p className="text-xl text-fg-secondary max-w-3xl mx-auto leading-relaxed">
-                Experience the future of chess with toroidal board topology, edge-wrapping movement, and revolutionary gameplay that breaks all boundaries. Challenge AI opponents, compete globally, and master unique tactical patterns.
+                Play on a board where the edges wrap around, challenge an AI opponent, and track your progress over time.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Gameplay Features */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="p-6 text-center">
                 <Zap size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Toroidal Board Topology</h4>
-                <p className="text-sm text-fg-secondary">Pieces wrap around board edges, creating mind-bending strategic possibilities</p>
+                <h4 className="font-bold text-fg mb-2">Side-Wrapping Board</h4>
+                <p className="text-sm text-fg-secondary">Pieces wrap around the board edges, opening up new strategic possibilities</p>
               </Card>
               <Card className="p-6 text-center">
                 <Infinity size={40} className="mx-auto mb-4 text-accent-primary" />
                 <h4 className="font-bold text-fg mb-2">Edge-Wrapping Movement</h4>
-                <p className="text-sm text-fg-secondary">Revolutionary gameplay mechanics transcend traditional boundaries</p>
+                <p className="text-sm text-fg-secondary">Pieces moving off one edge appear on the opposite side</p>
               </Card>
               <Card className="p-6 text-center">
                 <Sparkles size={40} className="mx-auto mb-4 text-accent-primary" />
                 <h4 className="font-bold text-fg mb-2">Unique Tactical Patterns</h4>
-                <p className="text-sm text-fg-secondary">Discover new strategies impossible in traditional chess</p>
+                <p className="text-sm text-fg-secondary">Discover strategies that don't exist in traditional chess</p>
               </Card>
-
-              {/* AI & Multiplayer */}
               <Card className="p-6 text-center">
                 <Bot size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Smart AI Opponents</h4>
-                <p className="text-sm text-fg-secondary">Challenge adaptive AI with multiple difficulty levels</p>
+                <h4 className="font-bold text-fg mb-2">AI Opponents</h4>
+                <p className="text-sm text-fg-secondary">Play against AI with adjustable difficulty levels</p>
               </Card>
-              <Card className="p-6 text-center">
-                <Users size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Global Multiplayer</h4>
-                <p className="text-sm text-fg-secondary">Play against thousands of players worldwide</p>
-              </Card>
-              <Card className="p-6 text-center">
-                <Trophy size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Competitive Rankings</h4>
-                <p className="text-sm text-fg-secondary">Climb leaderboards with accurate ELO-based skill matching</p>
-              </Card>
-
-              {/* Platform Features */}
               <Card className="p-6 text-center">
                 <Gamepad2 size={40} className="mx-auto mb-4 text-accent-primary" />
                 <h4 className="font-bold text-fg mb-2">Performance Analytics</h4>
                 <p className="text-sm text-fg-secondary">Track your progress with detailed statistics</p>
-              </Card>
-              <Card className="p-6 text-center">
-                <Shield size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Fair Play Protection</h4>
-                <p className="text-sm text-fg-secondary">Anti-cheat protection and active moderation</p>
-              </Card>
-              <Card className="p-6 text-center">
-                <Star size={40} className="mx-auto mb-4 text-accent-primary" />
-                <h4 className="font-bold text-fg mb-2">Custom Themes</h4>
-                <p className="text-sm text-fg-secondary">Personalize your gaming experience with multiple board themes</p>
               </Card>
             </div>
           </div>
@@ -224,16 +199,16 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-4xl font-gaming font-bold text-fg mb-6">
-              Ready to Revolutionize Your Chess Game?
+              Ready to Play?
             </h2>
             <p className="text-xl text-fg-secondary mb-8">
-              Join thousands of players already experiencing the future of chess
+              Create an account or jump in as a guest to start playing.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto">
               <Link href="/register" className="w-full sm:w-auto">
                 <Button variant="secondary" size="lg" className="w-full sm:w-auto">
                   <Play size={20} className="mr-2" />
-                  Start Your Journey
+                  Sign Up Free
                 </Button>
               </Link>
               <Button

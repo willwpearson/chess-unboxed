@@ -20,7 +20,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
   description: string;
   icon: any;
   color: string;
-  thinkingTime: number;
+  rating: number;
   personality: 'aggressive' | 'defensive' | 'balanced';
   features: string[];
 }> = {
@@ -29,7 +29,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     description: 'Perfect for learning the basics',
     icon: Bot,
     color: 'from-green-400 to-emerald-600',
-    thinkingTime: 500,
+    rating: 800,
     personality: 'balanced',
     features: ['Random moves', 'No deep strategy', 'Great for beginners']
   },
@@ -38,7 +38,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     description: 'Good challenge for casual players',
     icon: Brain,
     color: 'from-blue-400 to-indigo-600',
-    thinkingTime: 1500,
+    rating: 1200,
     personality: 'balanced',
     features: ['Basic tactics', 'Simple strategy', 'Balanced gameplay']
   },
@@ -47,7 +47,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     description: 'Strong opponent for experienced players',
     icon: Target,
     color: 'from-orange-400 to-red-600',
-    thinkingTime: 3000,
+    rating: 1600,
     personality: 'aggressive',
     features: ['Advanced tactics', 'Strong endgame', 'Aggressive play']
   },
@@ -56,7 +56,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     description: 'Ultimate challenge for chess masters',
     icon: Crown,
     color: 'from-purple-400 to-violet-600',
-    thinkingTime: 5000,
+    rating: 2000,
     personality: 'aggressive',
     features: ['Deep calculations', 'Perfect endgame', 'Master level']
   }
@@ -99,10 +99,8 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
   const handleStartGame = () => {
     if (!selectedDifficulty) return;
 
-    const config = BOT_CONFIGS[selectedDifficulty];
     const botConfig: BotConfig = {
       difficulty: selectedDifficulty,
-      thinkingTime: config.thinkingTime,
       personality: selectedPersonality
     };
 
@@ -152,7 +150,7 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
 
                 <div className="pt-3 border-t border-border-subtle relative z-10">
                   <span className="text-xs text-fg-muted">
-                    Thinking time: {config.thinkingTime / 1000}s
+                    Rating: ~{config.rating}
                   </span>
                 </div>
               </Card>
@@ -240,7 +238,7 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
                   <span className="font-medium text-fg">Personality:</span> {selectedPersonality}
                 </div>
                 <div>
-                  <span className="font-medium text-fg">Thinking Time:</span> {BOT_CONFIGS[selectedDifficulty].thinkingTime / 1000}s
+                  <span className="font-medium text-fg">Rating:</span> ~{BOT_CONFIGS[selectedDifficulty].rating}
                 </div>
               </div>
             </div>

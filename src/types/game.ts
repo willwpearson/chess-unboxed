@@ -204,7 +204,6 @@ export type BotDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
 
 export interface BotConfig {
   difficulty: BotDifficulty;
-  thinkingTime: number; // ms
   personality: 'Aggressive' | 'Defensive' | 'Balanced';
 }
 

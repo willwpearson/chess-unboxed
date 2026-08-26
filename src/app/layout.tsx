@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 export const metadata: Metadata = {
   title: 'Chess Unboxed',
   description: 'Play chess where pieces wrap around board edges. Play against bots or create an account.',
-  keywords: ['chess', 'unboxed', 'toroidal', 'online', 'game', 'strategy'],
+  keywords: ['chess', 'unboxed', 'wraparound', 'online', 'game', 'strategy'],
   authors: [{ name: 'Optim II' }],
 };
 

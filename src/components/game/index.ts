@@ -3,4 +3,3 @@ export { ChessBoard } from './ChessBoard';
 export { MoveHistory } from './MoveHistory';
 export { GameInfo } from './GameInfo';
 export { BotDifficultySelector } from './BotDifficultySelector';
-export { default as GameModeSelector } from './GameModeSelector';

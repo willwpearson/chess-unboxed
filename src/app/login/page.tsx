@@ -67,7 +67,7 @@ export default function LoginPage() {
                 Welcome Back
               </h1>
               <p className="text-fg-secondary">
-                Sign in to continue your chess journey
+                Sign in to your account
               </p>
             </div>
 

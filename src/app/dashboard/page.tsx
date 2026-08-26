@@ -51,7 +51,7 @@ export default function DashboardPage() {
                 Welcome, {user.display_name || user.username}!
               </h1>
               <p className="text-fg-secondary">
-                Ready to continue your chess journey?
+                Ready for another game?
               </p>
             </div>
 
@@ -66,7 +66,7 @@ export default function DashboardPage() {
                   <Bot size={40} />
                 </div>
                 <h3 className="text-xl font-bold text-fg mb-3">Play vs Bot</h3>
-                <p className="text-fg-secondary mb-4">Practice against AI opponents with adjustable difficulty levels</p>
+                <p className="text-fg-secondary mb-4">Practice against the AI with adjustable difficulty levels</p>
                 <div className="text-sm text-fg-secondary space-y-1">
                   <div>• Multiple difficulty levels</div>
                   <div>• Perfect for practice</div>
