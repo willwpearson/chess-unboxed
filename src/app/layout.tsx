@@ -32,7 +32,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-sans antialiased bg-background text-foreground">
+      <body className="font-sans antialiased bg-surface-base text-fg">
         <Providers>
           <div className="min-h-screen flex flex-col">
             {children}

@@ -8,9 +8,10 @@
  *   in .dark (dark values). They are re-exposed to Tailwind via the `@theme inline`
  *   block below so utilities like `bg-surface-base` / `text-fg` are generated but
  *   still resolve to mode-aware values at runtime.
- * - Legacy `--color-background` / `--color-foreground` / `--color-card` vars are kept
- *   as aliases onto the new semantic tokens since a handful of components still
- *   reference them directly (e.g. `bg-background`, `text-foreground`).
+ * - A handful of legacy `--color-*` aliases (destructive, board, game-surface) are
+ *   kept as plain custom properties, not exposed via `@theme`, because the
+ *   `.chess-square` rules below reference them directly with `var(...)` rather
+ *   than through Tailwind utility classes.
  * - `text-*` semantic tokens are exposed under a short `fg` (foreground) prefix
  *   (`--color-fg`, `--color-fg-muted`, etc.) to avoid the awkward `text-text-primary`
  *   utility name Tailwind would otherwise generate from `--color-text-primary`.
@@ -125,33 +126,14 @@
   --shadow-glow-accent: 0 0 24px rgba(37, 99, 235, 0.25);
   --shadow-glow-success: 0 0 24px rgba(16, 185, 129, 0.3);
 
-  /* Legacy aliases - kept so existing bg-background / text-foreground / .gaming-* usages
-     keep resolving unchanged during migration. Remove once nothing references them. */
-  --color-background: var(--surface-base);
-  --color-foreground: var(--fg);
-  --color-card: var(--surface-raised);
-  --color-card-foreground: var(--fg);
-  --color-popover: var(--surface-overlay);
-  --color-popover-foreground: var(--fg);
+  /* Legacy aliases - kept only for the raw var(...) references in the
+     .chess-square rules further down in this file. */
   --color-game-surface: var(--surface-raised);
   --color-game-surface-elevated: var(--surface-overlay);
   --color-game-surface-highlight: var(--surface-hover);
-  --color-game-border: var(--border-subtle);
-  --color-game-border-accent: var(--border-strong);
   --color-board-light: var(--board-square-light);
   --color-board-dark: var(--board-square-dark);
-  --color-board-highlight: var(--board-highlight-selected);
-  --color-board-move: var(--board-highlight-legal);
-  --color-board-check: var(--board-highlight-check);
-  --color-success: var(--status-success);
-  --color-warning: var(--status-warning);
   --color-destructive: var(--status-danger);
-  --color-destructive-foreground: var(--accent-danger-foreground);
-  --color-muted: var(--surface-sunken);
-  --color-muted-foreground: var(--fg-muted);
-  --color-border: var(--border-subtle);
-  --color-input: var(--surface-sunken);
-  --color-ring: var(--accent-primary);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -207,31 +189,12 @@
   --shadow-glow-success: 0 0 24px rgba(16, 185, 129, 0.5);
 
   /* Legacy aliases - see :root block for explanation */
-  --color-background: var(--surface-base);
-  --color-foreground: var(--fg);
-  --color-card: var(--surface-raised);
-  --color-card-foreground: var(--fg);
-  --color-popover: var(--surface-overlay);
-  --color-popover-foreground: var(--fg);
   --color-game-surface: #1a1a2e;
   --color-game-surface-elevated: #242438;
   --color-game-surface-highlight: #2d2d44;
-  --color-game-border: #3a3a52;
-  --color-game-border-accent: #4a4a66;
   --color-board-light: var(--board-square-light);
   --color-board-dark: var(--board-square-dark);
-  --color-board-highlight: var(--board-highlight-selected);
-  --color-board-move: var(--board-highlight-legal);
-  --color-board-check: var(--board-highlight-check);
-  --color-success: var(--status-success);
-  --color-warning: var(--status-warning);
   --color-destructive: var(--status-danger);
-  --color-destructive-foreground: var(--accent-danger-foreground);
-  --color-muted: #27272a;
-  --color-muted-foreground: var(--fg-secondary);
-  --color-border: var(--border-subtle);
-  --color-input: #27272a;
-  --color-ring: var(--accent-primary);
 }
 
 /* ---------------------------------------------------------------------- */
