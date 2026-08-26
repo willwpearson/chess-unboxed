@@ -12,6 +12,7 @@ const tables: Record<string, Row[]> = {
   users: [],
   user_sessions: [],
   user_ratings: [],
+  games: [],
 };
 
 let nextId = 1;
@@ -67,6 +68,9 @@ class QueryBuilder {
   private op: 'select' | 'insert' | 'update' | null = null;
   private payload: Row | null = null;
   private filters: Array<(row: Row) => boolean> = [];
+  private orderCol: string | null = null;
+  private orderAsc = true;
+  private limitN: number | null = null;
 
   constructor(table: string) {
     this.table = table;
@@ -99,8 +103,43 @@ class QueryBuilder {
     return this;
   }
 
+  gte(col: string, value: any) {
+    this.filters.push((row) => row[col] >= value);
+    return this;
+  }
+
+  lte(col: string, value: any) {
+    this.filters.push((row) => row[col] <= value);
+    return this;
+  }
+
+  in(col: string, values: any[]) {
+    this.filters.push((row) => values.includes(row[col]));
+    return this;
+  }
+
+  order(col: string, opts?: { ascending?: boolean }) {
+    this.orderCol = col;
+    this.orderAsc = opts?.ascending ?? true;
+    return this;
+  }
+
+  limit(n: number) {
+    this.limitN = n;
+    return this;
+  }
+
   private rows(): Row[] {
-    return tables[this.table].filter((row) => this.filters.every((f) => f(row)));
+    let result = tables[this.table].filter((row) => this.filters.every((f) => f(row)));
+    if (this.orderCol) {
+      const col = this.orderCol;
+      const dir = this.orderAsc ? 1 : -1;
+      result = [...result].sort((a, b) => (a[col] > b[col] ? 1 : a[col] < b[col] ? -1 : 0) * dir);
+    }
+    if (this.limitN != null) {
+      result = result.slice(0, this.limitN);
+    }
+    return result;
   }
 
   private execute(): { data: any; error: any } {
@@ -113,7 +152,7 @@ class QueryBuilder {
     }
 
     if (this.op === 'update' && this.payload) {
-      const matched = this.rows();
+      const matched = tables[this.table].filter((row) => this.filters.every((f) => f(row)));
       matched.forEach((row) => Object.assign(row, this.payload));
       return { data: matched, error: null };
     }

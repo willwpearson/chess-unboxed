@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -12,6 +13,15 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, retryAfterSeconds } = rateLimit(`register:${ip}`, 3, 60 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many registration attempts. Please try again later.' },
+        { status: 429, headers: retryAfterSeconds ? { 'Retry-After': String(retryAfterSeconds) } : undefined }
+      );
+    }
+
     const body = await request.json();
     const validatedData = registerSchema.parse(body);
 

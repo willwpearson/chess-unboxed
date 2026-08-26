@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
+import { signAuthToken } from '@/lib/jwt';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 interface CreateGuestUserRequest {
   username?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
-
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, retryAfterSeconds } = rateLimit(`guest:${ip}`, 10, 60 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many guest accounts created. Please try again later.' },
+        { status: 429, headers: retryAfterSeconds ? { 'Retry-After': String(retryAfterSeconds) } : undefined }
+      );
+    }
+
     const body = await request.json().catch(() => ({})) as CreateGuestUserRequest;
 
     // Generate guest username if not provided
@@ -74,15 +82,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate JWT token for guest session
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        username: user.username,
-        isGuest: true 
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' } // Guest sessions last 7 days
-    );
+    const token = signAuthToken({
+      userId: user.id,
+      username: user.username,
+      isGuest: true,
+    });
 
     // Create session record
     const { error: sessionError } = await supabaseAdmin
