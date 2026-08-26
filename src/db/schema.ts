@@ -50,9 +50,13 @@ export const userSessions = pgTable('user_sessions', {
   isActive: boolean('is_active').notNull().default(true),
 });
 
-// mode/variant/time-control-related columns are widened here in Phase 0
-// schema terms; the corresponding data migration for existing rows and the
-// server-authoritative move-persistence path land in Phase 1.
+// Phase 1: added server-authoritative move-persistence columns. `moves`
+// (the full ChessMove[] history) is the source of truth for reconstructing
+// game state server-side — `fen` is a cached fast-read for broadcasting the
+// current position, NOT used for reconstruction (see
+// docs/MULTIPLAYER_PROGRESS.md: WraparoundChessEngine.fen() never reflects
+// wraparound-move board changes, only the initial position + turn flag, so
+// FEN cannot round-trip a wraparound game's real position).
 export const games = pgTable('games', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -64,6 +68,18 @@ export const games = pgTable('games', {
   winnerId: uuid('winner_id').references(() => users.id),
   status: text('status').notNull().default('in_progress'), // 'in_progress' | 'completed' | 'abandoned'
   moves: jsonb('moves').notNull().default([]),
+  timeControl: text('time_control'), // 'bullet' | 'blitz' | 'rapid' | 'classical', null = untimed
+  initialTimeSec: integer('initial_time_sec'),
+  incrementSec: integer('increment_sec'),
+  whiteTimeMs: integer('white_time_ms'),
+  blackTimeMs: integer('black_time_ms'),
+  fen: text('fen'), // cached fast-read only, see note above
+  turn: text('turn'), // 'white' | 'black'
+  lobbyId: uuid('lobby_id'), // FK added once the `lobbies` table exists (Phase 2)
+  ratingChangeWhite: integer('rating_change_white'),
+  ratingChangeBlack: integer('rating_change_black'),
+  lastMoveAt: timestamp('last_move_at', { withTimezone: true }),
+  drawOfferedBy: uuid('draw_offered_by').references(() => users.id),
 });
 
 export type User = typeof users.$inferSelect;
