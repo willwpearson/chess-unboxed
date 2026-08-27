@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, integer, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, boolean, integer, timestamp, jsonb, type AnyPgColumn } from 'drizzle-orm/pg-core';
 
 // Source of truth for the Supabase Postgres schema, replacing the
 // hand-written `Database` type in src/lib/supabase.ts. This migration
@@ -50,6 +50,29 @@ export const userSessions = pgTable('user_sessions', {
   isActive: boolean('is_active').notNull().default(true),
 });
 
+// Phase 2: private invite-code lobbies. A lobby is a pre-game handshake —
+// once a second player joins, a `games` row is created and the lobby just
+// points at it (`gameId`) for the host's waiting-room to redirect on. No
+// `rated` column exists here at all: private/lobby games can never be rated
+// (matchmaking-only), enforced structurally rather than as an app-level
+// check that Phase 3 could forget.
+export const lobbies = pgTable('lobbies', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  hostId: uuid('host_id').notNull().references(() => users.id),
+  inviteCode: text('invite_code').notNull().unique(),
+  status: text('status').notNull().default('waiting'), // 'waiting' | 'active' | 'cancelled' | 'expired'
+  variant: text('variant').notNull().default('unboxed'),
+  timeControl: text('time_control'), // 'bullet' | 'blitz' | 'rapid' | 'classical', null = untimed
+  initialTimeSec: integer('initial_time_sec'),
+  incrementSec: integer('increment_sec'),
+  hostColorPreference: text('host_color_preference').notNull().default('random'), // 'white' | 'black' | 'random'
+  gameId: uuid('game_id').references((): AnyPgColumn => games.id),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  joinedAt: timestamp('joined_at', { withTimezone: true }),
+  cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+});
+
 // Phase 1: added server-authoritative move-persistence columns. `moves`
 // (the full ChessMove[] history) is the source of truth for reconstructing
 // game state server-side — `fen` is a cached fast-read for broadcasting the
@@ -75,7 +98,7 @@ export const games = pgTable('games', {
   blackTimeMs: integer('black_time_ms'),
   fen: text('fen'), // cached fast-read only, see note above
   turn: text('turn'), // 'white' | 'black'
-  lobbyId: uuid('lobby_id'), // FK added once the `lobbies` table exists (Phase 2)
+  lobbyId: uuid('lobby_id').references((): AnyPgColumn => lobbies.id), // Phase 2: FK now that `lobbies` exists
   ratingChangeWhite: integer('rating_change_white'),
   ratingChangeBlack: integer('rating_change_black'),
   lastMoveAt: timestamp('last_move_at', { withTimezone: true }),
@@ -86,5 +109,7 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type UserSession = typeof userSessions.$inferSelect;
 export type NewUserSession = typeof userSessions.$inferInsert;
+export type Lobby = typeof lobbies.$inferSelect;
+export type NewLobby = typeof lobbies.$inferInsert;
 export type Game = typeof games.$inferSelect;
 export type NewGame = typeof games.$inferInsert;

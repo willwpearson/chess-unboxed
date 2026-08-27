@@ -13,6 +13,7 @@ const tables: Record<string, Row[]> = {
   user_sessions: [],
   user_ratings: [],
   games: [],
+  lobbies: [],
 };
 
 let nextId = 1;

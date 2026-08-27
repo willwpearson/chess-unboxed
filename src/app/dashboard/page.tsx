@@ -8,7 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/Card';
 import { LoadingSpinner } from '@/components/ui/Loading';
-import { Trophy, Gamepad2, TrendingUp, Target, Bot } from 'lucide-react';
+import { Trophy, Gamepad2, TrendingUp, Target, Bot, Users } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -56,8 +56,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Play Now */}
-            <div className="mb-12 flex justify-center">
-              <Card interactive className="relative max-w-sm w-full p-8 text-center overflow-hidden group bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
+            <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
                 <Link href="/play/unboxed/bot" className="absolute inset-0" aria-label="Play vs Bot" />
                 <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-accent-primary">
                   <Bot size={60} />
@@ -71,6 +71,23 @@ export default function DashboardPage() {
                   <div>• Multiple difficulty levels</div>
                   <div>• Perfect for practice</div>
                   <div>• Instant matches</div>
+                </div>
+              </Card>
+
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-blue-500/10 to-cyan-600/10">
+                <Link href="/play/unboxed/private" className="absolute inset-0" aria-label="Play with a Friend" />
+                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-blue-500">
+                  <Users size={60} />
+                </div>
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white mb-6 relative z-10">
+                  <Users size={40} />
+                </div>
+                <h3 className="text-xl font-bold text-fg mb-3">Play with a Friend</h3>
+                <p className="text-fg-secondary mb-4">Create a private lobby and share the invite code</p>
+                <div className="text-sm text-fg-secondary space-y-1">
+                  <div>• Invite-code lobbies</div>
+                  <div>• Choose your time control</div>
+                  <div>• Just the two of you</div>
                 </div>
               </Card>
             </div>
