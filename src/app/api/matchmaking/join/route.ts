@@ -166,6 +166,8 @@ export async function POST(request: NextRequest) {
         white_time_ms: initialTimeMs,
         black_time_ms: initialTimeMs,
         turn: 'white',
+        white_last_seen_at: new Date(now).toISOString(),
+        black_last_seen_at: new Date(now).toISOString(),
       })
       .select('*')
       .single();

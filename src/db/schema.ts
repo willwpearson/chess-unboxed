@@ -103,6 +103,11 @@ export const games = pgTable('games', {
   ratingChangeBlack: integer('rating_change_black'),
   lastMoveAt: timestamp('last_move_at', { withTimezone: true }),
   drawOfferedBy: uuid('draw_offered_by').references(() => users.id),
+  // Phase 4: heartbeat-based abandonment detection (src/lib/server/abandonment.ts).
+  // Null means "never seen" (e.g. bot games, or rows created before this
+  // column existed) and is deliberately never treated as stale/forfeitable.
+  whiteLastSeenAt: timestamp('white_last_seen_at', { withTimezone: true }),
+  blackLastSeenAt: timestamp('black_last_seen_at', { withTimezone: true }),
 });
 
 // Phase 3: per-time-control ELO. Rows are created lazily — only when a

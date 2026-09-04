@@ -5,6 +5,7 @@ import type { GameState, GameMode, UIState, Square, ChessPiece, ChessMove, GameV
 import { GameManager, BotManager, createGame, createBotPlayer, createHumanPlayer } from '@/lib/gameManager';
 import { loadGameManager, type GameRow } from '@/lib/server/gameSession';
 import { supabase } from '@/lib/supabase';
+import { HEARTBEAT_INTERVAL_MS } from '@/lib/abandonmentConfig';
 
 interface GameStore {
   // Current game state
@@ -13,11 +14,12 @@ interface GameStore {
   botManager: BotManager | null;
   gameHistory: GameState[];
 
-  // Multiplayer (mode 'private'/'ranked') state
+  // Multiplayer (mode 'private'/'ranked'/'casual') state
   activeGameId: string | null;
   myColor: PieceColor | null;
   realtimeChannel: RealtimeChannel | null;
   drawOfferedBy: PieceColor | null;
+  heartbeatIntervalId: ReturnType<typeof setInterval> | null;
 
   // UI state
   ui: UIState;
@@ -85,6 +87,9 @@ export const useGameStore = create<GameStore>()(
               break;
             }
           }
+        } else if (row.status === 'abandoned' && !gameManager.isGameOver()) {
+          const abandoningColor: PieceColor = row.winner_id === row.white_player_id ? 'black' : 'white';
+          gameManager.forfeitByAbandonment(abandoningColor);
         } else if (row.status === 'completed' && !gameManager.isGameOver()) {
           if (row.winner_id) {
             const loserColor: PieceColor = row.winner_id === row.white_player_id ? 'black' : 'white';
@@ -119,6 +124,7 @@ export const useGameStore = create<GameStore>()(
       myColor: null,
       realtimeChannel: null,
       drawOfferedBy: null,
+      heartbeatIntervalId: null,
       ui: initialUIState,
 
       // Enhanced game management actions
@@ -176,11 +182,13 @@ export const useGameStore = create<GameStore>()(
           const gameManager = loadGameManager(row);
           const myColor: PieceColor = row.white_player_id === userId ? 'white' : 'black';
 
-          // Close any stale channel directly (not via unsubscribeFromGame —
-          // that also clears activeGameId/myColor/drawOfferedBy, which would
-          // wipe out the values this same call is about to set below).
-          const staleChannel = get().realtimeChannel;
+          // Close any stale channel/heartbeat directly (not via
+          // unsubscribeFromGame — that also clears activeGameId/myColor/
+          // drawOfferedBy, which would wipe out the values this same call is
+          // about to set below).
+          const { realtimeChannel: staleChannel, heartbeatIntervalId: staleHeartbeatId } = get();
           if (staleChannel) supabase.removeChannel(staleChannel);
+          if (staleHeartbeatId) clearInterval(staleHeartbeatId);
 
           set({
             gameManager,
@@ -203,6 +211,28 @@ export const useGameStore = create<GameStore>()(
       },
 
       subscribeToGame: (gameId: string) => {
+        // Heartbeat is plain fetch-based (see src/app/api/games/[gameId]/heartbeat)
+        // and runs regardless of Realtime availability — it's also how the
+        // opponent's own presence gets refreshed, and how this client learns
+        // an opponent was forfeited for going quiet (see abandonment.ts).
+        const heartbeatIntervalId = setInterval(async () => {
+          try {
+            const response = await fetch(`/api/games/${gameId}/heartbeat`, {
+              method: 'POST',
+              credentials: 'include',
+            });
+            const body = await response.json();
+            if (body.success && body.data.status !== 'in_progress') {
+              const gameResponse = await fetch(`/api/games?id=${gameId}`, { credentials: 'include' });
+              const gameBody = await gameResponse.json();
+              if (gameBody.game) handleRemoteGameUpdate(gameBody.game);
+            }
+          } catch (error) {
+            console.error('Heartbeat failed:', error);
+          }
+        }, HEARTBEAT_INTERVAL_MS);
+        set({ heartbeatIntervalId });
+
         // In dev mode (NEXT_PUBLIC_DEV_MODE=true) `supabase` resolves to the
         // in-memory devDb mock, which has no `.channel()` — there's no
         // Postgres WAL to subscribe to. Skip Realtime there rather than
@@ -223,11 +253,14 @@ export const useGameStore = create<GameStore>()(
       },
 
       unsubscribeFromGame: () => {
-        const { realtimeChannel } = get();
+        const { realtimeChannel, heartbeatIntervalId } = get();
         if (realtimeChannel) {
           supabase.removeChannel(realtimeChannel);
         }
-        set({ realtimeChannel: null, activeGameId: null, myColor: null, drawOfferedBy: null });
+        if (heartbeatIntervalId) {
+          clearInterval(heartbeatIntervalId);
+        }
+        set({ realtimeChannel: null, activeGameId: null, myColor: null, drawOfferedBy: null, heartbeatIntervalId: null });
       },
 
       makeMove: async (from: Square, to: Square, promotion?: string): Promise<boolean> => {

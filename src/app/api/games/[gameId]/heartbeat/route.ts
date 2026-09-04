@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getAuthUserId } from '@/lib/server/authUser';
+import { recordHeartbeatAndCheckAbandonment } from '@/lib/server/abandonment';
 import type { PieceColor } from '@/types/game';
 
+// Unrate-limited, like GET /api/matchmaking/status and GET
+// /api/lobbies/[lobbyId] — this is the client's frequent legitimate poll
+// target, scoped to a game the caller already belongs to, not a
+// guessable-secret abuse vector.
 export async function POST(request: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = await params;
 
@@ -31,18 +36,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   if (game.status !== 'in_progress') {
-    return NextResponse.json({ success: false, error: 'Game is not in progress' }, { status: 409 });
+    return NextResponse.json({
+      success: true,
+      data: { status: game.status, winnerId: game.winner_id, abandoned: false },
+      timestamp: Date.now(),
+    });
   }
 
-  const { error: updateError } = await supabaseAdmin
-    .from('games')
-    .update({ draw_offered_by: userId, [`${myColor}_last_seen_at`]: new Date().toISOString() })
-    .eq('id', gameId);
+  const { abandoned, game: updatedGame } = await recordHeartbeatAndCheckAbandonment(game, myColor, userId);
 
-  if (updateError) {
-    console.error('Failed to record draw offer:', updateError);
-    return NextResponse.json({ success: false, error: 'Failed to offer draw' }, { status: 500 });
-  }
-
-  return NextResponse.json({ success: true, timestamp: Date.now() });
+  return NextResponse.json({
+    success: true,
+    data: {
+      status: abandoned ? updatedGame!.status : game.status,
+      winnerId: abandoned ? updatedGame!.winner_id : null,
+      abandoned,
+    },
+    timestamp: Date.now(),
+  });
 }

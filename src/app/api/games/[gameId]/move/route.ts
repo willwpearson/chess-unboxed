@@ -123,6 +123,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     turn: nextTurn,
     fen: manager.getFEN(),
     last_move_at: new Date(now).toISOString(),
+    [`${myColor}_last_seen_at`]: new Date(now).toISOString(),
   };
 
   if (hasClock && remainingMs != null && incrementSec != null) {

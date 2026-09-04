@@ -104,6 +104,8 @@ export async function POST(request: NextRequest) {
       black_time_ms: initialTimeMs,
       turn: 'white',
       lobby_id: claimed.id,
+      white_last_seen_at: new Date().toISOString(),
+      black_last_seen_at: new Date().toISOString(),
     })
     .select('*')
     .single();
