@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/Loading';
 import { Users, Swords, Zap, Clock, Hourglass, Crown, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { TIME_CONTROL_PRESETS } from '@/lib/timeControls';
+import { getDefaultPreset } from '@/lib/timeControls';
 
-// UI shortcuts for creating a lobby, sourced from the same fixed presets
-// Phase 3's matchmaking pool uses (src/lib/timeControls.ts), plus an
-// 'Untimed' option that only makes sense for a private lobby (matchmaking
-// has no untimed pool).
+// UI shortcuts for creating a lobby, sourced from each bucket's default
+// preset (src/lib/timeControls.ts), plus an 'Untimed' option that only makes
+// sense for a private lobby (matchmaking has no untimed pool). A lobby only
+// affects its own two participants, so — unlike matchmaking — there's no
+// need to offer the alternate per-bucket presets here.
 const TIME_CONTROLS: {
   key: 'bullet' | 'blitz' | 'rapid' | 'classical' | null;
   label: string;
@@ -24,10 +25,10 @@ const TIME_CONTROLS: {
   initialTimeSec?: number;
   incrementSec?: number;
 }[] = [
-  { key: 'bullet', label: TIME_CONTROL_PRESETS.bullet.label, description: '1 min', icon: Zap, initialTimeSec: TIME_CONTROL_PRESETS.bullet.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.bullet.incrementSec },
-  { key: 'blitz', label: TIME_CONTROL_PRESETS.blitz.label, description: '5 min', icon: Swords, initialTimeSec: TIME_CONTROL_PRESETS.blitz.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.blitz.incrementSec },
-  { key: 'rapid', label: TIME_CONTROL_PRESETS.rapid.label, description: '10 min', icon: Clock, initialTimeSec: TIME_CONTROL_PRESETS.rapid.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.rapid.incrementSec },
-  { key: 'classical', label: TIME_CONTROL_PRESETS.classical.label, description: '30 min', icon: Crown, initialTimeSec: TIME_CONTROL_PRESETS.classical.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.classical.incrementSec },
+  { key: 'bullet', label: getDefaultPreset('bullet').label, description: '1 min', icon: Zap, initialTimeSec: getDefaultPreset('bullet').initialTimeSec, incrementSec: getDefaultPreset('bullet').incrementSec },
+  { key: 'blitz', label: getDefaultPreset('blitz').label, description: '5 min', icon: Swords, initialTimeSec: getDefaultPreset('blitz').initialTimeSec, incrementSec: getDefaultPreset('blitz').incrementSec },
+  { key: 'rapid', label: getDefaultPreset('rapid').label, description: '10 min', icon: Clock, initialTimeSec: getDefaultPreset('rapid').initialTimeSec, incrementSec: getDefaultPreset('rapid').incrementSec },
+  { key: 'classical', label: getDefaultPreset('classical').label, description: '30 min', icon: Crown, initialTimeSec: getDefaultPreset('classical').initialTimeSec, incrementSec: getDefaultPreset('classical').incrementSec },
   { key: null, label: 'Untimed', description: 'No clock', icon: Hourglass },
 ];
 

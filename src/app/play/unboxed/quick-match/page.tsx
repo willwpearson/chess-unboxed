@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/Loading';
 import { Trophy, Swords, Zap, Clock, Crown, ArrowLeft } from 'lucide-react';
-import { TIME_CONTROL_PRESETS, TIME_CONTROL_BUCKETS, type TimeControlBucket } from '@/lib/timeControls';
+import { TIME_CONTROL_PRESETS, TIME_CONTROL_BUCKETS, getDefaultPreset, type TimeControlBucket } from '@/lib/timeControls';
 
 const TIME_CONTROL_ICONS: Record<TimeControlBucket, any> = {
   bullet: Zap,
@@ -24,8 +24,16 @@ export default function QuickMatchHubPage() {
 
   const [queueType, setQueueType] = useState<'ranked' | 'casual'>('casual');
   const [timeControl, setTimeControl] = useState<TimeControlBucket>('blitz');
+  const [presetId, setPresetId] = useState<string>(getDefaultPreset('blitz').id);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Each bucket pools separately by exact preset — picking a new bucket
+  // resets to its default preset rather than carrying over a stale id.
+  const handleSelectBucket = (bucket: TimeControlBucket) => {
+    setTimeControl(bucket);
+    setPresetId(getDefaultPreset(bucket).id);
+  };
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -48,7 +56,7 @@ export default function QuickMatchHubPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ queueType, timeControl }),
+        body: JSON.stringify({ queueType, timeControl, presetId }),
       });
       const body = await response.json();
       if (!body.success) {
@@ -130,21 +138,35 @@ export default function QuickMatchHubPage() {
               </div>
 
               <h3 className="text-xl font-bold text-fg mb-4">Time Control</h3>
-              <div className="grid grid-cols-2 gap-3 mb-8">
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {TIME_CONTROL_BUCKETS.map((bucket) => {
                   const Icon = TIME_CONTROL_ICONS[bucket];
-                  const preset = TIME_CONTROL_PRESETS[bucket];
+                  const defaultPreset = getDefaultPreset(bucket);
                   const isSelected = timeControl === bucket;
                   return (
-                    <button key={bucket} type="button" onClick={() => setTimeControl(bucket)}>
+                    <button key={bucket} type="button" onClick={() => handleSelectBucket(bucket)}>
                       <Card interactive className={`p-4 text-center ${isSelected ? 'ring-2 ring-accent-primary' : ''}`}>
                         <Icon size={24} className="mx-auto mb-2 text-accent-primary" />
-                        <div className="font-semibold text-fg text-sm">{preset.label}</div>
-                        <div className="text-xs text-fg-secondary">{Math.round(preset.initialTimeSec / 60)} min</div>
+                        <div className="font-semibold text-fg text-sm capitalize">{bucket}</div>
+                        <div className="text-xs text-fg-secondary">{Math.round(defaultPreset.initialTimeSec / 60)} min</div>
                       </Card>
                     </button>
                   );
                 })}
+              </div>
+
+              <h3 className="text-sm font-semibold text-fg-secondary mb-3">Preset</h3>
+              <div className="flex flex-wrap gap-2 mb-8">
+                {TIME_CONTROL_PRESETS[timeControl].map((preset) => (
+                  <button key={preset.id} type="button" onClick={() => setPresetId(preset.id)}>
+                    <Card
+                      interactive
+                      className={`px-4 py-2 text-sm font-semibold ${presetId === preset.id ? 'ring-2 ring-accent-primary' : ''}`}
+                    >
+                      {preset.label}
+                    </Card>
+                  </button>
+                ))}
               </div>
 
               {error && <p className="text-sm text-status-danger mb-4">{error}</p>}

@@ -3,7 +3,8 @@ import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getAuthUserId } from '@/lib/server/authUser';
 import { rateLimit } from '@/lib/rateLimit';
-import { TIME_CONTROL_PRESETS } from '@/lib/timeControls';
+import { findPreset } from '@/lib/timeControls';
+import { RATING_BAND_BASE, RATING_BAND_WIDEN_PER_SEC } from '@/lib/matchmakingConfig';
 import type { PieceColor } from '@/types/game';
 
 // Phase 3: matchmaking. One shared queue/pairing mechanism for both
@@ -26,6 +27,7 @@ const CANDIDATE_BATCH_SIZE = 5;
 const joinSchema = z.object({
   queueType: z.enum(['ranked', 'casual']),
   timeControl: z.enum(['bullet', 'blitz', 'rapid', 'classical']),
+  presetId: z.string(),
 });
 
 export async function POST(request: NextRequest) {
@@ -52,7 +54,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { queueType, timeControl } = body;
+  const { queueType, timeControl, presetId } = body;
+
+  const preset = findPreset(timeControl, presetId);
+  if (!preset) {
+    return NextResponse.json({ success: false, error: 'Unknown time control preset' }, { status: 400 });
+  }
 
   if (queueType === 'ranked') {
     const { data: user, error: userError } = await supabaseAdmin
@@ -94,8 +101,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const preset = TIME_CONTROL_PRESETS[timeControl];
-
   let ratingSnapshot: number | null = null;
   if (queueType === 'ranked') {
     const { data: ratingRow } = await supabaseAdmin
@@ -114,6 +119,8 @@ export async function POST(request: NextRequest) {
     .select('*')
     .eq('queue_type', queueType)
     .eq('time_control', timeControl)
+    .eq('initial_time_sec', preset.initialTimeSec)
+    .eq('increment_sec', preset.incrementSec)
     .eq('status', 'waiting')
     .neq('user_id', userId)
     .order('created_at', { ascending: true })
@@ -127,6 +134,19 @@ export async function POST(request: NextRequest) {
         .eq('id', candidate.id)
         .eq('status', 'waiting');
       continue;
+    }
+
+    // Ranked-only rating-band check: a candidate's allowed band widens the
+    // longer they've been waiting, so a stale entry becomes matchable
+    // against a wider rating spread rather than sitting forever. Skipping
+    // (not expiring) an out-of-band candidate leaves it waiting for a
+    // better-suited future joiner.
+    if (queueType === 'ranked' && candidate.rating_snapshot != null && ratingSnapshot != null) {
+      const waitedSec = (now - new Date(candidate.created_at).getTime()) / 1000;
+      const band = RATING_BAND_BASE + RATING_BAND_WIDEN_PER_SEC * waitedSec;
+      if (Math.abs(candidate.rating_snapshot - ratingSnapshot) > band) {
+        continue;
+      }
     }
 
     // Atomic claim: only succeeds if the candidate is still 'waiting' at the

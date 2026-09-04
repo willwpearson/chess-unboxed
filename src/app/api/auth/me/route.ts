@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyAuthToken } from '@/lib/jwt';
+import { sweepAbandonedGamesForUser } from '@/lib/server/abandonment';
 
 export async function GET(request: NextRequest) {
   try {
@@ -79,6 +80,16 @@ export async function GET(request: NextRequest) {
       .from('users')
       .update({ last_seen: new Date().toISOString() })
       .eq('id', user.id);
+
+    // Best-effort: sweep any of this user's own in_progress games where the
+    // opponent has gone stale. Closes most of the "both players abandoned
+    // simultaneously" gap (see src/lib/server/abandonment.ts) — never lets a
+    // sweep failure break the /me response itself.
+    try {
+      await sweepAbandonedGamesForUser(user.id);
+    } catch (sweepError) {
+      console.error('Abandonment sweep error:', sweepError);
+    }
 
     // Remove sensitive data from response
     const { password_hash, ...userWithoutPassword } = user;

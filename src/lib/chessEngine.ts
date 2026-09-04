@@ -689,25 +689,35 @@ export class WraparoundChessEngine {
       type = 'horizontal';
     }
 
-    // Calculate shortest distance considering wraparound
-    const directDistance = Math.max(fileDiff, rankDiff);
-    const wraparoundFileDistance = 8 - fileDiff;
-    const wraparoundRankDistance = 8 - rankDiff;
-    const wraparoundDistance = Math.max(wraparoundFileDistance, wraparoundRankDistance);
-
-    const distance = Math.min(directDistance, wraparoundDistance);
-
-    // Generate path (simplified for now)
-    const path: Square[] = [from, to];
-
     // Only the file axis ever wraps in this engine (every move-generation
     // branch applies `% 8` to the file, never the rank — see e.g.
     // getKnightWraparoundMoves/getBishopWraparoundMoves), so whether a move
     // actually used the wraparound path depends solely on the raw file
-    // distance, not the mixed file/rank `distance` above: it wrapped iff
-    // going around the file edge (8 - fileDiff) is strictly shorter than
-    // going directly (fileDiff > 4). This is independent of piece type.
+    // distance, not a mixed file/rank formula: it wrapped iff going around
+    // the file edge (8 - fileDiff) is strictly shorter than going directly
+    // (fileDiff > 4). This is independent of piece type.
     const wrapped = fileDiff > 4;
+
+    // Distance only ever wraps on the file component; rank is never wrapped.
+    const effectiveFileDiff = Math.min(fileDiff, 8 - fileDiff);
+    const distance = Math.max(effectiveFileDiff, rankDiff);
+
+    // Trace intermediate squares for sliding moves. Knights jump, so there's
+    // no intermediate square to trace for them.
+    let path: Square[];
+    if (type === 'knight') {
+      path = [from, to];
+    } else {
+      path = [from];
+      const rankStep = Math.sign(toPos.rank - fromPos.rank);
+      const directFileStep = Math.sign(toPos.file - fromPos.file);
+      const fileStep = wrapped ? -directFileStep : directFileStep;
+      let current = fromPos;
+      while (current.file !== toPos.file || current.rank !== toPos.rank) {
+        current = this.applyWraparound({ file: current.file + fileStep, rank: current.rank + rankStep });
+        path.push(this.positionToAlgebraic(current));
+      }
+    }
 
     return { type, distance, path, wrapped };
   }

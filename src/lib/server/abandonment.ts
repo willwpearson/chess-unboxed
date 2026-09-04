@@ -76,3 +76,36 @@ export async function recordHeartbeatAndCheckAbandonment(
 
   return { abandoned: true, game: updated };
 }
+
+// Closes most of the "both players abandon simultaneously" gap: the
+// heartbeat check above only ever runs as a side effect of a client polling
+// the ONE game it's viewing, so if nobody's left with that game open, it
+// never gets checked. This sweeps ALL of the caller's own in_progress games
+// whenever they're authenticated anywhere in the app (wired into
+// GET /api/auth/me, which fires on every authenticated page load) — reusing
+// recordHeartbeatAndCheckAbandonment as-is means this also has the side
+// benefit of refreshing the caller's presence on every game they're party
+// to, not just the one open in the current tab.
+export async function sweepAbandonedGamesForUser(userId: string): Promise<{ sweptGameIds: string[] }> {
+  const { data: activeGames } = await supabaseAdmin
+    .from('games')
+    .select('*')
+    .eq('status', 'in_progress')
+    .or(`white_player_id.eq.${userId},black_player_id.eq.${userId}`)
+    .limit(20);
+
+  if (!activeGames || activeGames.length === 0) {
+    return { sweptGameIds: [] };
+  }
+
+  const sweptGameIds: string[] = [];
+  for (const game of activeGames) {
+    const callerColor: PieceColor = game.white_player_id === userId ? 'white' : 'black';
+    const { abandoned } = await recordHeartbeatAndCheckAbandonment(game, callerColor, userId);
+    if (abandoned) {
+      sweptGameIds.push(game.id);
+    }
+  }
+
+  return { sweptGameIds };
+}

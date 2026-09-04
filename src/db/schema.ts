@@ -108,7 +108,12 @@ export const games = pgTable('games', {
   // column existed) and is deliberately never treated as stale/forfeitable.
   whiteLastSeenAt: timestamp('white_last_seen_at', { withTimezone: true }),
   blackLastSeenAt: timestamp('black_last_seen_at', { withTimezone: true }),
-});
+}, (table) => ({
+  // Phase 5: supports "all of my in_progress games" (src/lib/server/abandonment.ts's
+  // sweepAbandonedGamesForUser), queried as an OR across white/black player id.
+  whitePlayerStatusIdx: index('games_white_player_status_idx').on(table.whitePlayerId, table.status),
+  blackPlayerStatusIdx: index('games_black_player_status_idx').on(table.blackPlayerId, table.status),
+}));
 
 // Phase 3: per-time-control ELO. Rows are created lazily — only when a
 // ranked game between two players in a given bucket actually completes
@@ -151,7 +156,10 @@ export const matchmakingQueue = pgTable('matchmaking_queue', {
   matchedAt: timestamp('matched_at', { withTimezone: true }),
   cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
 }, (table) => ({
-  pairingIdx: index('matchmaking_queue_pairing_idx').on(table.queueType, table.timeControl, table.status, table.createdAt),
+  // Phase 5: extended with initialTimeSec/incrementSec — multi-preset time
+  // controls means pairing must match on the exact preset, not just the
+  // bucket (src/lib/timeControls.ts, src/app/api/matchmaking/join/route.ts).
+  pairingIdx: index('matchmaking_queue_pairing_idx').on(table.queueType, table.timeControl, table.initialTimeSec, table.incrementSec, table.status, table.createdAt),
 }));
 
 export type User = typeof users.$inferSelect;
