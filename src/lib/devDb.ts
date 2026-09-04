@@ -14,6 +14,7 @@ const tables: Record<string, Row[]> = {
   user_ratings: [],
   games: [],
   lobbies: [],
+  matchmaking_queue: [],
 };
 
 let nextId = 1;
@@ -96,6 +97,11 @@ class QueryBuilder {
 
   eq(col: string, value: any) {
     this.filters.push((row) => row[col] === value);
+    return this;
+  }
+
+  neq(col: string, value: any) {
+    this.filters.push((row) => row[col] !== value);
     return this;
   }
 

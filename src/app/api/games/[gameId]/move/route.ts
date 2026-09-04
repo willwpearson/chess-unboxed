@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase';
 import { loadGameManager, GameReplayError, GameRow } from '@/lib/server/gameSession';
 import { getAuthUserId } from '@/lib/server/authUser';
+import { applyRankedResult } from '@/lib/server/applyGameResult';
 import type { PieceColor } from '@/types/game';
 
 const moveSchema = z.object({
@@ -91,6 +92,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         })
         .eq('id', gameId);
 
+      await applyRankedResult(game, winnerId);
+
       return NextResponse.json({ success: false, error: 'Your time has expired' }, { status: 409 });
     }
   }
@@ -145,6 +148,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   if (updateError) {
     console.error('Failed to persist move:', updateError);
     return NextResponse.json({ success: false, error: 'Failed to persist move' }, { status: 500 });
+  }
+
+  if (result.gameEnd) {
+    await applyRankedResult(game, update.winner_id ?? null);
   }
 
   return NextResponse.json({

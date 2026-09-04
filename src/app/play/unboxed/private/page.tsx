@@ -10,12 +10,12 @@ import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/Loading';
 import { Users, Swords, Zap, Clock, Hourglass, Crown, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { TIME_CONTROL_PRESETS } from '@/lib/timeControls';
 
-// Standard, well-known time-control presets used as UI shortcuts for
-// creating a lobby. Per docs/MULTIPLAYER_PROGRESS.md, the *formal* bucket
-// definitions (used for matchmaking pooling) are a Phase 3 concern — a
-// private lobby just needs some concrete seconds/increment values to send,
-// which these provide without constraining what Phase 3 later formalizes.
+// UI shortcuts for creating a lobby, sourced from the same fixed presets
+// Phase 3's matchmaking pool uses (src/lib/timeControls.ts), plus an
+// 'Untimed' option that only makes sense for a private lobby (matchmaking
+// has no untimed pool).
 const TIME_CONTROLS: {
   key: 'bullet' | 'blitz' | 'rapid' | 'classical' | null;
   label: string;
@@ -24,10 +24,10 @@ const TIME_CONTROLS: {
   initialTimeSec?: number;
   incrementSec?: number;
 }[] = [
-  { key: 'bullet', label: 'Bullet', description: '1 min', icon: Zap, initialTimeSec: 60, incrementSec: 0 },
-  { key: 'blitz', label: 'Blitz', description: '5 min', icon: Swords, initialTimeSec: 300, incrementSec: 0 },
-  { key: 'rapid', label: 'Rapid', description: '10 min', icon: Clock, initialTimeSec: 600, incrementSec: 0 },
-  { key: 'classical', label: 'Classical', description: '30 min', icon: Crown, initialTimeSec: 1800, incrementSec: 0 },
+  { key: 'bullet', label: TIME_CONTROL_PRESETS.bullet.label, description: '1 min', icon: Zap, initialTimeSec: TIME_CONTROL_PRESETS.bullet.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.bullet.incrementSec },
+  { key: 'blitz', label: TIME_CONTROL_PRESETS.blitz.label, description: '5 min', icon: Swords, initialTimeSec: TIME_CONTROL_PRESETS.blitz.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.blitz.incrementSec },
+  { key: 'rapid', label: TIME_CONTROL_PRESETS.rapid.label, description: '10 min', icon: Clock, initialTimeSec: TIME_CONTROL_PRESETS.rapid.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.rapid.incrementSec },
+  { key: 'classical', label: TIME_CONTROL_PRESETS.classical.label, description: '30 min', icon: Crown, initialTimeSec: TIME_CONTROL_PRESETS.classical.initialTimeSec, incrementSec: TIME_CONTROL_PRESETS.classical.incrementSec },
   { key: null, label: 'Untimed', description: 'No clock', icon: Hourglass },
 ];
 

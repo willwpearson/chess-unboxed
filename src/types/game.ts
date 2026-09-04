@@ -70,7 +70,7 @@ export interface GamePosition {
 }
 
 // Game state types
-export type GameMode = 'bot' | 'private' | 'ranked';
+export type GameMode = 'bot' | 'private' | 'ranked' | 'casual';
 export type GameVariant = 'unboxed';
 export type GameStatus = 'waiting' | 'active' | 'paused' | 'finished' | 'abandoned';
 export type GameResult = 'white-wins' | 'black-wins' | 'draw' | 'ongoing';

@@ -58,28 +58,10 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Create initial ratings for all game modes (if using new schema)
-    const gameModes = ['classic', 'unboxed', 'programming'];
-    for (const gameMode of gameModes) {
-      try {
-        await supabaseAdmin
-          .from('user_ratings')
-          .insert({
-            user_id: user.id,
-            game_mode: gameMode,
-            current_rating: 1200,
-            peak_rating: 1200,
-            lowest_rating: 1200,
-            total_games: 0,
-            wins: 0,
-            losses: 0,
-            draws: 0,
-          });
-      } catch (ratingError) {
-        // If user_ratings table doesn't exist yet, continue without error
-        console.log(`Note: user_ratings table may not exist yet for game mode: ${gameMode}`);
-      }
-    }
+    // Per-time-control user_ratings rows are created lazily, only when a
+    // ranked game actually completes (see src/lib/server/applyGameResult.ts)
+    // — guests aren't eligible for ranked anyway (see
+    // src/app/api/matchmaking/join/route.ts), so there's nothing to seed here.
 
     // Generate JWT token for guest session
     const token = signAuthToken({

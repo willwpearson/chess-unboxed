@@ -234,7 +234,7 @@ export const useGameStore = create<GameStore>()(
         const { gameManager, botManager, currentGame, activeGameId } = get();
         if (!gameManager) return false;
 
-        if (currentGame?.mode === 'private' && activeGameId) {
+        if (currentGame?.mode !== 'bot' && activeGameId) {
           try {
             const response = await fetch(`/api/games/${activeGameId}/move`, {
               method: 'POST',
@@ -331,7 +331,7 @@ export const useGameStore = create<GameStore>()(
         const { gameManager, currentGame, activeGameId, myColor } = get();
         if (!gameManager) return;
 
-        if (currentGame?.mode === 'private' && activeGameId && myColor) {
+        if (currentGame?.mode !== 'bot' && activeGameId && myColor) {
           try {
             const response = await fetch(`/api/games/${activeGameId}/resign`, {
               method: 'POST',
@@ -364,7 +364,7 @@ export const useGameStore = create<GameStore>()(
         const { gameManager, currentGame, activeGameId, myColor } = get();
         if (!gameManager) return;
 
-        if (currentGame?.mode === 'private' && activeGameId) {
+        if (currentGame?.mode !== 'bot' && activeGameId) {
           try {
             const response = await fetch(`/api/games/${activeGameId}/draw-offer`, {
               method: 'POST',
@@ -391,7 +391,7 @@ export const useGameStore = create<GameStore>()(
 
       acceptDraw: async () => {
         const { gameManager, currentGame, activeGameId } = get();
-        if (!gameManager || currentGame?.mode !== 'private' || !activeGameId) return;
+        if (!gameManager || currentGame?.mode === 'bot' || !activeGameId) return;
 
         try {
           const response = await fetch(`/api/games/${activeGameId}/draw-accept`, {

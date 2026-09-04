@@ -8,7 +8,7 @@ import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/Card';
 import { LoadingSpinner } from '@/components/ui/Loading';
-import { Trophy, Gamepad2, TrendingUp, Target, Bot, Users } from 'lucide-react';
+import { Trophy, Gamepad2, TrendingUp, Target, Bot, Users, Swords } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -56,7 +56,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Play Now */}
-            <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <div className="mb-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
               <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
                 <Link href="/play/unboxed/bot" className="absolute inset-0" aria-label="Play vs Bot" />
                 <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-accent-primary">
@@ -88,6 +88,23 @@ export default function DashboardPage() {
                   <div>• Invite-code lobbies</div>
                   <div>• Choose your time control</div>
                   <div>• Just the two of you</div>
+                </div>
+              </Card>
+
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-amber-500/10 to-orange-600/10">
+                <Link href="/play/unboxed/quick-match" className="absolute inset-0" aria-label="Quick Match" />
+                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-amber-500">
+                  <Swords size={60} />
+                </div>
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white mb-6 relative z-10">
+                  <Swords size={40} />
+                </div>
+                <h3 className="text-xl font-bold text-fg mb-3">Quick Match</h3>
+                <p className="text-fg-secondary mb-4">Get paired with an opponent, ranked or casual</p>
+                <div className="text-sm text-fg-secondary space-y-1">
+                  <div>• Automatic pairing</div>
+                  <div>• Ranked ELO or casual play</div>
+                  <div>• Bullet to classical</div>
                 </div>
               </Card>
             </div>

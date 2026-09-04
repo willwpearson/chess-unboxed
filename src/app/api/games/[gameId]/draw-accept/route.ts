@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getAuthUserId } from '@/lib/server/authUser';
+import { applyRankedResult } from '@/lib/server/applyGameResult';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = await params;
@@ -46,6 +47,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     console.error('Failed to accept draw:', updateError);
     return NextResponse.json({ success: false, error: 'Failed to accept draw' }, { status: 500 });
   }
+
+  await applyRankedResult(game, null);
 
   return NextResponse.json({ success: true, timestamp: Date.now() });
 }

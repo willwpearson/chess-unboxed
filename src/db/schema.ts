@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, boolean, integer, timestamp, jsonb, type AnyPgColumn } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, boolean, integer, timestamp, jsonb, uniqueIndex, index, type AnyPgColumn } from 'drizzle-orm/pg-core';
 
 // Source of truth for the Supabase Postgres schema, replacing the
 // hand-written `Database` type in src/lib/supabase.ts. This migration
@@ -84,7 +84,7 @@ export const games = pgTable('games', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   endedAt: timestamp('ended_at', { withTimezone: true }),
-  mode: text('mode').notNull(), // 'bot' | 'private' | 'ranked'
+  mode: text('mode').notNull(), // 'bot' | 'private' | 'ranked' | 'casual'
   variant: text('variant').notNull().default('unboxed'),
   whitePlayerId: uuid('white_player_id').references(() => users.id),
   blackPlayerId: uuid('black_player_id').references(() => users.id),
@@ -105,6 +105,50 @@ export const games = pgTable('games', {
   drawOfferedBy: uuid('draw_offered_by').references(() => users.id),
 });
 
+// Phase 3: per-time-control ELO. Rows are created lazily — only when a
+// ranked game between two players in a given bucket actually completes
+// (see src/lib/server/applyGameResult.ts) — never eagerly at signup, so a
+// user with no ranked games in a bucket simply has no row for it.
+export const userRatings = pgTable('user_ratings', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  timeControl: text('time_control').notNull(), // 'bullet' | 'blitz' | 'rapid' | 'classical'
+  rating: integer('rating').notNull().default(1200),
+  peakRating: integer('peak_rating').notNull().default(1200),
+  gamesPlayed: integer('games_played').notNull().default(0),
+  wins: integer('wins').notNull().default(0),
+  losses: integer('losses').notNull().default(0),
+  draws: integer('draws').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  userTimeControlIdx: uniqueIndex('user_ratings_user_id_time_control_idx').on(table.userId, table.timeControl),
+}));
+
+// Phase 3: two-sided matchmaking pool. A player joining either finds and
+// atomically claims an existing 'waiting' row (pairing them immediately) or
+// inserts itself as 'waiting' for a future joiner to claim — see
+// src/app/api/matchmaking/join/route.ts. No host/joiner distinction, unlike
+// `lobbies`, since neither side initiated on the other's behalf.
+export const matchmakingQueue = pgTable('matchmaking_queue', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  queueType: text('queue_type').notNull(), // 'ranked' | 'casual'
+  variant: text('variant').notNull().default('unboxed'),
+  timeControl: text('time_control').notNull(), // 'bullet' | 'blitz' | 'rapid' | 'classical' — matchmaking has no untimed pool
+  initialTimeSec: integer('initial_time_sec').notNull(),
+  incrementSec: integer('increment_sec').notNull(),
+  ratingSnapshot: integer('rating_snapshot'), // informational only in v1; null for casual/guests
+  status: text('status').notNull().default('waiting'), // 'waiting' | 'matched' | 'cancelled' | 'expired'
+  matchedGameId: uuid('matched_game_id').references(() => games.id),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  matchedAt: timestamp('matched_at', { withTimezone: true }),
+  cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+}, (table) => ({
+  pairingIdx: index('matchmaking_queue_pairing_idx').on(table.queueType, table.timeControl, table.status, table.createdAt),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type UserSession = typeof userSessions.$inferSelect;
@@ -113,3 +157,7 @@ export type Lobby = typeof lobbies.$inferSelect;
 export type NewLobby = typeof lobbies.$inferInsert;
 export type Game = typeof games.$inferSelect;
 export type NewGame = typeof games.$inferInsert;
+export type UserRating = typeof userRatings.$inferSelect;
+export type NewUserRating = typeof userRatings.$inferInsert;
+export type MatchmakingQueueEntry = typeof matchmakingQueue.$inferSelect;
+export type NewMatchmakingQueueEntry = typeof matchmakingQueue.$inferInsert;

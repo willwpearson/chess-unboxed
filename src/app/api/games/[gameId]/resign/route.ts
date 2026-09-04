@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getAuthUserId } from '@/lib/server/authUser';
+import { applyRankedResult } from '@/lib/server/applyGameResult';
 import type { PieceColor } from '@/types/game';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
@@ -49,6 +50,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     console.error('Failed to persist resignation:', updateError);
     return NextResponse.json({ success: false, error: 'Failed to resign' }, { status: 500 });
   }
+
+  await applyRankedResult(game, winnerId);
 
   return NextResponse.json({ success: true, data: { winnerId }, timestamp: Date.now() });
 }

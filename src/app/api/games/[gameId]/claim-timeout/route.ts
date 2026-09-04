@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getAuthUserId } from '@/lib/server/authUser';
+import { applyRankedResult } from '@/lib/server/applyGameResult';
 import type { PieceColor } from '@/types/game';
 
 // Either player can call this once they observe (client-side, purely
@@ -64,6 +65,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     console.error('Failed to persist timeout claim:', updateError);
     return NextResponse.json({ success: false, error: 'Failed to claim timeout' }, { status: 500 });
   }
+
+  await applyRankedResult(game, winnerId);
 
   return NextResponse.json({ success: true, data: { winnerId }, timestamp: now });
 }

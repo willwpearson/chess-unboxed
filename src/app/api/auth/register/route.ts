@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
         username,
         display_name: displayName || username,
         password_hash: passwordHash,
+        is_active: true,
         current_rating: 1200,
         peak_rating: 1200,
       })
