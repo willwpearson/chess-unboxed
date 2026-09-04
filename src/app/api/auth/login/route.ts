@@ -1,19 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { z } from 'zod';
+import { signAuthToken } from '@/lib/jwt';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 const loginSchema = z.object({
   identifier: z.string().min(1, 'Email or username is required'),
   password: z.string().min(1, 'Password is required'),
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
-const JWT_EXPIRES_IN = '7d';
-
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, retryAfterSeconds } = rateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many login attempts. Please try again later.' },
+        { status: 429, headers: retryAfterSeconds ? { 'Retry-After': String(retryAfterSeconds) } : undefined }
+      );
+    }
+
     const body = await request.json();
     const validatedData = loginSchema.parse(body);
 
@@ -57,15 +64,11 @@ export async function POST(request: NextRequest) {
       .eq('id', user.id);
 
     // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        username: user.username,
-        email: user.email 
-      },
-      JWT_SECRET,
-      { expiresIn: JWT_EXPIRES_IN }
-    );
+    const token = signAuthToken({
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+    });
 
     // Remove sensitive data from response
     const { password_hash, ...userWithoutPassword } = user;
@@ -84,6 +87,7 @@ export async function POST(request: NextRequest) {
         ip_address: ipAddress,
         user_agent: userAgent,
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days
+        is_active: true,
       });
 
     const response = NextResponse.json({
@@ -99,7 +103,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60, // 7 days
       path: '/',
     });

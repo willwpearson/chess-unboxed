@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { verifyAuthToken } from '@/lib/jwt';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,8 +10,8 @@ export async function POST(request: NextRequest) {
     if (token) {
       try {
         // Decode token to get user info
-        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-        
+        const decoded = verifyAuthToken(token);
+
         // Deactivate user sessions
         await supabaseAdmin
           .from('user_sessions')
@@ -36,7 +34,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set('auth-token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 0,
       path: '/',
     });

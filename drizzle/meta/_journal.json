@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1787756564720,
+      "tag": "0000_sharp_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787757017108,
+      "tag": "0001_crazy_spencer_smythe",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787757114043,
+      "tag": "0002_glamorous_madame_web",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787872688350,
+      "tag": "0003_thankful_squadron_sinister",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788544554470,
+      "tag": "0004_cultured_dust",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788546025121,
+      "tag": "0005_large_magma",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788553210301,
+      "tag": "0006_worried_purifiers",
+      "breakpoints": true
+    }
+  ]
+}

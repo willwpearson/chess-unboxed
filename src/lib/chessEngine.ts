@@ -654,7 +654,7 @@ export class WraparoundChessEngine {
       isCheck,
       isCheckmate,
       isStalemate,
-      isWraparound: true,
+      isWraparound: wraparoundInfo.wrapped,
       wraparoundType: wraparoundInfo.type,
       wraparoundDistance: wraparoundInfo.distance,
       wraparoundPath: wraparoundInfo.path,
@@ -669,15 +669,16 @@ export class WraparoundChessEngine {
     type: 'horizontal' | 'vertical' | 'diagonal' | 'knight';
     distance: number;
     path: Square[];
+    wrapped: boolean;
   } {
     const fromPos = this.algebraicToPosition(from);
     const toPos = this.algebraicToPosition(to);
-    
+
     const fileDiff = Math.abs(toPos.file - fromPos.file);
     const rankDiff = Math.abs(toPos.rank - fromPos.rank);
-    
+
     let type: 'horizontal' | 'vertical' | 'diagonal' | 'knight' = 'horizontal';
-    
+
     if (piece.type === 'knight') {
       type = 'knight';
     } else if (fileDiff > 0 && rankDiff > 0) {
@@ -687,19 +688,38 @@ export class WraparoundChessEngine {
     } else {
       type = 'horizontal';
     }
-    
-    // Calculate shortest distance considering wraparound
-    const directDistance = Math.max(fileDiff, rankDiff);
-    const wraparoundFileDistance = 8 - fileDiff;
-    const wraparoundRankDistance = 8 - rankDiff;
-    const wraparoundDistance = Math.max(wraparoundFileDistance, wraparoundRankDistance);
-    
-    const distance = Math.min(directDistance, wraparoundDistance);
-    
-    // Generate path (simplified for now)
-    const path: Square[] = [from, to];
-    
-    return { type, distance, path };
+
+    // Only the file axis ever wraps in this engine (every move-generation
+    // branch applies `% 8` to the file, never the rank — see e.g.
+    // getKnightWraparoundMoves/getBishopWraparoundMoves), so whether a move
+    // actually used the wraparound path depends solely on the raw file
+    // distance, not a mixed file/rank formula: it wrapped iff going around
+    // the file edge (8 - fileDiff) is strictly shorter than going directly
+    // (fileDiff > 4). This is independent of piece type.
+    const wrapped = fileDiff > 4;
+
+    // Distance only ever wraps on the file component; rank is never wrapped.
+    const effectiveFileDiff = Math.min(fileDiff, 8 - fileDiff);
+    const distance = Math.max(effectiveFileDiff, rankDiff);
+
+    // Trace intermediate squares for sliding moves. Knights jump, so there's
+    // no intermediate square to trace for them.
+    let path: Square[];
+    if (type === 'knight') {
+      path = [from, to];
+    } else {
+      path = [from];
+      const rankStep = Math.sign(toPos.rank - fromPos.rank);
+      const directFileStep = Math.sign(toPos.file - fromPos.file);
+      const fileStep = wrapped ? -directFileStep : directFileStep;
+      let current = fromPos;
+      while (current.file !== toPos.file || current.rank !== toPos.rank) {
+        current = this.applyWraparound({ file: current.file + fileStep, rank: current.rank + rankStep });
+        path.push(this.positionToAlgebraic(current));
+      }
+    }
+
+    return { type, distance, path, wrapped };
   }
 
   /**

@@ -546,6 +546,15 @@ export class GameManager {
   }
 
   /**
+   * Forfeit the game on behalf of a player who has gone unresponsive
+   * (heartbeat-based abandonment detection, see src/lib/server/abandonment.ts)
+   */
+  public forfeitByAbandonment(abandoningPlayer: PieceColor): void {
+    const result: GameResult = abandoningPlayer === 'white' ? 'black-wins' : 'white-wins';
+    this.endGame(result, 'abandoned');
+  }
+
+  /**
    * Offer/accept draw
    */
   public offerDraw(): void {

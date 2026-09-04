@@ -1,16 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import jwt from 'jsonwebtoken';
 import { nanoid } from 'nanoid';
+import { signAuthToken } from '@/lib/jwt';
+import { rateLimit, getClientIp } from '@/lib/rateLimit';
 
 interface CreateGuestUserRequest {
   username?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
-
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const { allowed, retryAfterSeconds } = rateLimit(`guest:${ip}`, 10, 60 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many guest accounts created. Please try again later.' },
+        { status: 429, headers: retryAfterSeconds ? { 'Retry-After': String(retryAfterSeconds) } : undefined }
+      );
+    }
+
     const body = await request.json().catch(() => ({})) as CreateGuestUserRequest;
 
     // Generate guest username if not provided
@@ -50,39 +58,17 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Create initial ratings for all game modes (if using new schema)
-    const gameModes = ['classic', 'unboxed', 'programming'];
-    for (const gameMode of gameModes) {
-      try {
-        await supabaseAdmin
-          .from('user_ratings')
-          .insert({
-            user_id: user.id,
-            game_mode: gameMode,
-            current_rating: 1200,
-            peak_rating: 1200,
-            lowest_rating: 1200,
-            total_games: 0,
-            wins: 0,
-            losses: 0,
-            draws: 0,
-          });
-      } catch (ratingError) {
-        // If user_ratings table doesn't exist yet, continue without error
-        console.log(`Note: user_ratings table may not exist yet for game mode: ${gameMode}`);
-      }
-    }
+    // Per-time-control user_ratings rows are created lazily, only when a
+    // ranked game actually completes (see src/lib/server/applyGameResult.ts)
+    // — guests aren't eligible for ranked anyway (see
+    // src/app/api/matchmaking/join/route.ts), so there's nothing to seed here.
 
     // Generate JWT token for guest session
-    const token = jwt.sign(
-      { 
-        userId: user.id, 
-        username: user.username,
-        isGuest: true 
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' } // Guest sessions last 7 days
-    );
+    const token = signAuthToken({
+      userId: user.id,
+      username: user.username,
+      isGuest: true,
+    });
 
     // Create session record
     const { error: sessionError } = await supabaseAdmin

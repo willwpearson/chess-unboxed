@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { verifyAuthToken } from '@/lib/jwt';
+import { sweepAbandonedGamesForUser } from '@/lib/server/abandonment';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +9,7 @@ export async function GET(request: NextRequest) {
     const cookieToken = request.cookies.get('auth-token')?.value;
     const authHeader = request.headers.get('authorization');
     const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-    
+
     const token = cookieToken || bearerToken;
 
     if (!token) {
@@ -23,12 +22,35 @@ export async function GET(request: NextRequest) {
     // Verify and decode token
     let decoded;
     try {
-      decoded = jwt.verify(token, JWT_SECRET) as { userId: string; username: string; email?: string; isGuest?: boolean };
+      decoded = verifyAuthToken(token);
     } catch (jwtError) {
       return NextResponse.json(
         { success: false, error: 'Invalid or expired token' },
         { status: 401 }
       );
+    }
+
+    // Confirm the session backing this token hasn't been revoked (logout,
+    // admin action, etc.) — a valid JWT signature alone is not sufficient.
+    const { data: sessions, error: sessionError } = await supabaseAdmin
+      .from('user_sessions')
+      .select('id, is_active, expires_at')
+      .eq('user_id', decoded.userId)
+      .eq('is_active', true);
+
+    if (sessionError) {
+      console.error('Session lookup error:', sessionError);
+    } else if (sessions) {
+      const now = Date.now();
+      const hasValidSession = sessions.some(
+        (s: any) => s.is_active && (!s.expires_at || new Date(s.expires_at).getTime() > now)
+      );
+      if (!hasValidSession) {
+        return NextResponse.json(
+          { success: false, error: 'Session has been revoked' },
+          { status: 401 }
+        );
+      }
     }
 
     // Get user from database
@@ -58,6 +80,16 @@ export async function GET(request: NextRequest) {
       .from('users')
       .update({ last_seen: new Date().toISOString() })
       .eq('id', user.id);
+
+    // Best-effort: sweep any of this user's own in_progress games where the
+    // opponent has gone stale. Closes most of the "both players abandoned
+    // simultaneously" gap (see src/lib/server/abandonment.ts) — never lets a
+    // sweep failure break the /me response itself.
+    try {
+      await sweepAbandonedGamesForUser(user.id);
+    } catch (sweepError) {
+      console.error('Abandonment sweep error:', sweepError);
+    }
 
     // Remove sensitive data from response
     const { password_hash, ...userWithoutPassword } = user;

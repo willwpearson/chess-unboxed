@@ -1,0 +1,661 @@
+{
+  "id": "d0b30ad8-f4cc-4df7-8f1e-55f322ddcf91",
+  "prevId": "592ac724-96bf-4d52-9b5b-2da6b078d20f",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.games": {
+      "name": "games",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mode": {
+          "name": "mode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "variant": {
+          "name": "variant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unboxed'"
+        },
+        "white_player_id": {
+          "name": "white_player_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "black_player_id": {
+          "name": "black_player_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "winner_id": {
+          "name": "winner_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'in_progress'"
+        },
+        "moves": {
+          "name": "moves",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "time_control": {
+          "name": "time_control",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "initial_time_sec": {
+          "name": "initial_time_sec",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "increment_sec": {
+          "name": "increment_sec",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "white_time_ms": {
+          "name": "white_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "black_time_ms": {
+          "name": "black_time_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fen": {
+          "name": "fen",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "turn": {
+          "name": "turn",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lobby_id": {
+          "name": "lobby_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating_change_white": {
+          "name": "rating_change_white",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating_change_black": {
+          "name": "rating_change_black",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_move_at": {
+          "name": "last_move_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "draw_offered_by": {
+          "name": "draw_offered_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "games_white_player_id_users_id_fk": {
+          "name": "games_white_player_id_users_id_fk",
+          "tableFrom": "games",
+          "tableTo": "users",
+          "columnsFrom": [
+            "white_player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "games_black_player_id_users_id_fk": {
+          "name": "games_black_player_id_users_id_fk",
+          "tableFrom": "games",
+          "tableTo": "users",
+          "columnsFrom": [
+            "black_player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "games_winner_id_users_id_fk": {
+          "name": "games_winner_id_users_id_fk",
+          "tableFrom": "games",
+          "tableTo": "users",
+          "columnsFrom": [
+            "winner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "games_lobby_id_lobbies_id_fk": {
+          "name": "games_lobby_id_lobbies_id_fk",
+          "tableFrom": "games",
+          "tableTo": "lobbies",
+          "columnsFrom": [
+            "lobby_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "games_draw_offered_by_users_id_fk": {
+          "name": "games_draw_offered_by_users_id_fk",
+          "tableFrom": "games",
+          "tableTo": "users",
+          "columnsFrom": [
+            "draw_offered_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.lobbies": {
+      "name": "lobbies",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "host_id": {
+          "name": "host_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "invite_code": {
+          "name": "invite_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'waiting'"
+        },
+        "variant": {
+          "name": "variant",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'unboxed'"
+        },
+        "time_control": {
+          "name": "time_control",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "initial_time_sec": {
+          "name": "initial_time_sec",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "increment_sec": {
+          "name": "increment_sec",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "host_color_preference": {
+          "name": "host_color_preference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'random'"
+        },
+        "game_id": {
+          "name": "game_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancelled_at": {
+          "name": "cancelled_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "lobbies_host_id_users_id_fk": {
+          "name": "lobbies_host_id_users_id_fk",
+          "tableFrom": "lobbies",
+          "tableTo": "users",
+          "columnsFrom": [
+            "host_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "lobbies_game_id_games_id_fk": {
+          "name": "lobbies_game_id_games_id_fk",
+          "tableFrom": "lobbies",
+          "tableTo": "games",
+          "columnsFrom": [
+            "game_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "lobbies_invite_code_unique": {
+          "name": "lobbies_invite_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "invite_code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_sessions": {
+      "name": "user_sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "device_info": {
+          "name": "device_info",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ip_address": {
+          "name": "ip_address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent": {
+          "name": "user_agent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_sessions_user_id_users_id_fk": {
+          "name": "user_sessions_user_id_users_id_fk",
+          "tableFrom": "user_sessions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "timezone": {
+          "name": "timezone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_verified": {
+          "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "is_guest": {
+          "name": "is_guest",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "last_seen": {
+          "name": "last_seen",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "premium_until": {
+          "name": "premium_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fide_rating": {
+          "name": "fide_rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "preferred_time_control": {
+          "name": "preferred_time_control",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "playstyle_tags": {
+          "name": "playstyle_tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_games": {
+          "name": "total_games",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "wins": {
+          "name": "wins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "losses": {
+          "name": "losses",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "draws": {
+          "name": "draws",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "current_rating": {
+          "name": "current_rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1200
+        },
+        "peak_rating": {
+          "name": "peak_rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1200
+        },
+        "profile_visibility": {
+          "name": "profile_visibility",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'public'"
+        },
+        "allow_friend_requests": {
+          "name": "allow_friend_requests",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "show_online_status": {
+          "name": "show_online_status",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
