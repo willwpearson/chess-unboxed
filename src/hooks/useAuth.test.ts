@@ -91,4 +91,38 @@ describe('useAuth', () => {
     expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.user).toBeNull();
   });
+
+  it('forgotPassword surfaces the generic success message', async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse({ success: false, error: 'Not authenticated' }, false, 401)) // mount refreshUser
+      .mockResolvedValueOnce(
+        jsonResponse({ success: true, data: { message: 'If that email exists, a reset link was sent.' } })
+      );
+
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    let forgotResult: { success: boolean; error?: string; message?: string } | undefined;
+    await act(async () => {
+      forgotResult = await result.current.forgotPassword('alice@example.com');
+    });
+
+    expect(forgotResult).toEqual({ success: true, message: 'If that email exists, a reset link was sent.' });
+  });
+
+  it('resetPassword surfaces a server error without throwing', async () => {
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(jsonResponse({ success: false, error: 'Not authenticated' }, false, 401))
+      .mockResolvedValueOnce(jsonResponse({ success: false, error: 'Invalid or expired reset link.' }, false, 400));
+
+    const { result } = renderHook(() => useAuth());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    let resetResult: { success: boolean; error?: string; message?: string } | undefined;
+    await act(async () => {
+      resetResult = await result.current.resetPassword('bad-token', 'newpassword');
+    });
+
+    expect(resetResult).toEqual({ success: false, error: 'Invalid or expired reset link.' });
+  });
 });

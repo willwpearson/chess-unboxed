@@ -39,6 +39,8 @@ interface AuthActions {
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   createGuestUser: () => Promise<{ success: boolean; error?: string }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>;
+  resetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; error?: string; message?: string }>;
 }
 
 interface UseAuthReturn extends AuthState, AuthActions {}
@@ -105,6 +107,20 @@ class AuthService {
   async createGuestUser() {
     return this.request('/auth/guest', {
       method: 'POST',
+    });
+  }
+
+  async forgotPassword(email: string) {
+    return this.request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    return this.request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
     });
   }
 }
@@ -246,6 +262,26 @@ export function useAuth(): UseAuthReturn {
     }
   };
 
+  const forgotPassword = async (email: string) => {
+    try {
+      const response = await authService.forgotPassword(email);
+      return { success: true, message: response.data?.message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send reset email';
+      return { success: false, error: errorMessage };
+    }
+  };
+
+  const resetPassword = async (token: string, newPassword: string) => {
+    try {
+      const response = await authService.resetPassword(token, newPassword);
+      return { success: true, message: response.data?.message };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to reset password';
+      return { success: false, error: errorMessage };
+    }
+  };
+
   // Initialize auth state on mount
   useEffect(() => {
     refreshUser();
@@ -258,5 +294,7 @@ export function useAuth(): UseAuthReturn {
     logout,
     refreshUser,
     createGuestUser,
+    forgotPassword,
+    resetPassword,
   };
 }
