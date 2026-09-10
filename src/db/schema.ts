@@ -50,6 +50,24 @@ export const userSessions = pgTable('user_sessions', {
   isActive: boolean('is_active').notNull().default(true),
 });
 
+// Forgot/reset-password flow: a separate table (not columns on `users`)
+// mirrors why `userSessions` is split out — supports multiple outstanding
+// reset requests cleanly, keeps `users` free of transient auth-flow state,
+// and gives single-use tracking (`usedAt`) for free. `tokenHash` is the
+// SHA-256 of a random 256-bit token; the raw token is only ever emailed to
+// the user, never stored (same reasoning as never storing `password_hash`
+// plaintext). See docs/MULTIPLAYER_PROGRESS.md.
+export const passwordResetTokens = pgTable('password_reset_tokens', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  tokenHash: text('token_hash').notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+}, (table) => ({
+  userIdx: index('password_reset_tokens_user_id_idx').on(table.userId),
+}));
+
 // Phase 2: private invite-code lobbies. A lobby is a pre-game handshake —
 // once a second player joins, a `games` row is created and the lobby just
 // points at it (`gameId`) for the host's waiting-room to redirect on. No
@@ -170,6 +188,8 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type UserSession = typeof userSessions.$inferSelect;
 export type NewUserSession = typeof userSessions.$inferInsert;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type NewPasswordResetToken = typeof passwordResetTokens.$inferInsert;
 export type Lobby = typeof lobbies.$inferSelect;
 export type NewLobby = typeof lobbies.$inferInsert;
 export type Game = typeof games.$inferSelect;

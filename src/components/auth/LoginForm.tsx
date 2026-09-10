@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -67,9 +68,14 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-fg-secondary mb-1">
-            Password
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-fg-secondary">
+              Password
+            </label>
+            <Link href="/forgot-password" className="text-sm text-accent-primary hover:text-fg font-medium">
+              Forgot password?
+            </Link>
+          </div>
           <input
             id="password"
             type="password"

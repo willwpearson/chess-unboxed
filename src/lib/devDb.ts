@@ -15,6 +15,7 @@ const tables: Record<string, Row[]> = {
   games: [],
   lobbies: [],
   matchmaking_queue: [],
+  password_reset_tokens: [],
 };
 
 let nextId = 1;
