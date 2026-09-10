@@ -113,6 +113,10 @@ export const games = pgTable('games', {
   // sweepAbandonedGamesForUser), queried as an OR across white/black player id.
   whitePlayerStatusIdx: index('games_white_player_status_idx').on(table.whitePlayerId, table.status),
   blackPlayerStatusIdx: index('games_black_player_status_idx').on(table.blackPlayerId, table.status),
+  // Phase 6: supports sweepGloballyAbandonedGames' player-agnostic scan for
+  // rows where BOTH sides have gone stale, regardless of who (if anyone) is
+  // making the current request.
+  globalAbandonIdx: index('games_global_abandon_idx').on(table.status, table.whiteLastSeenAt, table.blackLastSeenAt),
 }));
 
 // Phase 3: per-time-control ELO. Rows are created lazily — only when a

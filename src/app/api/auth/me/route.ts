@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { verifyAuthToken } from '@/lib/jwt';
-import { sweepAbandonedGamesForUser } from '@/lib/server/abandonment';
+import { sweepAbandonedGamesForUser, sweepGloballyAbandonedGames } from '@/lib/server/abandonment';
 
 export async function GET(request: NextRequest) {
   try {
@@ -89,6 +89,17 @@ export async function GET(request: NextRequest) {
       await sweepAbandonedGamesForUser(user.id);
     } catch (sweepError) {
       console.error('Abandonment sweep error:', sweepError);
+    }
+
+    // Best-effort: also reap a small batch of games where BOTH players went
+    // stale simultaneously (no surviving participant to trigger the sweep
+    // above for that specific game). Runs on behalf of ANY authenticated
+    // user, not just the two players involved — see
+    // src/lib/server/abandonment.ts's sweepGloballyAbandonedGames.
+    try {
+      await sweepGloballyAbandonedGames();
+    } catch (globalSweepError) {
+      console.error('Global abandonment sweep error:', globalSweepError);
     }
 
     // Remove sensitive data from response

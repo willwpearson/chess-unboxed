@@ -1,0 +1,1 @@
+CREATE INDEX "games_global_abandon_idx" ON "games" USING btree ("status","white_last_seen_at","black_last_seen_at");
