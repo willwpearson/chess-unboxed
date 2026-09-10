@@ -8,17 +8,26 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { LoadingSpinner } from '@/components/ui/Loading';
-import { Users, Swords, Zap, Clock, Hourglass, Crown, ArrowLeft } from 'lucide-react';
+import { Users, Swords, Zap, Clock, Hourglass, Crown, ArrowLeft, Sliders } from 'lucide-react';
 import Link from 'next/link';
-import { getDefaultPreset } from '@/lib/timeControls';
+import { classifyBucket, getDefaultPreset } from '@/lib/timeControls';
+import { DurationInput } from '@/components/ui/DurationInput';
+
+const CUSTOM_INITIAL_MIN_SEC = 15;
+const CUSTOM_INITIAL_MAX_SEC = 10800; // 180 min
+const CUSTOM_INCREMENT_MIN_SEC = 0;
+const CUSTOM_INCREMENT_MAX_SEC = 60;
 
 // UI shortcuts for creating a lobby, sourced from each bucket's default
-// preset (src/lib/timeControls.ts), plus an 'Untimed' option that only makes
-// sense for a private lobby (matchmaking has no untimed pool). A lobby only
-// affects its own two participants, so — unlike matchmaking — there's no
-// need to offer the alternate per-bucket presets here.
+// preset (src/lib/timeControls.ts), plus an 'Untimed' option and a 'Custom'
+// option that only make sense for a private lobby (matchmaking has no
+// untimed pool and doesn't support arbitrary values — see
+// docs/MULTIPLAYER_PROGRESS.md Open Questions). A lobby only affects its own
+// two participants, so — unlike matchmaking — there's no need to offer the
+// alternate per-bucket presets here, just a quick default per bucket plus a
+// fully custom option.
 const TIME_CONTROLS: {
-  key: 'bullet' | 'blitz' | 'rapid' | 'classical' | null;
+  key: 'bullet' | 'blitz' | 'rapid' | 'classical' | 'custom' | null;
   label: string;
   description: string;
   icon: any;
@@ -30,6 +39,7 @@ const TIME_CONTROLS: {
   { key: 'rapid', label: getDefaultPreset('rapid').label, description: '10 min', icon: Clock, initialTimeSec: getDefaultPreset('rapid').initialTimeSec, incrementSec: getDefaultPreset('rapid').incrementSec },
   { key: 'classical', label: getDefaultPreset('classical').label, description: '30 min', icon: Crown, initialTimeSec: getDefaultPreset('classical').initialTimeSec, incrementSec: getDefaultPreset('classical').incrementSec },
   { key: null, label: 'Untimed', description: 'No clock', icon: Hourglass },
+  { key: 'custom', label: 'Custom', description: 'Set your own', icon: Sliders },
 ];
 
 export default function PrivateLobbyHubPage() {
@@ -40,6 +50,13 @@ export default function PrivateLobbyHubPage() {
   const [selectedTimeControl, setSelectedTimeControl] = useState(TIME_CONTROLS[1]);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  const [customInitialSec, setCustomInitialSec] = useState(300);
+  const [customIncrementSec, setCustomIncrementSec] = useState(0);
+  const [customInitialValid, setCustomInitialValid] = useState(true);
+  const [customIncrementValid, setCustomIncrementValid] = useState(true);
+  const isCustomSelected = selectedTimeControl.key === 'custom';
+  const isCustomInvalid = isCustomSelected && (!customInitialValid || !customIncrementValid);
 
   const [code, setCode] = useState('');
   const [isJoining, setIsJoining] = useState(false);
@@ -60,14 +77,15 @@ export default function PrivateLobbyHubPage() {
     setIsCreating(true);
     setCreateError(null);
     try {
+      const timeControl = isCustomSelected
+        ? { timeControl: classifyBucket(customInitialSec), initialTimeSec: customInitialSec, incrementSec: customIncrementSec }
+        : { timeControl: selectedTimeControl.key, initialTimeSec: selectedTimeControl.initialTimeSec, incrementSec: selectedTimeControl.incrementSec };
       const response = await fetch('/api/lobbies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          timeControl: selectedTimeControl.key,
-          initialTimeSec: selectedTimeControl.initialTimeSec,
-          incrementSec: selectedTimeControl.incrementSec,
+          ...timeControl,
           colorPreference: 'random',
         }),
       });
@@ -172,9 +190,34 @@ export default function PrivateLobbyHubPage() {
                   })}
                 </div>
 
+                {isCustomSelected && (
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <DurationInput
+                      id="custom-initial-time"
+                      label="Initial time (seconds)"
+                      valueSec={customInitialSec}
+                      onChangeSec={setCustomInitialSec}
+                      onValidityChange={setCustomInitialValid}
+                      min={CUSTOM_INITIAL_MIN_SEC}
+                      max={CUSTOM_INITIAL_MAX_SEC}
+                      step={15}
+                      helperText={`≈ ${Math.round(customInitialSec / 60)} min`}
+                    />
+                    <DurationInput
+                      id="custom-increment"
+                      label="Increment (seconds)"
+                      valueSec={customIncrementSec}
+                      onChangeSec={setCustomIncrementSec}
+                      onValidityChange={setCustomIncrementValid}
+                      min={CUSTOM_INCREMENT_MIN_SEC}
+                      max={CUSTOM_INCREMENT_MAX_SEC}
+                    />
+                  </div>
+                )}
+
                 {createError && <p className="text-sm text-status-danger mb-4">{createError}</p>}
 
-                <Button onClick={handleCreateLobby} disabled={isCreating} className="w-full" size="lg">
+                <Button onClick={handleCreateLobby} disabled={isCreating || isCustomInvalid} className="w-full" size="lg">
                   {isCreating ? 'Creating…' : 'Create Lobby'}
                 </Button>
               </Card>
