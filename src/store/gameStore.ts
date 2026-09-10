@@ -88,8 +88,13 @@ export const useGameStore = create<GameStore>()(
             }
           }
         } else if (row.status === 'abandoned' && !gameManager.isGameOver()) {
-          const abandoningColor: PieceColor = row.winner_id === row.white_player_id ? 'black' : 'white';
-          gameManager.forfeitByAbandonment(abandoningColor);
+          if (row.winner_id === null) {
+            // Both players abandoned — no one to credit a win to.
+            gameManager.forfeitByMutualAbandonment();
+          } else {
+            const abandoningColor: PieceColor = row.winner_id === row.white_player_id ? 'black' : 'white';
+            gameManager.forfeitByAbandonment(abandoningColor);
+          }
         } else if (row.status === 'completed' && !gameManager.isGameOver()) {
           if (row.winner_id) {
             const loserColor: PieceColor = row.winner_id === row.white_player_id ? 'black' : 'white';

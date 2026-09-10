@@ -105,6 +105,17 @@ class QueryBuilder {
     return this;
   }
 
+  // Mirrors Supabase's .not(col, op, value) negated-filter shape. Only the
+  // 'is' operator is implemented (the only one this codebase currently
+  // uses, e.g. .not('white_last_seen_at', 'is', null)).
+  not(col: string, op: string, value: any) {
+    if (op !== 'is') {
+      throw new Error(`devDb QueryBuilder.not() only supports the 'is' operator, got '${op}'`);
+    }
+    this.filters.push((row) => row[col] !== value);
+    return this;
+  }
+
   or(expr: string) {
     this.filters.push((row) => matchesOr(row, expr));
     return this;

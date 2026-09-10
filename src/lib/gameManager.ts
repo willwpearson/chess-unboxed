@@ -555,6 +555,15 @@ export class GameManager {
   }
 
   /**
+   * Forfeit as a mutual/rated draw when BOTH players are detected as
+   * abandoned (no surviving participant to credit a win to — see
+   * src/lib/server/abandonment.ts's sweepGloballyAbandonedGames)
+   */
+  public forfeitByMutualAbandonment(): void {
+    this.endGame('draw', 'abandoned');
+  }
+
+  /**
    * Offer/accept draw
    */
   public offerDraw(): void {
