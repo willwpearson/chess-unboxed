@@ -64,6 +64,13 @@
       "when": 1789010732235,
       "tag": "0008_broad_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789414095434,
+      "tag": "0009_next_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }

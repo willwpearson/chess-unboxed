@@ -41,6 +41,39 @@ describe('initializeGame', () => {
   });
 });
 
+describe('initPuzzle', () => {
+  const PUZZLE_FEN = '5bk1/5ppp/8/8/8/8/8/KR6 w - - 0 1';
+
+  it('builds a local game manager from the puzzle FEN with no active DB game', () => {
+    useGameStore.getState().initPuzzle({ startingFen: PUZZLE_FEN, sideToMove: 'white' });
+
+    const state = useGameStore.getState();
+    expect(state.gameManager).not.toBeNull();
+    expect(state.activeGameId).toBeNull();
+    expect(state.myColor).toBe('white');
+    expect(state.currentGame?.position.turn).toBe('white');
+  });
+
+  it('lets ChessBoard-style move lookups work against the puzzle position', () => {
+    useGameStore.getState().initPuzzle({ startingFen: PUZZLE_FEN, sideToMove: 'white' });
+    const legalMoves = useGameStore.getState().getLegalMoves('b1');
+    expect(legalMoves).toContain('b8');
+  });
+
+  it('applies the puzzle-solving move via the shared makeMove action', async () => {
+    useGameStore.getState().initPuzzle({ startingFen: PUZZLE_FEN, sideToMove: 'white' });
+    const ok = await useGameStore.getState().makeMove('b1', 'b8');
+    expect(ok).toBe(true);
+    expect(useGameStore.getState().currentGame?.status).toBe('finished');
+  });
+
+  it('clears any stale multiplayer session state', () => {
+    useGameStore.setState({ activeGameId: 'stale-game', myColor: 'black' });
+    useGameStore.getState().initPuzzle({ startingFen: PUZZLE_FEN, sideToMove: 'white' });
+    expect(useGameStore.getState().activeGameId).toBeNull();
+  });
+});
+
 describe('makeMove (local bot game)', () => {
   beforeEach(async () => {
     await useGameStore.getState().initializeGame('bot', 'unboxed', BOT_CONFIG);
