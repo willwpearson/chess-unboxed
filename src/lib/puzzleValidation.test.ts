@@ -10,6 +10,33 @@ describe('validatePuzzleSolution', () => {
     }
   });
 
+  it('flags a puzzle as wraparound-dependent when the mate only holds under wraparound rules', () => {
+    // Rb1-b8 is itself a plain vertical slide (no file displacement at
+    // all), but it's only checkmate because the rook's rank-8 attack on
+    // g8 reaches around the wrapped edge past the f8 bishop — see the
+    // comment on this puzzle in puzzles.seed.ts.
+    const puzzle = puzzlesSeed.find((p) => p.slug === 'wrap-rook-back-rank-001')!;
+    const result = validatePuzzleSolution(puzzle);
+    expect(result.valid, result.error).toBe(true);
+    expect(result.usedWraparound).toBe(true);
+  });
+
+  it('flags a puzzle as NOT wraparound-dependent when the mate holds under standard rules too', () => {
+    // King boxed on b8 (nowhere near the a/h-file wrap edge), mated by a
+    // plain vertical rook approach along the d-file followed by a short,
+    // unobstructed rank-8 attack entirely within the b-d range. Nothing
+    // here depends on wraparound geometry.
+    const result = validatePuzzleSolution({
+      slug: 'standard-style-fixture',
+      startingFen: '1k6/ppp5/8/8/8/8/8/K2R4 w - - 0 1',
+      sideToMove: 'white',
+      solutionMoves: [{ from: 'd1', to: 'd8' }],
+      isWraparoundMode: true,
+    });
+    expect(result.valid, result.error).toBe(true);
+    expect(result.usedWraparound).toBe(false);
+  });
+
   it('rejects an illegal move in the solution', () => {
     const result = validatePuzzleSolution({
       slug: 'bad-illegal-move',
