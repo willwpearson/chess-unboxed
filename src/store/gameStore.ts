@@ -27,6 +27,7 @@ interface GameStore {
   // Game management actions
   initializeGame: (mode: GameMode, variant: GameVariant, botConfig?: BotConfig) => Promise<boolean>;
   initializeMultiplayerGame: (gameId: string, userId: string) => Promise<boolean>;
+  initPuzzle: (puzzle: { startingFen: string; sideToMove: PieceColor }) => void;
   subscribeToGame: (gameId: string) => void;
   unsubscribeFromGame: () => void;
   makeMove: (from: Square, to: Square, promotion?: string) => Promise<boolean>;
@@ -213,6 +214,42 @@ export const useGameStore = create<GameStore>()(
           console.error('Failed to initialize multiplayer game:', error);
           return false;
         }
+      },
+
+      // Puzzle mode: a local-only GameManager built from a puzzle's starting
+      // FEN, no DB game/activeGameId. Reusing this store (rather than
+      // forking ChessBoard) is deliberate — ChessBoard hard-depends on
+      // useGameStore() for square-selection/drag UI state and legal-move
+      // lookups with no prop escape hatch, so giving it a real gameManager
+      // here is the lowest-effort way to get correct board interaction for
+      // a puzzle position. Puzzle-specific bookkeeping (move index, hints,
+      // attempt result, the practice queue) lives in usePuzzleStore instead
+      // of here, layered on top of this gameManager.
+      initPuzzle: (puzzle: { startingFen: string; sideToMove: PieceColor }) => {
+        const { realtimeChannel: staleChannel, heartbeatIntervalId: staleHeartbeatId } = get();
+        if (staleChannel) supabase.removeChannel(staleChannel);
+        if (staleHeartbeatId) clearInterval(staleHeartbeatId);
+
+        const white = createHumanPlayer('Solver', 'white', 1200);
+        const black = createHumanPlayer('Solver', 'black', 1200);
+        const gameManager = createGame({
+          mode: 'casual',
+          variant: 'unboxed',
+          players: { white, black },
+          fen: puzzle.startingFen,
+        });
+
+        set({
+          gameManager,
+          botManager: null,
+          currentGame: gameManager.getGameState(),
+          activeGameId: null,
+          myColor: puzzle.sideToMove,
+          realtimeChannel: null,
+          heartbeatIntervalId: null,
+          drawOfferedBy: null,
+        });
+        get().clearUI();
       },
 
       subscribeToGame: (gameId: string) => {

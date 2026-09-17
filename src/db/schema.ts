@@ -184,6 +184,66 @@ export const matchmakingQueue = pgTable('matchmaking_queue', {
   pairingIdx: index('matchmaking_queue_pairing_idx').on(table.queueType, table.timeControl, table.initialTimeSec, table.incrementSec, table.status, table.createdAt),
 }));
 
+// Puzzles: hand-curated seed set (see src/data/puzzles.seed.ts, seeded via
+// scripts/seedPuzzles.ts) — not user-submitted or engine-generated in v1.
+// `solutionMoves` is the authoritative solution as a full principal
+// variation (solver moves + forced opponent replies), replayed move-by-move
+// the same way `games.moves` is replayed — there is no cached FEN here to
+// fall back on, so the starting position (`startingFen`) plus the move list
+// is the only source of truth (see WraparoundChessEngine.fen() note above).
+export const puzzles = pgTable('puzzles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  slug: text('slug').notNull().unique(), // stable id for idempotent reseeding
+  startingFen: text('starting_fen').notNull(),
+  sideToMove: text('side_to_move').notNull(), // 'white' | 'black' — whose move solves the puzzle
+  solutionMoves: jsonb('solution_moves').notNull(), // [{from, to, promotion?}, ...] full PV
+  isWraparoundMode: boolean('is_wraparound_mode').notNull().default(true),
+  rating: integer('rating').notNull().default(1200), // puzzle difficulty, same Elo scale as userPuzzleRatings
+  themes: text('themes').array(),
+  active: boolean('active').notNull().default(true), // soft-disable without deleting attempt history
+}, (table) => ({
+  ratingIdx: index('puzzles_rating_idx').on(table.rating),
+  activeIdx: index('puzzles_active_idx').on(table.active),
+}));
+
+// Per-user puzzle ELO — same lazy-create pattern as userRatings (see
+// src/lib/server/applyPuzzleResult.ts), but a single bucket: puzzles aren't
+// time-controlled in v1, so there's no timeControl column to key on.
+export const userPuzzleRatings = pgTable('user_puzzle_ratings', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  rating: integer('rating').notNull().default(1200),
+  peakRating: integer('peak_rating').notNull().default(1200),
+  puzzlesAttempted: integer('puzzles_attempted').notNull().default(0),
+  puzzlesSolved: integer('puzzles_solved').notNull().default(0),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  userIdx: uniqueIndex('user_puzzle_ratings_user_id_idx').on(table.userId),
+}));
+
+// One row per (user, puzzle) attempt outcome. The unique index on
+// (userId, puzzleId) is what makes rating updates idempotent: a puzzle can
+// only ever be "attempted" (rating-affecting) once per user — see the
+// attempt route's idempotency check in src/app/api/puzzles/[puzzleId]/attempt.
+// Re-solving an already-attempted puzzle is fine for review, it just never
+// recomputes ELO a second time.
+export const puzzleAttempts = pgTable('puzzle_attempts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  puzzleId: uuid('puzzle_id').notNull().references(() => puzzles.id, { onDelete: 'cascade' }),
+  solved: boolean('solved').notNull(),
+  movesPlayed: jsonb('moves_played').notNull().default([]), // display/debugging only, not trusted for verification
+  hintsUsed: integer('hints_used').notNull().default(0),
+  ratingChange: integer('rating_change'), // null if the rating write failed (mirrors games.rating_change_white)
+  source: text('source').notNull(), // 'practice' | 'daily'
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  userPuzzleIdx: uniqueIndex('puzzle_attempts_user_puzzle_idx').on(table.userId, table.puzzleId),
+  userCreatedIdx: index('puzzle_attempts_user_created_idx').on(table.userId, table.createdAt),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type UserSession = typeof userSessions.$inferSelect;
@@ -198,3 +258,9 @@ export type UserRating = typeof userRatings.$inferSelect;
 export type NewUserRating = typeof userRatings.$inferInsert;
 export type MatchmakingQueueEntry = typeof matchmakingQueue.$inferSelect;
 export type NewMatchmakingQueueEntry = typeof matchmakingQueue.$inferInsert;
+export type Puzzle = typeof puzzles.$inferSelect;
+export type NewPuzzle = typeof puzzles.$inferInsert;
+export type UserPuzzleRating = typeof userPuzzleRatings.$inferSelect;
+export type NewUserPuzzleRating = typeof userPuzzleRatings.$inferInsert;
+export type PuzzleAttempt = typeof puzzleAttempts.$inferSelect;
+export type NewPuzzleAttempt = typeof puzzleAttempts.$inferInsert;

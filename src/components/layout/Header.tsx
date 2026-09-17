@@ -7,7 +7,7 @@ import { useTheme } from '@/components/providers/ThemeProvider';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { Button } from '@/components/ui/Button';
 import { IconButton } from '@/components/ui/IconButton';
-import { Settings, Crown, LogOut, User, LayoutDashboard, Sun, Moon } from 'lucide-react';
+import { Settings, Crown, LogOut, User, LayoutDashboard, Sun, Moon, Puzzle } from 'lucide-react';
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuth();
@@ -44,6 +44,13 @@ export function Header() {
                 >
                   <LayoutDashboard size={18} />
                   <span className="font-medium text-sm lg:text-base">Dashboard</span>
+                </Link>
+                <Link
+                  href="/puzzles"
+                  className="flex items-center space-x-1 lg:space-x-2 text-fg-secondary hover:text-fg transition-colors duration-300"
+                >
+                  <Puzzle size={18} />
+                  <span className="font-medium text-sm lg:text-base">Puzzles</span>
                 </Link>
                 <Link
                   href="/settings"

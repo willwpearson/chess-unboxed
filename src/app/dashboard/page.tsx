@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
@@ -8,11 +8,12 @@ import { Footer } from '@/components/layout/Footer';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/Card';
 import { LoadingSpinner } from '@/components/ui/Loading';
-import { Trophy, Gamepad2, TrendingUp, Target, Bot, Users, Swords } from 'lucide-react';
+import { Trophy, Gamepad2, TrendingUp, Target, Bot, Users, Swords, Puzzle } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const [puzzleRating, setPuzzleRating] = useState<number | null>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -20,6 +21,16 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    fetch('/api/puzzles/rating', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((body) => {
+        if (body.success) setPuzzleRating(body.data.rating);
+      })
+      .catch(() => {});
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -56,7 +67,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Play Now */}
-            <div className="mb-12 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
               <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
                 <Link href="/play/unboxed/bot" className="absolute inset-0" aria-label="Play vs Bot" />
                 <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-accent-primary">
@@ -107,6 +118,23 @@ export default function DashboardPage() {
                   <div>• Bullet to classical</div>
                 </div>
               </Card>
+
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-purple-500/10 to-pink-600/10">
+                <Link href="/puzzles" className="absolute inset-0" aria-label="Puzzles" />
+                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-purple-500">
+                  <Puzzle size={60} />
+                </div>
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6 relative z-10">
+                  <Puzzle size={40} />
+                </div>
+                <h3 className="text-xl font-bold text-fg mb-3">Puzzles</h3>
+                <p className="text-fg-secondary mb-4">Sharpen your tactics on the wraparound board</p>
+                <div className="text-sm text-fg-secondary space-y-1">
+                  <div>• Daily puzzle</div>
+                  <div>• Rating-matched practice</div>
+                  <div>• Tracks its own rating</div>
+                </div>
+              </Card>
             </div>
 
             {/* Quick Actions */}
@@ -132,12 +160,18 @@ export default function DashboardPage() {
             {/* Profile Information */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-fg mb-6">Your Profile</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <Card className="p-6 text-center">
                   <Trophy size={32} className="mx-auto mb-3 text-accent-primary" />
                   <h3 className="text-2xl font-bold text-fg mb-1">{user.current_rating}</h3>
                   <p className="text-fg-secondary">Current Rating</p>
                   <p className="text-sm text-fg-secondary mt-1">Peak: {user.peak_rating}</p>
+                </Card>
+
+                <Card className="p-6 text-center">
+                  <Puzzle size={32} className="mx-auto mb-3 text-accent-primary" />
+                  <h3 className="text-2xl font-bold text-fg mb-1">{puzzleRating ?? '—'}</h3>
+                  <p className="text-fg-secondary">Puzzle Rating</p>
                 </Card>
 
                 <Card className="p-6 text-center">
