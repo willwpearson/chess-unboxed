@@ -204,6 +204,5 @@ export type BotDifficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Grandmas
 
 export interface BotConfig {
   difficulty: BotDifficulty;
-  personality: 'Aggressive' | 'Defensive' | 'Balanced';
 }
 

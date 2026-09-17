@@ -94,7 +94,7 @@ export default function HomePage() {
 
               {/* Content */}
               <div className="text-center lg:text-left">
-                <h1 className="text-5xl md:text-6xl font-gaming font-bold mb-6 text-fg">
+                <h1 className="text-5xl md:text-6xl font-bold mb-6 text-fg">
                   Chess Unboxed
                 </h1>
                 <p className="text-xl md:text-2xl text-fg-secondary mb-8 leading-relaxed">
@@ -143,7 +143,7 @@ export default function HomePage() {
         <section className="container mx-auto px-4 py-16 bg-surface-raised">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-gaming font-bold text-fg mb-6">
+              <h2 className="text-4xl font-bold text-fg mb-6">
                 How It Works
               </h2>
               <p className="text-xl text-fg-secondary max-w-3xl mx-auto leading-relaxed">
@@ -179,7 +179,7 @@ export default function HomePage() {
         {/* Call to Action */}
         <section className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-gaming font-bold text-fg mb-6">
+            <h2 className="text-4xl font-bold text-fg mb-6">
               Ready to Play?
             </h2>
             <p className="text-xl text-fg-secondary mb-8">

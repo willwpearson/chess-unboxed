@@ -14,8 +14,7 @@ export function Banner({ variant, children, className }: BannerProps) {
     <div
       className={cn(
         'rounded-lg p-4 font-semibold text-center',
-        variant === 'success' &&
-          'bg-status-success text-white shadow-[var(--shadow-glow-success)] animate-[victory-glow_2s_infinite_alternate]',
+        variant === 'success' && 'bg-status-success text-white border border-status-success/40',
         variant === 'danger' && 'bg-status-danger text-white',
         className
       )}

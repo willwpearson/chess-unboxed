@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-gaming font-bold mb-2 bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold mb-2 text-accent-primary">
                 Reset Password
               </h1>
               <p className="text-fg-secondary">

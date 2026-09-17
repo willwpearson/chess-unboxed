@@ -32,7 +32,7 @@ const ToggleSwitch = ({
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-fg">{label}</h4>
+        <h4 className="font-medium text-fg">{label}</h4>
         <p className="text-sm text-fg-muted">{description}</p>
       </div>
     </div>
@@ -68,7 +68,7 @@ const SelectDropdown = ({
   description: string;
 }) => (
   <Card className="p-4">
-    <label className="block text-sm font-gaming font-medium text-fg mb-2">
+    <label className="block text-sm font-medium text-fg mb-2">
       {label}
     </label>
     <select
@@ -107,7 +107,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Languages size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Language</h2>
+          <h2 className="text-2xl font-bold text-fg">Language</h2>
         </div>
 
         <SelectDropdown
@@ -123,28 +123,31 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Palette size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Board Theme</h2>
+          <h2 className="text-2xl font-bold text-fg">Board Theme</h2>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {(['classic', 'modern', 'wood', 'neon', 'cyberpunk'] as const).map((themeOption) => (
             <div
               key={themeOption}
-              className={`rounded-lg border p-4 text-center cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+              className={`rounded-lg border p-4 text-center cursor-pointer transition-colors duration-150 hover:border-border-strong ${
                 preferences.boardTheme === themeOption
                   ? 'border-accent-primary bg-accent-primary/10'
                   : 'border-border-subtle bg-surface-raised'
               }`}
               onClick={() => onUpdatePreference('boardTheme', themeOption)}
             >
-              {/* Board-skin preview swatches intentionally use fixed per-theme colors, not tokens */}
+              {/* Board-skin preview swatches: classic/modern/cyberpunk reference the same CSS
+                  vars the real squares use, so they stay truthful as the palette changes.
+                  wood/neon have no matching .chess-square CSS today (pre-existing gap) —
+                  their placeholder swatch colors are left as-is. */}
               <div className="grid grid-cols-2 gap-1 w-12 h-12 mx-auto mb-3">
-                <div className={`${themeOption === 'classic' ? 'bg-amber-100' : themeOption === 'modern' ? 'bg-slate-100' : themeOption === 'wood' ? 'bg-yellow-200' : themeOption === 'neon' ? 'bg-cyan-900' : 'bg-gray-900'} rounded`}></div>
-                <div className={`${themeOption === 'classic' ? 'bg-amber-800' : themeOption === 'modern' ? 'bg-slate-600' : themeOption === 'wood' ? 'bg-yellow-800' : themeOption === 'neon' ? 'bg-purple-900' : 'bg-purple-900'} rounded`}></div>
-                <div className={`${themeOption === 'classic' ? 'bg-amber-100' : themeOption === 'modern' ? 'bg-slate-100' : themeOption === 'wood' ? 'bg-yellow-200' : themeOption === 'neon' ? 'bg-cyan-400' : 'bg-purple-500'} rounded`}></div>
-                <div className={`${themeOption === 'classic' ? 'bg-amber-800' : themeOption === 'modern' ? 'bg-slate-600' : themeOption === 'wood' ? 'bg-yellow-800' : themeOption === 'neon' ? 'bg-pink-400' : 'bg-teal-400'} rounded`}></div>
+                <div className={`${themeOption === 'classic' ? 'bg-[var(--board-square-light)]' : themeOption === 'modern' ? 'bg-[var(--color-primary-100)]' : themeOption === 'wood' ? 'bg-yellow-200' : themeOption === 'neon' ? 'bg-cyan-900' : 'bg-[var(--color-game-surface)]'} rounded`}></div>
+                <div className={`${themeOption === 'classic' ? 'bg-[var(--board-square-dark)]' : themeOption === 'modern' ? 'bg-[var(--color-primary-600)]' : themeOption === 'wood' ? 'bg-yellow-800' : themeOption === 'neon' ? 'bg-purple-900' : 'bg-[var(--color-game-surface-highlight)]'} rounded`}></div>
+                <div className={`${themeOption === 'classic' ? 'bg-[var(--board-square-light)]' : themeOption === 'modern' ? 'bg-[var(--color-primary-100)]' : themeOption === 'wood' ? 'bg-yellow-200' : themeOption === 'neon' ? 'bg-cyan-400' : 'bg-[var(--color-game-surface)]'} rounded`}></div>
+                <div className={`${themeOption === 'classic' ? 'bg-[var(--board-square-dark)]' : themeOption === 'modern' ? 'bg-[var(--color-primary-600)]' : themeOption === 'wood' ? 'bg-yellow-800' : themeOption === 'neon' ? 'bg-pink-400' : 'bg-[var(--color-game-surface-highlight)]'} rounded`}></div>
               </div>
-              <h4 className="font-gaming font-medium text-fg mb-1 capitalize">{themeOption}</h4>
+              <h4 className="font-medium text-fg mb-1 capitalize">{themeOption}</h4>
             </div>
           ))}
         </div>
@@ -154,14 +157,14 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Gamepad2 size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Piece Set</h2>
+          <h2 className="text-2xl font-bold text-fg">Piece Set</h2>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
           {(['classic', 'modern', 'symbols'] as const).map((set) => (
             <div
               key={set}
-              className={`rounded-lg border p-4 text-center cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+              className={`rounded-lg border p-4 text-center cursor-pointer transition-colors duration-150 hover:border-border-strong ${
                 preferences.pieceSet === set
                   ? 'border-accent-primary bg-accent-primary/10'
                   : 'border-border-subtle bg-surface-raised'
@@ -177,7 +180,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
                   <span className="text-3xl leading-none">♚</span>
                 )}
               </div>
-              <span className="font-gaming font-medium text-fg text-sm capitalize">{set}</span>
+              <span className="font-medium text-fg text-sm capitalize">{set}</span>
             </div>
           ))}
         </div>
@@ -187,7 +190,7 @@ export function GameSettings({ preferences, onUpdatePreference }: GameSettingsPr
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Settings size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Game Options</h2>
+          <h2 className="text-2xl font-bold text-fg">Game Options</h2>
         </div>
 
         <div className="space-y-4">

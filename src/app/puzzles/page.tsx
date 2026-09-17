@@ -47,8 +47,8 @@ export default function PuzzlesLandingPage() {
       <Header />
       <main className="flex-1">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-          <Card className="p-8 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6">
+          <Card className="p-8 text-center bg-accent-secondary/12">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent-secondary text-accent-secondary-foreground mb-6">
               <Puzzle size={40} />
             </div>
             <h1 className="text-3xl font-bold text-fg mb-2">Puzzles</h1>

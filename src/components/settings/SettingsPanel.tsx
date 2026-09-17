@@ -252,7 +252,7 @@ export function SettingsPanel() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-gaming font-bold mb-2 bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">Settings</h1>
+              <h1 className="text-4xl font-bold mb-2 text-accent-primary">Settings</h1>
               <p className="text-fg-secondary">
                 Customize your chess experience and personalize your preferences
               </p>
@@ -326,7 +326,7 @@ export function SettingsPanel() {
                     >
                       {tab.icon}
                       <div className="flex-1">
-                        <div className="font-gaming font-medium">{tab.label}</div>
+                        <div className="font-medium">{tab.label}</div>
                         <div className="text-xs opacity-75">{tab.description}</div>
                       </div>
                     </button>

@@ -32,7 +32,7 @@ const ToggleSwitch = ({
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-fg">{label}</h4>
+        <h4 className="font-medium text-fg">{label}</h4>
         <p className="text-sm text-fg-muted">{description}</p>
       </div>
     </div>
@@ -68,7 +68,7 @@ const SelectDropdown = ({
   description: string;
 }) => (
   <Card className="p-4">
-    <label className="block text-sm font-gaming font-medium text-fg mb-2">
+    <label className="block text-sm font-medium text-fg mb-2">
       {label}
     </label>
     <select
@@ -95,7 +95,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Shield size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Profile Visibility</h2>
+          <h2 className="text-2xl font-bold text-fg">Profile Visibility</h2>
         </div>
 
         <SelectDropdown
@@ -115,7 +115,7 @@ export function PrivacySettings({ preferences, onUpdatePreference }: PrivacySett
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Lock size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Privacy Options</h2>
+          <h2 className="text-2xl font-bold text-fg">Privacy Options</h2>
         </div>
 
         <div className="space-y-4">

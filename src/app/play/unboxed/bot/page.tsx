@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -8,6 +8,7 @@ import { BotDifficultySelector } from '@/components/game/BotDifficultySelector';
 import { ChessBoard } from '@/components/game/ChessBoard';
 import { MoveHistory } from '@/components/game/MoveHistory';
 import { GameInfo } from '@/components/game/GameInfo';
+import { GameOverModal } from '@/components/game/GameOverModal';
 import { BotConfig, GameState, ChessMove, Player } from '@/types/game';
 import { useGameStore } from '@/store/gameStore';
 import { useUserStore } from '@/store/userStore';
@@ -23,6 +24,15 @@ export default function UnboxedBotGamePage() {
   const [gameStarted, setGameStarted] = useState(false);
   const [botConfig, setBotConfig] = useState<BotConfig | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const prevStatusRef = useRef(currentGame?.status);
+
+  useEffect(() => {
+    if (currentGame?.status === 'finished' && prevStatusRef.current !== 'finished') {
+      setShowGameOverModal(true);
+    }
+    prevStatusRef.current = currentGame?.status;
+  }, [currentGame?.status]);
 
   const handleStartGame = async (config: BotConfig) => {
     setIsLoading(true);
@@ -76,6 +86,7 @@ export default function UnboxedBotGamePage() {
   const handleNewGame = () => {
     setGameStarted(false);
     setBotConfig(null);
+    setShowGameOverModal(false);
   };
 
   if (!gameStarted || !currentGame) {
@@ -98,8 +109,8 @@ export default function UnboxedBotGamePage() {
 
               <div className="space-y-8">
                 {/* Game Mode Header */}
-                <Card className="p-4 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6">
+                <Card className="p-4 text-center bg-accent-primary/10">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent-primary text-accent-primary-foreground mb-6">
                     <Bot size={40} />
                   </div>
                   <h2 className="text-3xl font-bold text-fg">Play vs. Bot</h2>
@@ -123,37 +134,25 @@ export default function UnboxedBotGamePage() {
       {/* Modern Header - Purple theme for Unboxed */}
       <div className="bg-surface-raised border-b border-border-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <button
-              onClick={handleNewGame}
-              className="flex items-center space-x-2 px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
-            >
-              <ArrowLeft size={16} />
-              <span>New Game</span>
-            </button>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center min-h-16 py-2 gap-2">
+            <div className="justify-self-start">
+              <button
+                onClick={handleNewGame}
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
+              >
+                <ArrowLeft size={16} />
+                <span>New Game</span>
+              </button>
+            </div>
 
-            <div className="text-center">
-              <h1 className="text-lg font-semibold text-fg flex items-center justify-center space-x-2">
+            <div className="justify-self-center text-center">
+              <h1 className="text-lg font-semibold text-fg flex items-center justify-center flex-wrap gap-x-2 gap-y-1">
                 <span>{botConfig?.difficulty} Bot</span>
                 <Badge variant="info" size="sm">Unboxed</Badge>
               </h1>
-              {currentGame.status === 'finished' && (
-                <div className={`text-sm font-medium ${
-                  currentGame.result === 'white-wins' ? 'text-status-success' :
-                  currentGame.result === 'black-wins' ? 'text-status-danger' : 'text-status-warning'
-                }`}>
-                  {currentGame.result === 'white-wins' ? '1-0 You won!' :
-                   currentGame.result === 'black-wins' ? '0-1 You lost' : '½-½ Draw'}
-                  {currentGame.endReason && (
-                    <span className="text-fg-muted ml-1">
-                      ({currentGame.endReason.replace('-', ' ')})
-                    </span>
-                  )}
-                </div>
-              )}
             </div>
 
-            <div className="w-24"></div> {/* Spacer for centering */}
+            <div />
           </div>
         </div>
       </div>
@@ -182,13 +181,22 @@ export default function UnboxedBotGamePage() {
           {/* Side Panel - Modern and Compact */}
           <div className="w-full lg:w-80 space-y-4">
             <GameInfo game={currentGame} />
-            <MoveHistory 
+            <MoveHistory
               moves={currentGame.moves}
               isWraparoundMode={true}
             />
           </div>
         </div>
       </div>
+
+      <GameOverModal
+        isOpen={showGameOverModal}
+        onClose={() => setShowGameOverModal(false)}
+        result={currentGame.result}
+        endReason={currentGame.endReason}
+        perspective="white"
+        onNewGame={handleNewGame}
+      />
     </div>
   );
 }

@@ -158,8 +158,8 @@ export default function PrivateLobbyHubPage() {
               </Button>
             </div>
 
-            <Card className="p-4 text-center mb-8 bg-gradient-to-br from-blue-500/20 to-cyan-600/20">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white mb-6">
+            <Card className="p-4 text-center mb-8 bg-status-info/10">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-status-info text-white mb-6">
                 <Users size={40} />
               </div>
               <h2 className="text-3xl font-bold text-fg">Play with a Friend</h2>

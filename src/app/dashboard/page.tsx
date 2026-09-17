@@ -68,12 +68,12 @@ export default function DashboardPage() {
 
             {/* Play Now */}
             <div className="mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-accent-primary/10 to-accent-secondary/10">
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-accent-primary/10">
                 <Link href="/play/unboxed/bot" className="absolute inset-0" aria-label="Play vs Bot" />
                 <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-accent-primary">
                   <Bot size={60} />
                 </div>
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary text-white mb-6 relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent-primary text-accent-primary-foreground mb-6 relative z-10">
                   <Bot size={40} />
                 </div>
                 <h3 className="text-xl font-bold text-fg mb-3">Play vs Bot</h3>
@@ -85,12 +85,12 @@ export default function DashboardPage() {
                 </div>
               </Card>
 
-              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-blue-500/10 to-cyan-600/10">
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-status-info/10">
                 <Link href="/play/unboxed/private" className="absolute inset-0" aria-label="Play with a Friend" />
-                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-blue-500">
+                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-status-info">
                   <Users size={60} />
                 </div>
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white mb-6 relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-status-info text-white mb-6 relative z-10">
                   <Users size={40} />
                 </div>
                 <h3 className="text-xl font-bold text-fg mb-3">Play with a Friend</h3>
@@ -102,12 +102,12 @@ export default function DashboardPage() {
                 </div>
               </Card>
 
-              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-amber-500/10 to-orange-600/10">
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-status-warning/10">
                 <Link href="/play/unboxed/quick-match" className="absolute inset-0" aria-label="Quick Match" />
-                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-amber-500">
+                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-status-warning">
                   <Swords size={60} />
                 </div>
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white mb-6 relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-status-warning text-white mb-6 relative z-10">
                   <Swords size={40} />
                 </div>
                 <h3 className="text-xl font-bold text-fg mb-3">Quick Match</h3>
@@ -119,12 +119,12 @@ export default function DashboardPage() {
                 </div>
               </Card>
 
-              <Card interactive className="relative p-8 text-center overflow-hidden group bg-gradient-to-br from-purple-500/10 to-pink-600/10">
+              <Card interactive className="relative p-8 text-center overflow-hidden group bg-accent-secondary/12">
                 <Link href="/puzzles" className="absolute inset-0" aria-label="Puzzles" />
-                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-purple-500">
+                <div className="absolute top-4 right-4 opacity-40 group-hover:opacity-70 transition-opacity text-accent-secondary">
                   <Puzzle size={60} />
                 </div>
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6 relative z-10">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent-secondary text-accent-secondary-foreground mb-6 relative z-10">
                   <Puzzle size={40} />
                 </div>
                 <h3 className="text-xl font-bold text-fg mb-3">Puzzles</h3>
