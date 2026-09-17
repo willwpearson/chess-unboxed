@@ -28,6 +28,14 @@ export default function PuzzlesLandingPage() {
       .then((body) => {
         if (body.success) {
           setDailyPreview(body.data);
+        }
+      })
+      .catch(() => {});
+
+    fetch('/api/puzzles/rating', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((body) => {
+        if (body.success) {
           setRating(body.data.rating);
         }
       })

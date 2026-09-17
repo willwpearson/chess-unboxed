@@ -1,10 +1,12 @@
 import bcrypt from 'bcryptjs';
+import { puzzlesSeed } from '@/data/puzzles.seed';
 
 // Minimal in-memory stand-in for the Supabase client used by src/app/api/auth/*
-// routes when NEXT_PUBLIC_DEV_MODE=true. Implements only the chain shapes those
-// routes actually call: from(table).insert().select().single(), .select().or().single(),
-// .select().eq().single(), and .update().eq(). Data lives for the life of the dev
-// server process and reseeds the fixed dev user on every restart.
+// and src/app/api/puzzles/* routes when NEXT_PUBLIC_DEV_MODE=true. Implements
+// only the chain shapes those routes actually call: from(table).insert().select().single(),
+// .select().or().single(), .select().eq().single(), .update().eq(), and
+// .upsert(rows, { onConflict }). Data lives for the life of the dev server
+// process and reseeds the fixed dev user and curated puzzle set on every restart.
 
 type Row = Record<string, any>;
 
@@ -16,6 +18,9 @@ const tables: Record<string, Row[]> = {
   lobbies: [],
   matchmaking_queue: [],
   password_reset_tokens: [],
+  puzzles: [],
+  user_puzzle_ratings: [],
+  puzzle_attempts: [],
 };
 
 let nextId = 1;
@@ -55,6 +60,21 @@ function seed() {
     show_online_status: true,
     password_hash: bcrypt.hashSync('devpassword', 12),
   });
+
+  tables.puzzles.push(
+    ...puzzlesSeed.map((p) => ({
+      id: genId(),
+      created_at: new Date().toISOString(),
+      slug: p.slug,
+      starting_fen: p.startingFen,
+      side_to_move: p.sideToMove,
+      solution_moves: p.solutionMoves,
+      is_wraparound_mode: p.isWraparoundMode,
+      rating: p.rating,
+      themes: p.themes,
+      active: true,
+    }))
+  );
 }
 seed();
 
@@ -68,8 +88,9 @@ function matchesOr(row: Row, expr: string): boolean {
 
 class QueryBuilder {
   private table: string;
-  private op: 'select' | 'insert' | 'update' | null = null;
-  private payload: Row | null = null;
+  private op: 'select' | 'insert' | 'update' | 'upsert' | null = null;
+  private payload: Row | Row[] | null = null;
+  private onConflictCol = 'id';
   private filters: Array<(row: Row) => boolean> = [];
   private orderCol: string | null = null;
   private orderAsc = true;
@@ -93,6 +114,13 @@ class QueryBuilder {
   update(row: Row) {
     this.op = 'update';
     this.payload = row;
+    return this;
+  }
+
+  upsert(rows: Row | Row[], opts?: { onConflict?: string }) {
+    this.op = 'upsert';
+    this.payload = rows;
+    this.onConflictCol = opts?.onConflict ?? 'id';
     return this;
   }
 
@@ -174,6 +202,22 @@ class QueryBuilder {
       const matched = tables[this.table].filter((row) => this.filters.every((f) => f(row)));
       matched.forEach((row) => Object.assign(row, this.payload));
       return { data: matched, error: null };
+    }
+
+    if (this.op === 'upsert' && this.payload) {
+      const incomingRows = Array.isArray(this.payload) ? this.payload : [this.payload];
+      const col = this.onConflictCol;
+      const written = incomingRows.map((incoming) => {
+        const existing = store.find((row) => row[col] === incoming[col]);
+        if (existing) {
+          Object.assign(existing, incoming);
+          return existing;
+        }
+        const row: Row = { id: genId(), created_at: new Date().toISOString(), ...incoming };
+        store.push(row);
+        return row;
+      });
+      return { data: written, error: null };
     }
 
     // select

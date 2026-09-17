@@ -14,7 +14,7 @@ import { computeRatingDelta, type MatchScore } from '@/lib/elo';
 
 const RATING_FLOOR = 100;
 
-async function getOrCreatePuzzleRating(userId: string) {
+export async function getOrCreatePuzzleRating(userId: string) {
   const { data: existing } = await supabaseAdmin
     .from('user_puzzle_ratings')
     .select('*')
