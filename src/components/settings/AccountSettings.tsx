@@ -135,12 +135,12 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <User size={36} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Account Information</h2>
+          <h2 className="text-2xl font-bold text-fg">Account Information</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-gaming font-medium text-fg mb-2">
+            <label className="block text-sm font-medium text-fg mb-2">
               Email Address
             </label>
             <input
@@ -155,7 +155,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
           </div>
 
           <div>
-            <label className="block text-sm font-gaming font-medium text-fg mb-2">
+            <label className="block text-sm font-medium text-fg mb-2">
               Username
             </label>
             <input
@@ -173,7 +173,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
         <div className="mt-6 pt-6 border-t border-border-subtle">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="font-gaming font-medium text-fg">Password</h3>
+              <h3 className="font-medium text-fg">Password</h3>
               <p className="text-sm text-fg-muted">Change your account password</p>
             </div>
             <Button variant="secondary" onClick={() => setShowPasswordDialog(true)}>
@@ -188,12 +188,12 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
       <Card className="p-6 border-accent-danger">
         <div className="flex items-center space-x-3 mb-6">
           <AlertTriangle size={24} className="text-accent-danger" />
-          <h2 className="text-2xl font-gaming font-bold text-accent-danger">Danger Zone</h2>
+          <h2 className="text-2xl font-bold text-accent-danger">Danger Zone</h2>
         </div>
 
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="font-gaming font-medium text-fg">Delete Account</h3>
+            <h3 className="font-medium text-fg">Delete Account</h3>
             <p className="text-sm text-fg-muted">
               Permanently delete your account and all data. This action cannot be undone.
             </p>
@@ -279,7 +279,7 @@ export function AccountSettings({ isLoading, onNotification }: AccountSettingsPr
           <div className="space-y-4">
             <div className="flex items-center space-x-3 text-accent-danger mb-4">
               <AlertTriangle size={24} />
-              <h3 className="font-gaming font-bold text-lg">Are you absolutely sure?</h3>
+              <h3 className="font-bold text-lg">Are you absolutely sure?</h3>
             </div>
 
             <p className="text-fg">

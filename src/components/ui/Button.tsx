@@ -17,14 +17,14 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses =
-    'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-surface-base disabled:opacity-50 disabled:pointer-events-none disabled:translate-y-0 disabled:scale-100 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]';
+    'inline-flex items-center justify-center rounded-md font-medium transition duration-150 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-surface-base disabled:opacity-50 disabled:pointer-events-none';
 
   const variantClasses = {
-    primary: 'bg-accent-primary text-accent-primary-foreground shadow-sm hover:shadow-md active:shadow-xs',
-    secondary: 'bg-surface-raised border border-border-subtle text-fg shadow-xs hover:shadow-sm active:shadow-xs',
-    outline: 'bg-transparent border border-border-subtle text-fg hover:bg-surface-hover',
-    ghost: 'bg-transparent text-fg hover:bg-surface-hover',
-    danger: 'bg-accent-danger text-accent-danger-foreground shadow-sm hover:shadow-md active:shadow-xs',
+    primary: 'bg-accent-primary text-accent-primary-foreground shadow-xs hover:brightness-95 active:brightness-90',
+    secondary: 'bg-surface-raised border border-border-subtle text-fg shadow-xs hover:bg-surface-hover active:bg-surface-sunken',
+    outline: 'bg-transparent border border-border-subtle text-fg hover:bg-surface-hover active:bg-surface-sunken',
+    ghost: 'bg-transparent text-fg hover:bg-surface-hover active:bg-surface-sunken',
+    danger: 'bg-accent-danger text-accent-danger-foreground shadow-xs hover:brightness-95 active:brightness-90',
   };
 
   const sizeClasses = {

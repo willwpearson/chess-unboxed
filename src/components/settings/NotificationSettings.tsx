@@ -36,7 +36,7 @@ const ToggleSwitch = ({
         </div>
       )}
       <div>
-        <h4 className="font-gaming font-medium text-fg">{label}</h4>
+        <h4 className="font-medium text-fg">{label}</h4>
         <p className="text-sm text-fg-muted">{description}</p>
       </div>
     </div>
@@ -64,7 +64,7 @@ export function NotificationSettings({ preferences, onToggleNestedPreference }: 
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Mail size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Email Notifications</h2>
+          <h2 className="text-2xl font-bold text-fg">Email Notifications</h2>
         </div>
 
         <div className="space-y-4">
@@ -114,7 +114,7 @@ export function NotificationSettings({ preferences, onToggleNestedPreference }: 
       <Card className="p-6">
         <div className="flex items-center space-x-3 mb-6">
           <Smartphone size={24} className="text-accent-primary" />
-          <h2 className="text-2xl font-gaming font-bold text-fg">Push Notifications</h2>
+          <h2 className="text-2xl font-bold text-fg">Push Notifications</h2>
         </div>
 
         <div className="space-y-4">

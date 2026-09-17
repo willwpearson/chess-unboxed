@@ -18,11 +18,11 @@ export function IconButton({
   ...props
 }: IconButtonProps) {
   const baseClasses =
-    'inline-flex items-center justify-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-surface-base disabled:opacity-50 disabled:pointer-events-none disabled:translate-y-0 disabled:scale-100 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]';
+    'inline-flex items-center justify-center rounded-full transition duration-150 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 focus:ring-offset-surface-base disabled:opacity-50 disabled:pointer-events-none';
 
   const variantClasses = {
     ghost: 'bg-transparent text-fg-secondary hover:bg-surface-hover hover:text-fg',
-    solid: 'bg-surface-raised border border-border-subtle text-fg shadow-xs hover:shadow-sm',
+    solid: 'bg-surface-raised border border-border-subtle text-fg shadow-xs hover:bg-surface-hover',
     danger: 'bg-transparent text-accent-danger hover:bg-accent-danger/10',
   };
 

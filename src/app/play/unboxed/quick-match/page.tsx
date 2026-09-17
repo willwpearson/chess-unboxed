@@ -105,8 +105,8 @@ export default function QuickMatchHubPage() {
               </Button>
             </div>
 
-            <Card className="p-4 text-center mb-8 bg-gradient-to-br from-amber-500/20 to-orange-600/20">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white mb-6">
+            <Card className="p-4 text-center mb-8 bg-status-warning/10">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-status-warning text-white mb-6">
                 <Trophy size={40} />
               </div>
               <h2 className="text-3xl font-bold text-fg">Quick Match</h2>

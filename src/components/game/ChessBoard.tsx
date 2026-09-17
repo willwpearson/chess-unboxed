@@ -418,7 +418,7 @@ export function ChessBoard({
           ${getSquareColor(file, rank)}
           ${isSelected ? 'ring-2 ring-board-highlight-selected ring-inset shadow-inner' : ''}
           ${isPossibleMove && !isWraparoundTarget ? 'ring-1 ring-board-highlight-legal ring-inset' : ''}
-          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-secondary-400 ring-inset' : ''}
+          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-accent-secondary ring-inset' : ''}
           ${isLastMove ? 'ring-1 ring-board-highlight-lastmove ring-inset' : ''}
           ${isKingInCheck ? 'check' : ''}
         `}
@@ -432,12 +432,12 @@ export function ChessBoard({
             {piece ? (
               // Capture indicator - ring around edge
               <div className={`absolute inset-1 rounded-full border-2 ${
-                isWraparoundTarget ? 'border-secondary-400' : 'border-board-highlight-legal'
+                isWraparoundTarget ? 'border-accent-secondary' : 'border-board-highlight-legal'
               }`} />
             ) : (
               // Move indicator - small dot
               <div className={`w-3 md:w-6 h-3 md:h-6 rounded-full ${
-                isWraparoundTarget ? 'bg-secondary-400' : 'bg-board-highlight-legal'
+                isWraparoundTarget ? 'bg-accent-secondary' : 'bg-board-highlight-legal'
               } opacity-70`} />
             )}
           </div>
@@ -488,7 +488,7 @@ export function ChessBoard({
       <div className="relative w-full max-w-[min(100vw-2rem,100dvh-8rem)] aspect-square">
         <div 
           ref={boardRef}
-          className={`relative w-full h-full rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] bg-gradient-to-br from-secondary to-secondary-400`}
+          className={`relative w-full h-full rounded-xl shadow-[0_8px_32px_rgba(43,33,26,0.18)] bg-accent-primary`}
         >
           {/* Wraparound portals - off to the sides */}
           {isWraparoundMode && (
@@ -498,11 +498,11 @@ export function ChessBoard({
                 {/* Portal structure */}
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
-                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_12px_rgba(147,51,234,0.25)] animate-pulse"></div>
-                  <div className="absolute inset-1 rounded-full border-2 border-secondary-400 animate-pulse [animation-delay:0.5s]"></div>
+                  <div className="absolute inset-0 rounded-full border-3 border-accent-secondary shadow-[0_0_8px_rgba(201,138,44,0.18)] animate-pulse"></div>
+                  <div className="absolute inset-1 rounded-full border-2 border-accent-secondary/60 animate-pulse [animation-delay:0.5s]"></div>
 
                   {/* Portal center */}
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-r from-secondary-800 to-secondary-400 shadow-inner animate-pulse"></div>
+                  <div className="absolute inset-3 rounded-full bg-accent-secondary/80 shadow-inner animate-pulse"></div>
 
                 </div>
 
@@ -511,7 +511,7 @@ export function ChessBoard({
                   <div
                     key={`left-flow-${i}`}
                     data-testid="portal-particle"
-                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full opacity-70"
+                    className="absolute w-1.5 h-1.5 bg-accent-secondary rounded-full opacity-70"
                     style={{
                       top: `${8 + i * 15}%`,
                       left: '100%',
@@ -529,7 +529,7 @@ export function ChessBoard({
                   <div
                     key={`left-flow-sec-${i}`}
                     data-testid="portal-particle"
-                    className="absolute w-1 h-1 bg-secondary-400 rounded-full opacity-70"
+                    className="absolute w-1 h-1 bg-accent-secondary/70 rounded-full opacity-70"
                     style={{
                       top: `${16 + i * 25}%`,
                       left: '100%',
@@ -548,11 +548,11 @@ export function ChessBoard({
                 {/* Portal structure */}
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
-                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_12px_rgba(147,51,234,0.25)] animate-pulse"></div>
-                  <div className="absolute inset-1 rounded-full border-2 border-secondary-400 animate-pulse [animation-delay:0.5s]"></div>
+                  <div className="absolute inset-0 rounded-full border-3 border-accent-secondary shadow-[0_0_8px_rgba(201,138,44,0.18)] animate-pulse"></div>
+                  <div className="absolute inset-1 rounded-full border-2 border-accent-secondary/60 animate-pulse [animation-delay:0.5s]"></div>
 
                   {/* Portal center */}
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-l from-secondary-600 to-secondary-400 shadow-inner animate-pulse"></div>
+                  <div className="absolute inset-3 rounded-full bg-accent-secondary/80 shadow-inner animate-pulse"></div>
 
                 </div>
 
@@ -561,7 +561,7 @@ export function ChessBoard({
                   <div
                     key={`right-flow-${i}`}
                     data-testid="portal-particle"
-                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full opacity-70"
+                    className="absolute w-1.5 h-1.5 bg-accent-secondary rounded-full opacity-70"
                     style={{
                       top: `${8 + i * 15}%`,
                       right: '100%',
@@ -579,7 +579,7 @@ export function ChessBoard({
                   <div
                     key={`right-flow-sec-${i}`}
                     data-testid="portal-particle"
-                    className="absolute w-1 h-1 bg-secondary-400 rounded-full opacity-70"
+                    className="absolute w-1 h-1 bg-accent-secondary/70 rounded-full opacity-70"
                     style={{
                       top: `${16 + i * 25}%`,
                       right: '100%',

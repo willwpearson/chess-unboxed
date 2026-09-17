@@ -20,6 +20,7 @@ const BOT_CONFIGS: Record<BotDifficulty, {
   description: string;
   icon: any;
   color: string;
+  textColor: string;
   rating: number;
   features: string[];
 }> = {
@@ -27,7 +28,8 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     name: 'Beginner',
     description: 'Perfect for learning the basics',
     icon: Bot,
-    color: 'from-green-400 to-emerald-600',
+    color: 'bg-status-success',
+    textColor: 'text-white',
     rating: 800,
     features: ['Random moves', 'No deep strategy', 'Great for beginners']
   },
@@ -35,7 +37,8 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     name: 'Intermediate',
     description: 'Good challenge for casual players',
     icon: Brain,
-    color: 'from-blue-400 to-indigo-600',
+    color: 'bg-accent-secondary',
+    textColor: 'text-accent-secondary-foreground',
     rating: 1200,
     features: ['Basic tactics', 'Simple strategy', 'Balanced gameplay']
   },
@@ -43,7 +46,8 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     name: 'Advanced',
     description: 'Strong opponent for experienced players',
     icon: Target,
-    color: 'from-orange-400 to-red-600',
+    color: 'bg-status-warning',
+    textColor: 'text-accent-secondary-foreground',
     rating: 1600,
     features: ['Advanced tactics', 'Strong endgame', 'Aggressive play']
   },
@@ -51,7 +55,8 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     name: 'Grandmaster',
     description: 'Ultimate challenge for chess masters',
     icon: Crown,
-    color: 'from-purple-400 to-violet-600',
+    color: 'bg-accent-danger',
+    textColor: 'text-white',
     rating: 2000,
     features: ['Deep calculations', 'Perfect endgame', 'Master level']
   }
@@ -73,7 +78,7 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
   return (
     <Card className="p-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-gaming font-bold mb-4 bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">Choose Your Opponent</h2>
+        <h2 className="text-3xl font-bold mb-4 text-accent-primary">Choose Your Opponent</h2>
         <p className="text-lg text-fg-secondary">Select the difficulty level that matches your skill</p>
       </div>
 
@@ -92,14 +97,14 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
                   isSelected ? 'ring-2 ring-accent-primary' : ''
                 }`}
               >
-                {/* Gradient overlay for selected state */}
+                {/* Tint overlay for selected state */}
                 {isSelected && (
-                  <div className={`absolute inset-0 bg-gradient-to-br ${config.color} opacity-20 pointer-events-none`} />
+                  <div className={`absolute inset-0 ${config.color} opacity-10 pointer-events-none`} />
                 )}
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r ${config.color} text-white mx-auto mb-4 relative z-10`}>
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${config.color} ${config.textColor} mx-auto mb-4 relative z-10`}>
                   <IconComponent size={32} />
                 </div>
-                <h3 className="text-xl font-gaming font-bold text-fg mb-2 relative z-10">{config.name}</h3>
+                <h3 className="text-xl font-bold text-fg mb-2 relative z-10">{config.name}</h3>
                 <p className="text-sm text-fg-secondary mb-4 relative z-10">{config.description}</p>
 
                 <div className="space-y-2 mb-4 relative z-10">
@@ -129,7 +134,6 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
           disabled={!selectedDifficulty || isLoading}
           variant={selectedDifficulty && !isLoading ? 'primary' : 'secondary'}
           size="lg"
-          className="font-gaming"
         >
           {isLoading ? (
             <div className="flex items-center">

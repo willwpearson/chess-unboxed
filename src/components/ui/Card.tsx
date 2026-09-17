@@ -16,7 +16,7 @@ export function Card({ children, className, variant = 'elevated', interactive = 
       className={cn(
         'bg-surface-raised rounded-lg border border-border-subtle',
         variant === 'elevated' && 'shadow-sm',
-        interactive && 'hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer',
+        interactive && 'hover:border-border-strong transition-colors duration-150 cursor-pointer',
         className
       )}
     >

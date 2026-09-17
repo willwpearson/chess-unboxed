@@ -30,7 +30,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center justify-center space-x-3">
             <Crown size={32} className="text-accent-primary" />
-            <span className="text-xl font-gaming font-bold text-fg">
+            <span className="text-xl font-bold text-fg">
               Chess Unboxed
             </span>
           </Link>

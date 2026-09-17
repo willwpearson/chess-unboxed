@@ -109,8 +109,8 @@ export default function UnboxedBotGamePage() {
 
               <div className="space-y-8">
                 {/* Game Mode Header */}
-                <Card className="p-4 text-center bg-gradient-to-br from-purple-500/20 to-pink-600/20">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white mb-6">
+                <Card className="p-4 text-center bg-accent-primary/10">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-accent-primary text-accent-primary-foreground mb-6">
                     <Bot size={40} />
                   </div>
                   <h2 className="text-3xl font-bold text-fg">Play vs. Bot</h2>
