@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { ChessBoard } from '@/components/game/ChessBoard';
 import { MoveHistory } from '@/components/game/MoveHistory';
 import { GameInfo } from '@/components/game/GameInfo';
+import { GameOverModal } from '@/components/game/GameOverModal';
 import { ChessMove } from '@/types/game';
 import { useGameStore } from '@/store/gameStore';
 import { useAuth } from '@/hooks/useAuth';
@@ -34,6 +35,15 @@ export default function MultiplayerGamePage() {
   } = useGameStore();
 
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const prevStatusRef = useRef(currentGame?.status);
+
+  useEffect(() => {
+    if (currentGame?.status === 'finished' && prevStatusRef.current !== 'finished') {
+      setShowGameOverModal(true);
+    }
+    prevStatusRef.current = currentGame?.status;
+  }, [currentGame?.status]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -110,44 +120,26 @@ export default function MultiplayerGamePage() {
     <div className="min-h-screen bg-surface-base">
       <div className="bg-surface-raised border-b border-border-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="flex items-center space-x-2 px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
-            >
-              <ArrowLeft size={16} />
-              <span>Leave</span>
-            </button>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center min-h-16 py-2 gap-2">
+            <div className="justify-self-start">
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="flex items-center space-x-2 px-3 py-2 text-sm text-fg-secondary hover:text-fg transition-colors"
+              >
+                <ArrowLeft size={16} />
+                <span>Leave</span>
+              </button>
+            </div>
 
-            <div className="text-center">
-              <h1 className="text-lg font-semibold text-fg flex items-center justify-center space-x-2">
+            <div className="justify-self-center text-center">
+              <h1 className="text-lg font-semibold text-fg flex items-center justify-center flex-wrap gap-x-2 gap-y-1">
                 <Users size={18} />
                 <span>You are {myColor === 'white' ? 'White' : 'Black'}</span>
                 <Badge variant="info" size="sm">Unboxed</Badge>
               </h1>
-              {currentGame.status === 'finished' && (
-                <div
-                  className={`text-sm font-medium ${
-                    currentGame.result === `${myColor}-wins`
-                      ? 'text-status-success'
-                      : currentGame.result === 'draw'
-                      ? 'text-status-warning'
-                      : 'text-status-danger'
-                  }`}
-                >
-                  {currentGame.result === 'white-wins'
-                    ? '1-0 White won'
-                    : currentGame.result === 'black-wins'
-                    ? '0-1 Black won'
-                    : '½-½ Draw'}
-                  {currentGame.endReason && (
-                    <span className="text-fg-muted ml-1">({currentGame.endReason.replace('-', ' ')})</span>
-                  )}
-                </div>
-              )}
             </div>
 
-            <div className="w-24"></div>
+            <div />
           </div>
         </div>
       </div>
@@ -186,6 +178,15 @@ export default function MultiplayerGamePage() {
           </div>
         </div>
       </div>
+
+      <GameOverModal
+        isOpen={showGameOverModal}
+        onClose={() => setShowGameOverModal(false)}
+        result={currentGame.result}
+        endReason={currentGame.endReason}
+        perspective={myColor}
+        onNewGame={() => router.push('/dashboard')}
+      />
     </div>
   );
 }

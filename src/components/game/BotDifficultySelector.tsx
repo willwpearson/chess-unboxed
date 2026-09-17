@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { BotDifficulty, BotConfig } from '@/types/game';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Bot, Brain, Zap, Target, Crown, Settings, Swords, Scale, Shield } from 'lucide-react';
+import { Bot, Brain, Zap, Target, Crown } from 'lucide-react';
 
 interface BotDifficultySelectorProps {
   onStartGame: (config: BotConfig) => void;
@@ -21,7 +21,6 @@ const BOT_CONFIGS: Record<BotDifficulty, {
   icon: any;
   color: string;
   rating: number;
-  personality: 'aggressive' | 'defensive' | 'balanced';
   features: string[];
 }> = {
   Beginner: {
@@ -30,7 +29,6 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     icon: Bot,
     color: 'from-green-400 to-emerald-600',
     rating: 800,
-    personality: 'balanced',
     features: ['Random moves', 'No deep strategy', 'Great for beginners']
   },
   Intermediate: {
@@ -39,7 +37,6 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     icon: Brain,
     color: 'from-blue-400 to-indigo-600',
     rating: 1200,
-    personality: 'balanced',
     features: ['Basic tactics', 'Simple strategy', 'Balanced gameplay']
   },
   Advanced: {
@@ -48,7 +45,6 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     icon: Target,
     color: 'from-orange-400 to-red-600',
     rating: 1600,
-    personality: 'aggressive',
     features: ['Advanced tactics', 'Strong endgame', 'Aggressive play']
   },
   Grandmaster: {
@@ -57,51 +53,18 @@ const BOT_CONFIGS: Record<BotDifficulty, {
     icon: Crown,
     color: 'from-purple-400 to-violet-600',
     rating: 2000,
-    personality: 'aggressive',
     features: ['Deep calculations', 'Perfect endgame', 'Master level']
   }
 };
 
-const PERSONALITIES: {
-  type: 'Aggressive' | 'Balanced' | 'Defensive';
-  name: string;
-  description: string;
-  icon: typeof Swords;
-  gradient: string;
-}[] = [
-  {
-    type: 'Aggressive',
-    name: 'Aggressive',
-    description: 'Attacks quickly, takes risks',
-    icon: Swords,
-    gradient: 'from-red-500 to-orange-600'
-  },
-  {
-    type: 'Balanced',
-    name: 'Balanced',
-    description: 'Mix of attack and defense',
-    icon: Scale,
-    gradient: 'from-blue-500 to-indigo-600'
-  },
-  {
-    type: 'Defensive',
-    name: 'Defensive',
-    description: 'Solid play, fewer risks',
-    icon: Shield,
-    gradient: 'from-green-500 to-emerald-600'
-  }
-];
-
 export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultySelectorProps) {
   const [selectedDifficulty, setSelectedDifficulty] = useState<BotDifficulty | null>(null);
-  const [selectedPersonality, setSelectedPersonality] = useState<'Aggressive' | 'Defensive' | 'Balanced'>('Balanced');
 
   const handleStartGame = () => {
     if (!selectedDifficulty) return;
 
     const botConfig: BotConfig = {
-      difficulty: selectedDifficulty,
-      personality: selectedPersonality
+      difficulty: selectedDifficulty
     };
 
     onStartGame(botConfig);
@@ -159,46 +122,6 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
         })}
       </div>
 
-      {/* Personality Selection */}
-      {selectedDifficulty && (
-        <Card className="mt-8 p-6" variant="flat">
-          <div className="flex items-center space-x-3 mb-6">
-            <Settings size={24} className="text-accent-primary" />
-            <h3 className="text-2xl font-gaming font-bold text-fg">Bot Personality</h3>
-          </div>
-          <p className="text-fg-secondary mb-6">
-            Customize how the bot plays against you
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {PERSONALITIES.map((personality) => {
-              const isPersonalitySelected = selectedPersonality === personality.type;
-              const PersonalityIcon = personality.icon;
-              return (
-                <div key={personality.type} onClick={() => setSelectedPersonality(personality.type)}>
-                  <Card
-                    interactive
-                    className={`cursor-pointer p-4 text-center relative overflow-hidden ${
-                      isPersonalitySelected ? 'ring-2 ring-accent-primary' : ''
-                    }`}
-                  >
-                    {/* Gradient overlay for selected state */}
-                    {isPersonalitySelected && (
-                      <div className={`absolute inset-0 bg-gradient-to-br ${personality.gradient} opacity-20 pointer-events-none`} />
-                    )}
-                    <div className="flex items-center justify-center mb-3 relative z-10 text-fg">
-                      <PersonalityIcon size={32} />
-                    </div>
-                    <h4 className="font-gaming font-medium text-fg mb-2 relative z-10">{personality.name}</h4>
-                    <p className="text-sm text-fg-secondary relative z-10">{personality.description}</p>
-                  </Card>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
-
       {/* Start Game Button */}
       <div className="text-center my-8">
         <Button
@@ -230,12 +153,9 @@ export function BotDifficultySelector({ onStartGame, isLoading }: BotDifficultyS
           <CardContent className="p-4">
             <div className="text-center">
               <h4 className="font-semibold text-fg mb-2">Game Configuration</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-fg-secondary">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-fg-secondary">
                 <div>
                   <span className="font-medium text-fg">Difficulty:</span> {BOT_CONFIGS[selectedDifficulty].name}
-                </div>
-                <div>
-                  <span className="font-medium text-fg">Personality:</span> {selectedPersonality}
                 </div>
                 <div>
                   <span className="font-medium text-fg">Rating:</span> ~{BOT_CONFIGS[selectedDifficulty].rating}

@@ -201,7 +201,7 @@ export function MoveHistory({
 
       {/* Move List */}
       <div className="p-2">
-        <div className="max-h-80 overflow-y-auto">
+        <div className="max-h-48 sm:max-h-64 lg:max-h-80 overflow-y-auto">
           {filteredMoves.length === 0 ? (
             <div className="text-center py-4 text-fg-muted">
               <p className="text-xs">No moves match your filters</p>

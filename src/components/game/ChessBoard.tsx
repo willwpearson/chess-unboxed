@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { PromotionDialog } from './PromotionDialog';
 import { ChessPieceIcon } from './ChessPiece';
-import { Crown, RotateCcw, Flag, Users, RefreshCw } from 'lucide-react';
+import { Crown, Flag, Users, RefreshCw } from 'lucide-react';
 
 interface ChessBoardProps {
   position?: Record<Square, ChessPiece | null>;
@@ -128,7 +128,23 @@ export function ChessBoard({
     
     return pos;
   }, [chess, chessEngine, position]);
-  
+
+  // Determine whether the side to move is currently in check (and if it's checkmate),
+  // so the king's square can be highlighted. Uses chessEngine directly (not the plain
+  // `chess` instance) so wraparound-aware check detection is used in unboxed games.
+  const checkStatus = useMemo(() => {
+    const inCheck = chessEngine.inCheck();
+    if (!inCheck) {
+      return { inCheck: false, isCheckmate: false, kingSquare: null as Square | null };
+    }
+
+    const turn = normalizeColor(chessEngine.turn());
+    const kingSquare = (Object.entries(boardPosition) as [Square, ChessPiece | null][])
+      .find(([, piece]) => piece?.type === 'king' && piece.color === turn)?.[0] ?? null;
+
+    return { inCheck: true, isCheckmate: chessEngine.isCheckmate(), kingSquare };
+  }, [chessEngine, boardPosition]);
+
   // Helper function to convert our square format to chess.js format
   const toChessJSSquare = useCallback((square: Square): ChessJSSquare => square as ChessJSSquare, []);
   
@@ -387,7 +403,8 @@ export function ChessBoard({
     const isSelected = ui.selectedSquare === square;
     const isPossibleMove = ui.possibleMoves.includes(square);
     const isLastMove = false; // TODO: Implement last move highlighting
-    
+    const isKingInCheck = checkStatus.inCheck && checkStatus.kingSquare === square;
+
     // Check if this square would be a wraparound move
     const isWraparoundTarget = ui.selectedSquare && isWraparoundMove(ui.selectedSquare, square);
     const wraparoundType = ui.selectedSquare ? getWraparoundIndicators(ui.selectedSquare, square) : null;
@@ -395,13 +412,15 @@ export function ChessBoard({
     return (
       <div
         key={square}
+        data-square={square}
         className={`
           relative aspect-square cursor-pointer transition-all duration-200
           ${getSquareColor(file, rank)}
           ${isSelected ? 'ring-2 ring-board-highlight-selected ring-inset shadow-inner' : ''}
           ${isPossibleMove && !isWraparoundTarget ? 'ring-1 ring-board-highlight-legal ring-inset' : ''}
-          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-accent-secondary ring-inset' : ''}
+          ${isPossibleMove && isWraparoundTarget ? 'ring-1 ring-secondary-400 ring-inset' : ''}
           ${isLastMove ? 'ring-1 ring-board-highlight-lastmove ring-inset' : ''}
+          ${isKingInCheck ? 'check' : ''}
         `}
         onClick={() => handleSquareClick(square)}
         onDragOver={handleDragOver}
@@ -413,12 +432,12 @@ export function ChessBoard({
             {piece ? (
               // Capture indicator - ring around edge
               <div className={`absolute inset-1 rounded-full border-2 ${
-                isWraparoundTarget ? 'border-accent-secondary' : 'border-board-highlight-legal'
+                isWraparoundTarget ? 'border-secondary-400' : 'border-board-highlight-legal'
               }`} />
             ) : (
               // Move indicator - small dot
               <div className={`w-3 md:w-6 h-3 md:h-6 rounded-full ${
-                isWraparoundTarget ? 'bg-accent-secondary' : 'bg-board-highlight-legal'
+                isWraparoundTarget ? 'bg-secondary-400' : 'bg-board-highlight-legal'
               } opacity-70`} />
             )}
           </div>
@@ -466,7 +485,7 @@ export function ChessBoard({
       `}</style>
       
       {/* Modern Chess Board Container */}
-      <div className="relative w-full max-w-[min(100vw-2rem,100vh-8rem)] aspect-square">
+      <div className="relative w-full max-w-[min(100vw-2rem,100dvh-8rem)] aspect-square">
         <div 
           ref={boardRef}
           className={`relative w-full h-full rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] bg-gradient-to-br from-secondary to-secondary-400`}
@@ -475,95 +494,99 @@ export function ChessBoard({
           {isWraparoundMode && (
             <>
               {/* Left portal */}
-              <div className="absolute -left-16 top-0 bottom-0 w-12">
+              <div className="absolute -left-8 sm:-left-16 top-0 bottom-0 w-12 scale-75 sm:scale-100 origin-right">
                 {/* Portal structure */}
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
-                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
+                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_12px_rgba(147,51,234,0.25)] animate-pulse"></div>
                   <div className="absolute inset-1 rounded-full border-2 border-secondary-400 animate-pulse [animation-delay:0.5s]"></div>
-                  
+
                   {/* Portal center */}
                   <div className="absolute inset-3 rounded-full bg-gradient-to-r from-secondary-800 to-secondary-400 shadow-inner animate-pulse"></div>
-                  
+
                 </div>
-                
-                {/* Horizontal particles flowing toward board - distributed across full height */}
-                {[...Array(12)].map((_, i) => (
+
+                {/* Particles flowing toward board - distributed across full height */}
+                {[...Array(6)].map((_, i) => (
                   <div
                     key={`left-flow-${i}`}
-                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full"
+                    data-testid="portal-particle"
+                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full opacity-70"
                     style={{
-                      top: `${5 + i * 8}%`,
+                      top: `${8 + i * 15}%`,
                       left: '100%',
                       animationName: 'flowRight',
                       animationDuration: '3s',
                       animationIterationCount: 'infinite',
-                      animationDelay: `${i * 0.3}s`,
+                      animationDelay: `${i * 0.5}s`,
                       animationTimingFunction: 'ease-out'
                     }}
                   ></div>
                 ))}
-                
+
                 {/* Secondary flow particles */}
-                {[...Array(8)].map((_, i) => (
+                {[...Array(3)].map((_, i) => (
                   <div
                     key={`left-flow-sec-${i}`}
-                    className="absolute w-1 h-1 bg-secondary-400 rounded-full"
+                    data-testid="portal-particle"
+                    className="absolute w-1 h-1 bg-secondary-400 rounded-full opacity-70"
                     style={{
-                      top: `${8 + i * 10}%`,
+                      top: `${16 + i * 25}%`,
                       left: '100%',
                       animationName: 'flowRight',
                       animationDuration: '2.5s',
                       animationIterationCount: 'infinite',
-                      animationDelay: `${0.2 + i * 0.4}s`,
+                      animationDelay: `${0.3 + i * 0.6}s`,
                       animationTimingFunction: 'ease-out'
                     }}
                   ></div>
                 ))}
               </div>
-              
+
               {/* Right portal */}
-              <div className="absolute -right-16 top-0 bottom-0 w-12">
+              <div className="absolute -right-8 sm:-right-16 top-0 bottom-0 w-12 scale-75 sm:scale-100 origin-left">
                 {/* Portal structure */}
                 <div className="relative w-full h-full">
                   {/* Portal ring */}
-                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_20px_rgba(147,51,234,0.4)] animate-pulse"></div>
+                  <div className="absolute inset-0 rounded-full border-3 border-secondary shadow-[0_0_12px_rgba(147,51,234,0.25)] animate-pulse"></div>
                   <div className="absolute inset-1 rounded-full border-2 border-secondary-400 animate-pulse [animation-delay:0.5s]"></div>
-                  
+
                   {/* Portal center */}
                   <div className="absolute inset-3 rounded-full bg-gradient-to-l from-secondary-600 to-secondary-400 shadow-inner animate-pulse"></div>
 
                 </div>
-                
-                {/* Horizontal particles flowing toward board - distributed across full height */}
-                {[...Array(12)].map((_, i) => (
+
+                {/* Particles flowing toward board - distributed across full height */}
+                {[...Array(6)].map((_, i) => (
                   <div
                     key={`right-flow-${i}`}
-                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full"
+                    data-testid="portal-particle"
+                    className="absolute w-1.5 h-1.5 bg-secondary rounded-full opacity-70"
                     style={{
-                      top: `${5 + i * 8}%`,
+                      top: `${8 + i * 15}%`,
                       right: '100%',
                       animationName: 'flowLeft',
                       animationDuration: '3s',
                       animationIterationCount: 'infinite',
-                      animationDelay: `${i * 0.3}s`,
+                      animationDelay: `${i * 0.5}s`,
                       animationTimingFunction: 'ease-out'
                     }}
                   ></div>
                 ))}
-                
+
                 {/* Secondary flow particles */}
-                {[...Array(8)].map((_, i) => (
+                {[...Array(3)].map((_, i) => (
                   <div
                     key={`right-flow-sec-${i}`}
-                    className="absolute w-1 h-1 bg-secondary-400 rounded-full"
+                    data-testid="portal-particle"
+                    className="absolute w-1 h-1 bg-secondary-400 rounded-full opacity-70"
                     style={{
-                      top: `${8 + i * 10}%`,
+                      top: `${16 + i * 25}%`,
                       right: '100%',
                       animationName: 'flowLeft',
                       animationDuration: '2.5s',
                       animationIterationCount: 'infinite',
-                      animationDelay: `${0.2 + i * 0.4}s`,
+                      animationDelay: `${0.3 + i * 0.6}s`,
                       animationTimingFunction: 'ease-out'
                     }}
                   ></div>
@@ -606,11 +629,12 @@ export function ChessBoard({
 
         {/* Modern Action Buttons - Floating */}
         {showActionButtons && (
-          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex items-center space-x-2">
+          <div className="absolute -bottom-14 sm:-bottom-16 left-1/2 transform -translate-x-1/2 flex flex-wrap items-center justify-center gap-2 max-w-full px-2">
             {onOfferDraw && (
               <button
                 onClick={onOfferDraw}
                 disabled={!isPlayerTurn}
+                aria-label="Draw"
                 className="flex items-center space-x-1 px-3 py-2 bg-surface-raised border border-border-subtle rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:translate-y-0 text-sm text-fg"
               >
                 <Users size={14} />
@@ -621,30 +645,20 @@ export function ChessBoard({
             {onResign && (
               <button
                 onClick={onResign}
+                aria-label="Resign"
                 className="flex items-center space-x-1 px-3 py-2 bg-surface-raised border border-border-subtle rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-accent-danger hover:bg-accent-danger/10 text-sm"
               >
                 <Flag size={14} />
                 <span className="hidden sm:inline">Resign</span>
               </button>
             )}
-
-            <button
-              onClick={() => {
-                setSelectedSquare(null);
-                setPossibleMoves([]);
-              }}
-              className="flex items-center space-x-1 px-3 py-2 bg-surface-raised border border-border-subtle rounded-full shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 text-sm text-fg"
-            >
-              <RotateCcw size={14} />
-              <span className="hidden sm:inline">Clear</span>
-            </button>
           </div>
         )}
       </div>
 
       {/* Modern Turn Indicator */}
       {showTurnIndicator && (
-        <div className="mt-20 mb-4">
+        <div className="mt-14 sm:mt-20 mb-4">
           <Badge variant={isPlayerTurn ? 'success' : 'default'} size="md" className="shadow-sm">
             <div className={`w-2 h-2 rounded-full ${
               isPlayerTurn ? 'bg-status-success animate-pulse' : 'bg-fg-muted'
